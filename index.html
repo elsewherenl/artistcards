@@ -2,103 +2,143 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elsewhere Collective – Artist Cards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Artist Cards</title>
   <style>
     body {
-      background-color: #0D0D0D;
-      font-family: 'Avenir', 'Helvetica Neue', sans-serif;
+      font-family: Avenir, sans-serif;
+      background-color: #F3EFE9;
       color: #0D0D0D;
       margin: 0;
       padding: 2rem;
-      display: flex;
-      flex-wrap: wrap;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 2rem;
-      justify-content: center;
     }
 
     .card {
-      background-color: #F3EFE9;
-      border-radius: 16px;
+      background: white;
       padding: 1.5rem;
-      width: 300px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
 
-    .insta-box {
-      background-color: #2552FF;
-      color: white;
+    .artist-name {
+      font-size: 1.4rem;
       font-weight: bold;
-      padding: 0.5rem;
-      border-radius: 8px;
-      text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+      color: #0D0D0D;
       text-decoration: none;
     }
 
-    .insta-box:hover {
-      background-color: #1E3FCC;
+    .underline {
+      width: 40px;
+      height: 3px;
+      background-color: #2552FF;
+      margin-bottom: 1rem;
     }
 
-    .info {
-      margin: 0.4rem 0;
+    .insta-handle {
+      background-color: #2552FF;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .info-line {
+      margin: 0.3rem 0;
       font-size: 0.95rem;
     }
 
-    .info strong {
-      color: #2552FF;
-    }
-
-    a.website-link {
-      color: #D6B370;
-      text-decoration: none;
-    }
-
-    a.website-link:hover {
+    .info-line a {
+      color: #0D0D0D;
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
+  <div class="container" id="cardContainer"></div>
+
   <script>
-    fetch("https://api.sheetbest.com/sheets/3f70165a-6e9c-4d91-b570-0106ff29fb56")
-      .then(res => res.json())
-      .then(data => {
-        if (!Array.isArray(data)) {
-          console.error("SheetBest response is not an array:", data);
-          return;
-        }
+    const sheetURL = "https://api.sheetbest.com/sheets/3f70165a-6e9c-4d91-b570-0106ff29fb56";
 
-        data.forEach(row => {
-          const card = document.createElement('div');
-          card.className = 'card';
+    fetch(sheetURL)
+      .then((response) => response.json())
+      .then((data) => {
+        const container = document.getElementById("cardContainer");
 
-          const instaHandle = row['Instagram Name'] || "";
-          const instagramUrl = row['Insta Handle'] || "#";
-          const websiteUrl = row['Links'] || "";
-          const whereFound = row['Source'] || "Unknown";
-          const contacted = row['Contacted'] || "No";
+        data.forEach((row) => {
+          const card = document.createElement("div");
+          card.className = "card";
 
-          card.innerHTML = `
-            <a class="insta-box" href="${instagramUrl}" target="_blank">@${instaHandle}</a>
-            <div class="info"><strong>Name:</strong> ${row['Artist']}</div>
-            <div class="info"><strong>Genres:</strong> ${row['Genre']}</div>
-            <div class="info"><strong>Followers:</strong> ${row['Insta Follow']}</div>
-            <div class="info"><strong>Gallery Representation:</strong> ${row['Gallery Rep']}</div>
-            <div class="info"><strong>Sells on Website:</strong> ${row['Website wi']}</div>
-            <div class="info"><strong>Where Found:</strong> ${whereFound}</div>
-            <div class="info"><strong>Contacted:</strong> ${contacted}</div>
-            ${websiteUrl ? `<div class="info"><strong>Website:</strong> <a class="website-link" href="${websiteUrl}" target="_blank">${websiteUrl}</a></div>` : ""}
-          `;
+          const nameLink = document.createElement("a");
+          nameLink.href = row["Insta Handle"];
+          nameLink.className = "artist-name";
+          nameLink.textContent = row["Instagram Name"] || row["Artist"];
+          nameLink.target = "_blank";
 
-          document.body.appendChild(card);
+          const underline = document.createElement("div");
+          underline.className = "underline";
+
+          const instaHandle = document.createElement("a");
+          instaHandle.href = row["Insta Handle"];
+          instaHandle.className = "insta-handle";
+          instaHandle.textContent = "Instagram";
+          instaHandle.target = "_blank";
+
+          const genre = document.createElement("div");
+          genre.className = "info-line";
+          genre.innerHTML = `<strong>Genres:</strong> ${row["Genre"] || "—"}`;
+
+          const followers = document.createElement("div");
+          followers.className = "info-line";
+          followers.innerHTML = `<strong>Followers:</strong> ${row["Instagram Followers - Do not delete"] || "—"}`;
+
+          const gallery = document.createElement("div");
+          gallery.className = "info-line";
+          gallery.innerHTML = `<strong>Gallery Representation:</strong> ${row["Gallery Representation"] || "—"}`;
+
+          const sells = document.createElement("div");
+          sells.className = "info-line";
+          sells.innerHTML = `<strong>Sells on Website:</strong> ${row["Website with easy commerce"] || "—"}`;
+
+          const found = document.createElement("div");
+          found.className = "info-line";
+          found.innerHTML = `<strong>Where Found:</strong> ${row["Where Found"] || "—"}`;
+
+          const contacted = document.createElement("div");
+          contacted.className = "info-line";
+          contacted.innerHTML = `<strong>Contacted:</strong> ${row["Contacted"] || "—"}`;
+
+          const website = document.createElement("div");
+          website.className = "info-line";
+          if (row["Own Website"]) {
+            website.innerHTML = `<strong>Website:</strong> <a href="${row["Own Website"]}" target="_blank">${row["Own Website"]}</a>`;
+          }
+
+          card.appendChild(nameLink);
+          card.appendChild(underline);
+          card.appendChild(instaHandle);
+          card.appendChild(genre);
+          card.appendChild(followers);
+          card.appendChild(gallery);
+          card.appendChild(sells);
+          card.appendChild(found);
+          card.appendChild(contacted);
+          if (row["Own Website"]) card.appendChild(website);
+
+          container.appendChild(card);
         });
-      })
-      .catch(error => {
-        console.error("Error fetching SheetBest data:", error);
       });
   </script>
 </body>
