@@ -64,26 +64,31 @@
 </head>
 <body>
   <script>
-    fetch("https://sheet.best/api/sheets/1d1db4a3-446e-42d3-860f-4a6505461b90")
+    fetch("https://api.sheetbest.com/sheets/3f70165a-6e9c-4d91-b570-0106ff29fb56")
       .then(res => res.json())
       .then(data => {
+        if (!Array.isArray(data)) {
+          console.error("SheetBest response is not an array:", data);
+          return;
+        }
+
         data.forEach(row => {
           const card = document.createElement('div');
           card.className = 'card';
 
-          const instaHandle = row['Instagram Handle'];
-          const instagramUrl = row['Instagram URL'];
-          const websiteUrl = row['Website'];
-          const whereFound = row['Where Found'];
-          const contacted = row['Contacted'];
+          const instaHandle = row['Instagram Name'] || "";
+          const instagramUrl = row['Insta Handle'] || "#";
+          const websiteUrl = row['Links'] || "";
+          const whereFound = row['Source'] || "Unknown";
+          const contacted = row['Contacted'] || "No";
 
           card.innerHTML = `
             <a class="insta-box" href="${instagramUrl}" target="_blank">@${instaHandle}</a>
-            <div class="info"><strong>Name:</strong> ${row['Artist Name']}</div>
-            <div class="info"><strong>Genres:</strong> ${row['Genres']}</div>
-            <div class="info"><strong>Followers:</strong> ${row['Followers']}</div>
-            <div class="info"><strong>Representation:</strong> ${row['Gallery Representation']}</div>
-            <div class="info"><strong>Sells on Website:</strong> ${row['Sells on Website']}</div>
+            <div class="info"><strong>Name:</strong> ${row['Artist']}</div>
+            <div class="info"><strong>Genres:</strong> ${row['Genre']}</div>
+            <div class="info"><strong>Followers:</strong> ${row['Insta Follow']}</div>
+            <div class="info"><strong>Gallery Representation:</strong> ${row['Gallery Rep']}</div>
+            <div class="info"><strong>Sells on Website:</strong> ${row['Website wi']}</div>
             <div class="info"><strong>Where Found:</strong> ${whereFound}</div>
             <div class="info"><strong>Contacted:</strong> ${contacted}</div>
             ${websiteUrl ? `<div class="info"><strong>Website:</strong> <a class="website-link" href="${websiteUrl}" target="_blank">${websiteUrl}</a></div>` : ""}
@@ -91,6 +96,9 @@
 
           document.body.appendChild(card);
         });
+      })
+      .catch(error => {
+        console.error("Error fetching SheetBest data:", error);
       });
   </script>
 </body>
