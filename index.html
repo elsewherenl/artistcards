@@ -50,6 +50,8 @@
       gap: 0.5rem;
       text-decoration: none;
       width: fit-content;
+      color: #2552FF;
+      font-weight: 500;
     }
     .insta-logo {
       width: 20px;
@@ -64,6 +66,12 @@
     }
     .label {
       font-weight: 600;
+    }
+    .notes {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: #444;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
@@ -95,6 +103,7 @@
           img.alt = "Instagram";
           img.className = "insta-logo";
           insta.appendChild(img);
+          insta.append("Insta");
           card.appendChild(insta);
 
           if (row["Image"]) {
@@ -126,6 +135,13 @@
             site.target = "_blank";
             site.textContent = "Website";
             card.appendChild(site);
+          }
+
+          if (row["Notes"]) {
+            const notes = document.createElement("div");
+            notes.className = "notes";
+            notes.textContent = row["Notes"];
+            card.appendChild(notes);
           }
 
           container.appendChild(card);
