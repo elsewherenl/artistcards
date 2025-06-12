@@ -18,7 +18,6 @@
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 2rem;
     }
-
     .card {
       background: white;
       padding: 1.5rem;
@@ -64,7 +63,41 @@
       color: #0D0D0D;
       text-decoration: underline;
     }
+  .page-header {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.main-title {
+  font-family: 'Avenir', sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #0D0D0D; /* Black */
+  margin-bottom: 0.25rem;
+  position: relative;
+  display: inline-block;
+}
+
+.main-title::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #2552FF; /* Lapis Lazuli */
+  margin-top: 4px;
+}
+
+.subtitle {
+  font-family: 'Avenir', sans-serif;
+  font-size: 1rem;
+  color: #0D0D0D; /* Black */
+  margin: 0;
+}
   </style>
+<header class="page-header">
+  <h1 class="main-title">Artist Prospecting</h1>
+  <p class="subtitle">Ranked by creative fit</p>
+</header>
 </head>
 <body>
   <div class="container" id="cardContainer"></div>
