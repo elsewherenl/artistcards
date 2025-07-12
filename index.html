@@ -6,32 +6,111 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <title>Artist Prospecting</title>
   <link href="https://fonts.googleapis.com/css2?family=Avenir&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Avenir', sans-serif;
+      font-family: 'Satoshi', sans-serif;
       background-color: #F3EFE9;
       margin: 0;
       padding: 2rem;
       color: #0D0D0D;
+      position: relative;
     }
+    
+    .header {
+      position: relative;
+      margin-bottom: 4rem;
+    }
+    
+    .logo {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: #F3EFE9;
+      border: 2px solid #0D0D0D;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      color: #0D0D0D;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      line-height: 0.9;
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+      padding: 0.5rem;
+      padding-bottom: 0.8rem;
+      box-sizing: border-box;
+      text-decoration: none;
+    }
+    
     h1 {
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 2rem;
+      font-weight: 500;
       margin-bottom: 0.25rem;
+      margin-right: 120px;
+      letter-spacing: -0.02em;
     }
+    
     h2 {
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 1rem;
-      font-weight: normal;
+      font-weight: 400;
       margin-top: 0;
       border-bottom: 2px solid #2552FF;
       padding-bottom: 0.25rem;
       display: inline-block;
+      letter-spacing: -0.01em;
     }
+    
+    .summary {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(214, 179, 112, 0.15);
+      border-radius: 0;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .summary-item {
+      text-align: center;
+    }
+    
+    .summary-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 500;
+      color: #D6B370;
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    
+    .summary-label {
+      font-family: 'Satoshi', sans-serif;
+      font-size: 0.875rem;
+      color: #666;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 1.5rem;
       margin-top: 2rem;
     }
+    
     .card {
       background: white;
       padding: 1.5rem;
@@ -40,11 +119,16 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+      font-family: 'Satoshi', sans-serif;
     }
+    
     .artist-name {
-      font-weight: bold;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
       font-size: 1.25rem;
+      letter-spacing: -0.02em;
     }
+    
     .insta-link {
       display: flex;
       align-items: center;
@@ -52,12 +136,15 @@
       text-decoration: none;
       width: fit-content;
       color: #2552FF;
+      font-family: 'Satoshi', sans-serif;
       font-weight: 500;
     }
+    
     .insta-logo {
       width: 20px;
       height: 20px;
     }
+    
     .image {
       width: 100%;
       height: auto;
@@ -65,26 +152,155 @@
       object-fit: cover;
       border-radius: 0.5rem;
     }
+    
     .label {
+      font-family: 'Satoshi', sans-serif;
       font-weight: 600;
     }
+    
     .notes {
+      font-family: 'Satoshi', sans-serif;
       font-size: 0.85rem;
       font-style: italic;
       color: #444;
       margin-top: 0.5rem;
     }
+    
+    .field-item {
+      font-family: 'Satoshi', sans-serif;
+    }
+    
+    .website-link {
+      font-family: 'Satoshi', sans-serif;
+      color: #2552FF;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .website-link:hover {
+      text-decoration: underline;
+    }
+    
+    .footer {
+      text-align: left;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(214, 179, 112, 0.2);
+    }
+    
+    .footer-brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0D0D0D;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+    }
+    
+    @media (max-width: 768px) {
+      .logo {
+        position: relative;
+        margin: 0 auto 1rem auto;
+        width: 80px;
+        height: 80px;
+        font-size: 0.6rem;
+      }
+      
+      h1 {
+        margin-right: 0;
+        text-align: center;
+      }
+      
+      .footer {
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Artist Prospecting</h1>
-  <h2>Ranked by creative fit</h2>
+  <div class="header">
+    <div class="logo">
+      <div>else</div>
+      <div>where</div>
+      <div>collective</div>
+    </div>
+    <h1>Artist Prospecting</h1>
+    <h2>Ranked by creative fit</h2>
+  </div>
+  
+  <!-- Summary Dashboard -->
+  <div class="summary" id="summary">
+    <div class="summary-item">
+      <span class="summary-number" id="totalArtists">0</span>
+      <span class="summary-label">Total Artists</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-number" id="avgFollowers">0</span>
+      <span class="summary-label">Avg Followers</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-number" id="contacted">0</span>
+      <span class="summary-label">Contacted</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-number" id="topGenre">-</span>
+      <span class="summary-label">Top Genre</span>
+    </div>
+  </div>
+  
   <div class="grid" id="cards"></div>
+  
+  <div class="footer">
+    <div class="footer-brand">elsewhere collective</div>
+  </div>
 
   <script>
     fetch("https://api.sheetbest.com/sheets/3f70165a-6e9c-4d91-b570-0106ff29fb56")
       .then((res) => res.json())
       .then((data) => {
+        // Calculate summary stats
+        const totalArtists = data.length;
+        
+        const followersData = data
+          .map(row => {
+            const followers = row["Instagram Followers - Do not delete"];
+            if (!followers) return 0;
+            const str = followers.toString().toLowerCase().replace(/,/g, '');
+            if (str.includes('k')) {
+              return parseFloat(str.replace('k', '')) * 1000;
+            }
+            return parseInt(str) || 0;
+          })
+          .filter(num => num > 0);
+        
+        const avgFollowers = followersData.length > 0 
+          ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
+          : 0;
+        
+        const contacted = data.filter(row => 
+          row["Contacted"] && row["Contacted"].toLowerCase().includes('yes')
+        ).length;
+        
+        const genres = data
+          .map(row => row["Genre"])
+          .filter(genre => genre)
+          .reduce((acc, genre) => {
+            acc[genre] = (acc[genre] || 0) + 1;
+            return acc;
+          }, {});
+        
+        const topGenre = Object.keys(genres).length > 0
+          ? Object.keys(genres).reduce((a, b) => genres[a] > genres[b] ? a : b)
+          : '-';
+        
+        // Update summary display
+        document.getElementById('totalArtists').textContent = totalArtists;
+        document.getElementById('avgFollowers').textContent = 
+          avgFollowers > 1000 ? (avgFollowers/1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
+        document.getElementById('contacted').textContent = contacted;
+        document.getElementById('topGenre').textContent = topGenre;
+        
+        // Populate cards
         const container = document.getElementById("cards");
         data.forEach((row) => {
           const card = document.createElement("div");
@@ -125,16 +341,18 @@
           fields.forEach(({ label, key }) => {
             if (row[key]) {
               const el = document.createElement("div");
+              el.className = "field-item";
               el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
               card.appendChild(el);
             }
           });
 
-          if (row["Own Website"]) {
+          if (row["Own Website"] && row["Own Website"] !== "No" && row["Own Website"].startsWith("http")) {
             const site = document.createElement("a");
             site.href = row["Own Website"];
             site.target = "_blank";
             site.textContent = "Website";
+            site.className = "website-link";
             card.appendChild(site);
           }
 
@@ -147,6 +365,10 @@
 
           container.appendChild(card);
         });
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        document.getElementById('summary').style.display = 'none';
       });
   </script>
 </body>
