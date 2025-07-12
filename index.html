@@ -355,12 +355,11 @@
             }
           });
 
-          if (row["Own Website"] && row["Own Website"] !== "No" && row["Own Website"].startsWith("http")) {
+          if (row["Own Website"]) {
             const site = document.createElement("a");
             site.href = row["Own Website"];
             site.target = "_blank";
             site.textContent = "Website";
-            site.className = "website-link";
             card.appendChild(site);
           }
 
