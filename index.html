@@ -199,6 +199,15 @@
       color: #0D0D0D;
       letter-spacing: -0.02em;
       text-transform: lowercase;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      cursor: pointer;
+    }
+    
+    .footer-brand:hover {
+      transform: scale(1.05);
+      transform-origin: left center;
+      color: #D6B370;
+      letter-spacing: 0.02em;
     }
     
     @media (max-width: 768px) {
@@ -261,7 +270,7 @@
   <div class="grid" id="cards"></div>
   
   <div class="footer">
-    <div class="footer-brand">elsewhere collective</div>
+    <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
   </div>
 
   <script>
