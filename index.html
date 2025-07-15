@@ -263,9 +263,84 @@
   </div>
 
   <script>
-    fetch("https://api.sheetbest.com/sheets/3f70165a-6e9c-4d91-b570-0106ff29fb56")
-      .then((res) => res.json())
-      .then((data) => {
+    // More robust CSV parser
+    function parseCSV(csv) {
+      const lines = csv.split('\n');
+      const result = [];
+      const headers = [];
+      
+      // Parse headers
+      const headerLine = lines[0];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < headerLine.length; i++) {
+        const char = headerLine[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          headers.push(current.trim().replace(/^"|"$/g, ''));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      headers.push(current.trim().replace(/^"|"$/g, ''));
+      
+      console.log('Headers found:', headers);
+      
+      // Parse data rows
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        const values = [];
+        current = '';
+        inQuotes = false;
+        
+        for (let j = 0; j < lines[i].length; j++) {
+          const char = lines[i][j];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim().replace(/^"|"$/g, ''));
+        
+        // Create row object
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] || '';
+        });
+        
+        // Only add rows that have some data
+        if (row[headers[0]] && row[headers[0]] !== '') {
+          result.push(row);
+        }
+      }
+      
+      console.log('Parsed data:', result.slice(0, 3)); // Log first 3 rows
+      return result;
+    }
+
+    fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357")
+      .then((res) => res.text())
+      .then((csvData) => {
+        console.log('Raw CSV data (first 500 chars):', csvData.substring(0, 500));
+        const data = parseCSV(csvData);
+        
+        // Check if data is valid array
+        if (!Array.isArray(data) || data.length === 0) {
+          console.error('Invalid data format:', data);
+          document.getElementById('summary').style.display = 'none';
+          return;
+        }
+        
+        console.log(`Found ${data.length} artists`);
+        
         // Calculate summary stats
         const totalArtists = data.length;
         
