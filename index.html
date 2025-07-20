@@ -441,13 +441,29 @@
             }
           });
 
-          if (row["Own Website"]) {
-            const site = document.createElement("a");
-            site.href = row["Own Website"];
-            site.target = "_blank";
-            site.textContent = "Website";
-            card.appendChild(site);
-          }
+    // Website fields
+const websiteFields = [
+  { label: "Own Website", key: "Own Website" },
+  { label: "Easy Commerce", key: "Website with easy commerce" },
+  { label: "Gallery Rep", key: "Gallery Representation" }
+];
+
+websiteFields.forEach(({ label, key }) => {
+  if (row[key]) {
+    const el = document.createElement("div");
+    el.className = "field-item";
+    
+    if (key === "Own Website" && row[key] !== "No") {
+      // Make website a clickable link
+      el.innerHTML = `<span class="label">${label}:</span> <a href="${row[key]}" target="_blank" class="website-link">Visit Site</a>`;
+    } else {
+      // Display as text
+      el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
+    }
+    
+    card.appendChild(el);
+  }
+});
 
           if (row["Notes"]) {
             const notes = document.createElement("div");
