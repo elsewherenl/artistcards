@@ -316,15 +316,62 @@
       }
     }
     @media (min-width: 768px) {
-      .card img {
-        transition: transform 0.3s ease;
+        .card img {
+          transition: transform 0.3s ease;
+        }
+
+        .card:hover img {
+          transform: scale(1.1);
+        }
       }
 
-      .card:hover img {
-        transform: scale(1.1);
+      /* Mobile filter modal and toggle button styles */
+      @media (max-width: 768px) {
+        #filters {
+          display: none;
+          position: fixed;
+          bottom: 60px;
+          right: 1rem;
+          background-color: #0D0D0D;
+          padding: 1rem;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          z-index: 1000;
+          max-width: 90vw;
+          flex-direction: column;
+          row-gap: 1rem;
+        }
+        .filter-toggle {
+          position: fixed;
+          bottom: 1rem;
+          right: 1rem;
+          background-color: #2552FF;
+          color: #fff;
+          border: none;
+          padding: 0.7rem;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 1.2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1001;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
       }
-    }
-
+      @media (min-width: 768px) {
+        .filter-toggle {
+          display: none;
+        }
+        #filters {
+          display: grid !important;
+          position: static !important;
+          background-color: inherit !important;
+          border: none !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+        }
+      }
     </style>
     </head>
     <body>
@@ -390,7 +437,14 @@
         <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
     </div>
 
+    <!-- Filter Toggle Button (only on mobile) -->
+    <button class="filter-toggle" onclick="toggleFilters()">☰</button>
+
     <script>
+    function toggleFilters() {
+      const filters = document.getElementById("filters");
+      filters.style.display = filters.style.display === "none" || filters.style.display === "" ? "flex" : "none";
+    }
     function parseCSV(csv) {
         const lines = csv.split('\n');
         const result = [];
@@ -590,7 +644,23 @@
           followersSelect.value = "All";
           renderCards(fullData);
           updateStats(fullData);
+          // On mobile, hide filters after reset
+          if (window.innerWidth <= 768) {
+            document.getElementById("filters").style.display = "none";
+          }
         });
+        // Hide filters on resize to mobile
+        window.addEventListener('resize', function() {
+          if (window.innerWidth <= 768) {
+            document.getElementById("filters").style.display = "none";
+          } else {
+            document.getElementById("filters").style.display = "grid";
+          }
+        });
+        // Initial state for filters on load (mobile hidden)
+        if (window.innerWidth <= 768) {
+          document.getElementById("filters").style.display = "none";
+        }
         })
         .catch(err => {
         console.error("Error:", err);
