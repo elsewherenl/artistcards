@@ -1,484 +1,602 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-  <!-- Bookmark/Apple touch icon (stamp logo) -->
-  <link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
-  <title>Artist Prospecting</title>
-  <link href="https://fonts.googleapis.com/css2?family=Avenir&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      font-family: 'Satoshi', sans-serif;
-      background-color: #F3EFE9;
-      margin: 0;
-      padding: 2rem;
-      color: #0D0D0D;
-      position: relative;
-    }
-    
-    .header {
-      position: relative;
-      margin-bottom: 4rem;
-    }
-    
-    .logo {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100px;
-      height: 100px;
-      background: #F3EFE9;
-      border: 2px solid #0D0D0D;
-      border-radius: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      color: #0D0D0D;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 500;
-      line-height: 0.9;
-      text-transform: lowercase;
-      letter-spacing: 0.02em;
-      padding: 0.5rem;
-      padding-bottom: 0.8rem;
-      box-sizing: border-box;
-      text-decoration: none;
-    }
-    
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 2rem;
-      font-weight: 500;
-      margin-bottom: 0.25rem;
-      margin-right: 120px;
-      letter-spacing: -0.02em;
-    }
-    
-    h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-      font-weight: 400;
-      margin-top: 0;
-      margin-left: 0;
-      border-bottom: 2px solid #2552FF;
-      padding-bottom: 0.25rem;
-      padding-left: 0;
-      display: inline-block;
-      letter-spacing: -0.01em;
-    }
-    
-    .summary {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(214, 179, 112, 0.15);
-      border-radius: 0;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
-    
-    .summary-item {
-      text-align: center;
-    }
-    
-    .summary-number {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 2rem;
-      font-weight: 500;
-      color: #D6B370;
-      display: block;
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-    
-    .summary-label {
-      font-family: 'Satoshi', sans-serif;
-      font-size: 0.875rem;
-      color: #666;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-    }
-    
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-    
-    .card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      font-family: 'Satoshi', sans-serif;
-    }
-    
-    .artist-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 500;
-      font-size: 1.25rem;
-      letter-spacing: -0.02em;
-    }
-    
-    .insta-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      width: fit-content;
-      color: #2552FF;
-      font-family: 'Satoshi', sans-serif;
-      font-weight: 500;
-    }
-    
-    .insta-logo {
-      width: 20px;
-      height: 20px;
-    }
-    
-    .image {
-      width: 100%;
-      height: auto;
-      max-height: 320px;
-      object-fit: cover;
-      border-radius: 0.5rem;
-    }
-    
-    .label {
-      font-family: 'Satoshi', sans-serif;
-      font-weight: 600;
-    }
-    
-    .notes {
-      font-family: 'Satoshi', sans-serif;
-      font-size: 0.85rem;
-      font-style: italic;
-      color: #444;
-      margin-top: 0.5rem;
-    }
-    
-    .field-item {
-      font-family: 'Satoshi', sans-serif;
-    }
-    
-    .website-link {
-      font-family: 'Satoshi', sans-serif;
-      color: #2552FF;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    
-    .website-link:hover {
-      text-decoration: underline;
-    }
-    
-    .footer {
-      text-align: left;
-      margin-top: 4rem;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(214, 179, 112, 0.2);
-    }
-    
-    .footer-brand {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #0D0D0D;
-      letter-spacing: -0.02em;
-      text-transform: lowercase;
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      cursor: pointer;
-    }
-    
-    .footer-brand:hover {
-      transform: scale(1.05);
-      transform-origin: left center;
-      color: #D6B370;
-      letter-spacing: 0.02em;
-    }
-    
-    @media (max-width: 768px) {
-      .logo {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <!-- Bookmark/Apple touch icon (stamp logo) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
+    <title>Artist Prospecting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Avenir&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
+    <style>
+        body {
+        font-family: 'Satoshi', sans-serif;
+        background-color: #F3EFE9;
+        margin: 0;
+        padding: 2rem;
+        color: #0D0D0D;
         position: relative;
-        margin: 0 auto 1rem auto;
-        width: 80px;
-        height: 80px;
-        font-size: 0.6rem;
-      }
-      
-      h1 {
-        margin-right: 0;
+        }
+        
+        .header {
+        position: relative;
+        margin-bottom: 4rem;
+        }
+        
+        .logo {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: #F3EFE9;
+        border: 2px solid #0D0D0D;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        color: #0D0D0D;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 500;
+        line-height: 0.9;
+        text-transform: lowercase;
+        letter-spacing: 0.02em;
+        padding: 0.5rem;
+        padding-bottom: 0.8rem;
+        box-sizing: border-box;
+        text-decoration: none;
+        }
+        
+        h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        margin-right: 120px;
+        letter-spacing: -0.02em;
+        }
+        
+        h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-top: 0;
+        margin-left: 0;
+        border-bottom: 2px solid #2552FF;
+        padding-bottom: 0.25rem;
+        padding-left: 0;
+        display: inline-block;
+        letter-spacing: -0.01em;
+        }
+        
+        .summary {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(214, 179, 112, 0.15);
+        border-radius: 0;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .summary-item {
         text-align: center;
-      }
-      
-      h2 {
-        text-align: center;
+        }
+        
+        .summary-number {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 500;
+        color: #D6B370;
         display: block;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        }
+        
+        .summary-label {
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.875rem;
+        color: #666;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        }
+        
+        .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+        }
+        
+    .filter-select {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    background-color: white;
+    color: #0D0D0D;
+    width: 100%;
+    margin-top: 0.25rem;
+    }
+
+    .filter-checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #2552FF;
+    margin-top: 0.4rem;
+    transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+    #filters {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    }
+
+        .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        font-family: 'Satoshi', sans-serif;
+        }
+        
+        .artist-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 500;
+        font-size: 1.25rem;
+        letter-spacing: -0.02em;
+        }
+        
+        .insta-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        width: fit-content;
+        color: #2552FF;
+        font-family: 'Satoshi', sans-serif;
+        font-weight: 500;
+        }
+        
+        .insta-logo {
+        width: 20px;
+        height: 20px;
+        }
+        
+        .image {
         width: 100%;
+        height: auto;
+        max-height: 320px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        }
+        
+        .label {
+        font-family: 'Satoshi', sans-serif;
+        font-weight: 600;
+        }
+        
+        .notes {
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.85rem;
+        font-style: italic;
+        color: #444;
+        margin-top: 0.5rem;
+        }
+        
+        .field-item {
+        font-family: 'Satoshi', sans-serif;
+        }
+        
+        .website-link {
+        font-family: 'Satoshi', sans-serif;
+        color: #2552FF;
+        text-decoration: none;
+        font-weight: 500;
+        }
+        
+        .website-link:hover {
+        text-decoration: underline;
+        }
+        
+        .footer {
+        text-align: left;
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(214, 179, 112, 0.2);
+        }
+        
+        .footer-brand {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #0D0D0D;
+        letter-spacing: -0.02em;
+        text-transform: lowercase;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+        }
+        
+        .footer-brand:hover {
+        transform: scale(1.05);
+        transform-origin: left center;
+        color: #D6B370;
+        letter-spacing: 0.02em;
+        }
+        
+        @media (max-width: 768px) {
+        .logo {
+            position: relative;
+            margin: 0 auto 1rem auto;
+            width: 80px;
+            height: 80px;
+            font-size: 0.6rem;
+        }
+        
+        h1 {
+            margin-right: 0;
+            text-align: center;
+        }
+        
+        h2 {
+            text-align: center;
+            display: block;
+            width: 100%;
+        }
+        
+        .footer {
+            text-align: center;
+        }
+        }
+ .filter-reset {
+      background-color: #2552FF;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 400;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .filter-reset:hover {
+      background-color: #1f47d4;
+    }
+
+    #filters {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .no-results {
+      color: #fff;
+      text-align: center;
+      padding: 2rem 0;
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+
+    /* Mobile UX improvements */
+    @media (max-width: 480px) {
+      .summary-item label,
+      .summary-label {
+        font-size: 0.9rem;
       }
-      
-      .footer {
-        text-align: center;
+
+      .filter-select {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .filter-checkbox {
+        transform: scale(1.2);
+        margin-top: 0.3rem;
+      }
+
+      #filters {
+        row-gap: 1rem;
       }
     }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="logo">
-      <div>else</div>
-      <div>where</div>
-      <div>collective</div>
-    </div>
-    <h1>Artist Prospecting</h1>
-    <h2>Ranked by creative fit</h2>
-  </div>
-  
-  <!-- Summary Dashboard -->
-  <div class="summary" id="summary">
-    <div class="summary-item">
-      <span class="summary-number" id="totalArtists">0</span>
-      <span class="summary-label">Total Artists</span>
-    </div>
-    <div class="summary-item">
-      <span class="summary-number" id="avgFollowers">0</span>
-      <span class="summary-label">Avg Followers</span>
-    </div>
-    <div class="summary-item">
-      <span class="summary-number" id="contacted">0</span>
-      <span class="summary-label">Contacted</span>
-    </div>
-    <div class="summary-item">
-      <span class="summary-number" id="topGenre">-</span>
-      <span class="summary-label">Top Genre</span>
-    </div>
-  </div>
-  
-  <div class="grid" id="cards"></div>
-  
-  <div class="footer">
-    <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
-  </div>
-
-  <script>
-    // More robust CSV parser
-    function parseCSV(csv) {
-      const lines = csv.split('\n');
-      const result = [];
-      const headers = [];
-      
-      // Parse headers
-      const headerLine = lines[0];
-      let current = '';
-      let inQuotes = false;
-      
-      for (let i = 0; i < headerLine.length; i++) {
-        const char = headerLine[i];
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          headers.push(current.trim().replace(/^"|"$/g, ''));
-          current = '';
-        } else {
-          current += char;
-        }
+    @media (min-width: 768px) {
+      .card img {
+        transition: transform 0.3s ease;
       }
-      headers.push(current.trim().replace(/^"|"$/g, ''));
-      
-      console.log('Headers found:', headers);
-      
-      // Parse data rows
-      for (let i = 1; i < lines.length; i++) {
+
+      .card:hover img {
+        transform: scale(1.1);
+      }
+    }
+
+    </style>
+    </head>
+    <body>
+    <div class="header">
+        <div class="logo">
+        <div>else</div>
+        <div>where</div>
+        <div>collective</div>
+        </div>
+        <h1>Artist Prospecting</h1>
+        <h2>Ranked by creative fit</h2>
+    </div>
+    
+<!-- Summary Dashboard -->
+<div class="summary" id="summary">
+    <div class="summary-item">
+    <span class="summary-number" id="totalArtists">0</span>
+    <span class="summary-label">Total Artists</span>
+    </div>
+    <div class="summary-item">
+    <span class="summary-number" id="avgFollowers">0</span>
+    <span class="summary-label">Avg Followers</span>
+    </div>
+    <div class="summary-item">
+    <span class="summary-number" id="contacted">0</span>
+    <span class="summary-label">Contacted</span>
+    </div>
+    <div class="summary-item">
+    <span class="summary-number" id="topGenre">-</span>
+    <span class="summary-label">Top Genre</span>
+    </div>
+</div>
+<div class="summary" id="filters" style="margin-top: 1rem; margin-bottom: 2rem;">
+  <div class="summary-item">
+    <label for="genreFilter" class="summary-label">Genre</label><br>
+    <select id="genreFilter" class="filter-select">
+      <option value="All">All</option>
+    </select>
+  </div>
+  <div class="summary-item">
+    <label for="contactedFilter" class="summary-label">Contacted Only</label><br>
+    <input type="checkbox" id="contactedFilter" class="filter-checkbox" />
+  </div>
+  <div class="summary-item">
+    <label for="followersFilter" class="summary-label">Followers</label><br>
+    <select id="followersFilter" class="filter-select">
+      <option value="All">All</option>
+      <option value="under5k">Under 5k</option>
+      <option value="5kto10k">5k–10k</option>
+      <option value="10kplus">10k+</option>
+    </select>
+  </div>
+  <div class="summary-item">
+    <label class="summary-label">Reset</label>
+    <button id="resetFilters" class="filter-reset">Clear Filters</button>
+  </div>
+</div>
+    
+
+    <div class="grid" id="cards"></div>
+    
+    <div class="footer">
+        <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
+    </div>
+
+    <script>
+    function parseCSV(csv) {
+        const lines = csv.split('\n');
+        const result = [];
+        const headers = [];
+        let current = '', inQuotes = false;
+        for (let i = 0; i < lines[0].length; i++) {
+        const char = lines[0][i];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) {
+            headers.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
+        } else current += char;
+        }
+        headers.push(current.trim().replace(/^"|"$/g, ''));
+
+        for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
-        
-        const values = [];
-        current = '';
-        inQuotes = false;
-        
+        const values = [], row = {};
+        current = ''; inQuotes = false;
         for (let j = 0; j < lines[i].length; j++) {
-          const char = lines[i][j];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
+            const char = lines[i][j];
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) {
             values.push(current.trim().replace(/^"|"$/g, ''));
             current = '';
-          } else {
-            current += char;
-          }
+            } else current += char;
         }
         values.push(current.trim().replace(/^"|"$/g, ''));
-        
-        // Create row object
-        const row = {};
-        headers.forEach((header, index) => {
-          row[header] = values[index] || '';
-        });
-        
-        // Only add rows that have some data
-        if (row[headers[0]] && row[headers[0]] !== '') {
-          result.push(row);
+        headers.forEach((header, idx) => row[header] = values[idx] || '');
+        if (row[headers[0]]) result.push(row);
         }
-      }
-      
-      console.log('Parsed data:', result.slice(0, 3)); // Log first 3 rows
-      return result;
+        return result;
     }
 
     fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357")
-      .then((res) => res.text())
-      .then((csvData) => {
-        console.log('Raw CSV data (first 500 chars):', csvData.substring(0, 500));
+        .then(res => res.text())
+        .then(csvData => {
         const data = parseCSV(csvData);
-        
-        // Check if data is valid array
-        if (!Array.isArray(data) || data.length === 0) {
-          console.error('Invalid data format:', data);
-          document.getElementById('summary').style.display = 'none';
-          return;
-        }
-        
-        console.log(`Found ${data.length} artists`);
-        
-        // Calculate summary stats
-        const totalArtists = data.length;
-        
-        const followersData = data
-          .map(row => {
-            const followers = row["Instagram Followers - Do not delete"];
-            if (!followers) return 0;
-            const str = followers.toString().toLowerCase().replace(/,/g, '');
-            if (str.includes('k')) {
-              return parseFloat(str.replace('k', '')) * 1000;
-            }
-            return parseInt(str) || 0;
-          })
-          .filter(num => num > 0);
-        
-        const avgFollowers = followersData.length > 0 
-          ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
-          : 0;
-        
-        const contacted = data.filter(row => 
-          row["Contacted"] && row["Contacted"].toLowerCase().includes('yes')
-        ).length;
-        
-        const genres = data
-          .map(row => row["Genre"])
-          .filter(genre => genre)
-          .reduce((acc, genre) => {
-            acc[genre] = (acc[genre] || 0) + 1;
-            return acc;
-          }, {});
-        
-        const topGenre = Object.keys(genres).length > 0
-          ? Object.keys(genres).reduce((a, b) => genres[a] > genres[b] ? a : b)
-          : '-';
-        
-        // Update summary display
-        document.getElementById('totalArtists').textContent = totalArtists;
-        document.getElementById('avgFollowers').textContent = 
-          avgFollowers > 1000 ? (avgFollowers/1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
-        document.getElementById('contacted').textContent = contacted;
-        document.getElementById('topGenre').textContent = topGenre;
-        
-        // Populate cards
-        const container = document.getElementById("cards");
-        data.forEach((row) => {
-          const card = document.createElement("div");
-          card.className = "card";
+        const genreSelect = document.getElementById("genreFilter");
+        const contactedCheckbox = document.getElementById("contactedFilter");
+        const followersSelect = document.getElementById("followersFilter");
 
-          const name = document.createElement("div");
-          name.className = "artist-name";
-          name.textContent = row["Instagram Name"] || row["Artist"] || "Untitled";
-          card.appendChild(name);
+        // Store all data for re-filtering
+        let fullData = data;
 
-          const insta = document.createElement("a");
-          insta.className = "insta-link";
-          insta.href = row["Insta Handle"] || "#";
-          insta.target = "_blank";
-          const img = document.createElement("img");
-          img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
-          img.alt = "Instagram";
-          img.className = "insta-logo";
-          insta.appendChild(img);
-          insta.append("Insta");
-          card.appendChild(insta);
-
-          if (row["Image"]) {
-            const image = document.createElement("img");
-            image.className = "image";
-            image.src = row["Image"];
-            image.alt = row["Instagram Name"];
-            card.appendChild(image);
-          }
-
-          const fields = [
-            { label: "Genre", key: "Genre" },
-            { label: "Followers", key: "Instagram Followers - Do not delete" },
-            { label: "Where Found", key: "Where Found" },
-            { label: "Contacted", key: "Contacted" },
-          ];
-
-          fields.forEach(({ label, key }) => {
-            if (row[key]) {
-              const el = document.createElement("div");
-              el.className = "field-item";
-              el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
-              card.appendChild(el);
-            }
-          });
-
-    // Website fields
-const websiteFields = [
-  { label: "Own Website", key: "Own Website" },
-  { label: "Easy Commerce", key: "Website with easy commerce" },
-  { label: "Gallery Rep", key: "Gallery Representation" }
-];
-
-websiteFields.forEach(({ label, key }) => {
-  if (row[key]) {
-    const el = document.createElement("div");
-    el.className = "field-item";
-    
-    if (key === "Own Website" && row[key] !== "No") {
-      // Make website a clickable link
-      el.innerHTML = `<span class="label">${label}:</span> <a href="${row[key]}" target="_blank" class="website-link">Visit Site</a>`;
-    } else {
-      // Display as text
-      el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
-    }
-    
-    card.appendChild(el);
-  }
-});
-
-          if (row["Notes"]) {
-            const notes = document.createElement("div");
-            notes.className = "notes";
-            notes.textContent = row["Notes"];
-            card.appendChild(notes);
-          }
-
-          container.appendChild(card);
+        // Populate genres
+        const genres = [...new Set(data.map(row => row["Genre"]).filter(Boolean))];
+        genres.sort().forEach(genre => {
+            const option = document.createElement("option");
+            option.value = genre;
+            option.textContent = genre;
+            genreSelect.appendChild(option);
         });
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        document.getElementById('summary').style.display = 'none';
-      });
-  </script>
-</body>
-</html>
+
+        function filterData() {
+            const genre = genreSelect.value;
+            const contactedOnly = contactedCheckbox.checked;
+            const followersRange = followersSelect.value;
+
+            return fullData.filter(row => {
+            const genreMatch = genre === "All" || row["Genre"] === genre;
+            const contactedMatch = !contactedOnly || (row["Contacted"] && row["Contacted"].toLowerCase().includes("yes"));
+            let followers = 0;
+            const raw = row["Instagram Followers - Do not delete"] || '';
+            const str = raw.toLowerCase().replace(/,/g, '');
+            if (str.includes('k')) followers = parseFloat(str.replace('k', '')) * 1000;
+            else followers = parseInt(str) || 0;
+            let followersMatch = true;
+            if (followersRange === "under5k") followersMatch = followers < 5000;
+            else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
+            else if (followersRange === "10kplus") followersMatch = followers > 10000;
+            return genreMatch && contactedMatch && followersMatch;
+            });
+        }
+
+        function renderCards(dataset) {
+            const container = document.getElementById("cards");
+            if (dataset.length === 0) {
+              container.innerHTML = "<p class='no-results'>No artists match these filters.</p>";
+              return;
+            }
+            container.innerHTML = "";
+            dataset.forEach((row) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const name = document.createElement("div");
+            name.className = "artist-name";
+            name.textContent = row["Instagram Name"] || row["Artist"] || "Untitled";
+            card.appendChild(name);
+
+            const insta = document.createElement("a");
+            insta.className = "insta-link";
+            insta.href = row["Insta Handle"] || "#";
+            insta.target = "_blank";
+            const img = document.createElement("img");
+            img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
+            img.alt = "Instagram";
+            img.className = "insta-logo";
+            insta.appendChild(img);
+            insta.append("Insta");
+            card.appendChild(insta);
+
+            if (row["Image"]) {
+                const image = document.createElement("img");
+                image.className = "image";
+                image.src = row["Image"];
+                image.alt = row["Instagram Name"];
+                card.appendChild(image);
+            }
+
+            const fields = [
+                { label: "Genre", key: "Genre" },
+                { label: "Followers", key: "Instagram Followers - Do not delete" },
+                { label: "Where Found", key: "Where Found" },
+                { label: "Contacted", key: "Contacted" },
+            ];
+
+            fields.forEach(({ label, key }) => {
+                if (row[key]) {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
+                card.appendChild(el);
+                }
+            });
+
+            const websiteFields = [
+                { label: "Own Website", key: "Own Website" },
+                { label: "Easy Commerce", key: "Website with easy commerce" },
+                { label: "Gallery Rep", key: "Gallery Representation" }
+            ];
+
+            websiteFields.forEach(({ label, key }) => {
+                if (row[key]) {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                if (key === "Own Website" && row[key] !== "No") {
+                    el.innerHTML = `<span class="label">${label}:</span> <a href="${row[key]}" target="_blank" class="website-link">Visit Site</a>`;
+                } else {
+                    el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
+                }
+                card.appendChild(el);
+                }
+            });
+
+            if (row["Notes"]) {
+                const notes = document.createElement("div");
+                notes.className = "notes";
+                notes.textContent = row["Notes"];
+                card.appendChild(notes);
+            }
+
+            container.appendChild(card);
+            });
+        }
+
+        function updateStats(filtered) {
+            const followersData = filtered
+            .map(row => {
+                const followers = row["Instagram Followers - Do not delete"];
+                if (!followers) return 0;
+                const str = followers.toString().toLowerCase().replace(/,/g, '');
+                return str.includes('k')
+                ? parseFloat(str.replace('k', '')) * 1000
+                : parseInt(str) || 0;
+            }).filter(n => n > 0);
+            const avgFollowers = followersData.length > 0
+            ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
+            : 0;
+            const contacted = filtered.filter(r => r["Contacted"] && r["Contacted"].toLowerCase().includes("yes")).length;
+            const genres = filtered.map(r => r["Genre"]).filter(Boolean)
+            .reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
+            const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+
+            document.getElementById("totalArtists").textContent = filtered.length;
+            document.getElementById("avgFollowers").textContent = avgFollowers > 1000 ? (avgFollowers / 1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
+            document.getElementById("contacted").textContent = contacted;
+            document.getElementById("topGenre").textContent = topGenre;
+        }
+
+        function refreshUI() {
+            const filtered = filterData();
+            renderCards(filtered);
+            updateStats(filtered);
+        }
+
+        genreSelect.addEventListener("change", refreshUI);
+        contactedCheckbox.addEventListener("change", refreshUI);
+        followersSelect.addEventListener("change", refreshUI);
+
+        refreshUI(); // Initial render
+        // Reset Filters button
+        document.getElementById("resetFilters").addEventListener("click", () => {
+          genreSelect.value = "All";
+          contactedCheckbox.checked = false;
+          followersSelect.value = "All";
+          renderCards(fullData);
+          updateStats(fullData);
+        });
+        })
+        .catch(err => {
+        console.error("Error:", err);
+        document.getElementById("summary").style.display = "none";
+        });
+    </script>
+    </body>
+    </html>
+   
