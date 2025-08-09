@@ -118,13 +118,23 @@
 .filter-select {
 font-family: 'Satoshi', sans-serif;
 font-size: 1rem;
-padding: 0.5rem 0.75rem;
-border: 1px solid rgba(0, 0, 0, 0.15);
-border-radius: 0;
+font-weight: 400;
+padding: 0.5rem 1rem;
+border: 2px solid #D6B370;
+border-radius: 20px;
 background-color: white;
 color: #0D0D0D;
 width: 100%;
 margin-top: 0.25rem;
+transition: all 0.3s ease;
+cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #2552FF;
+    box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 .filter-checkbox {
@@ -135,9 +145,177 @@ margin-top: 0.4rem;
 transform: scale(1.1);
 }
 
+/* Search bar styling */
+.search-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-input {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    border-radius: 20px;
+    background: white;
+    color: #0D0D0D;
+    width: 100%;
+    max-width: 400px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.1);
+    text-transform: capitalize;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2552FF;
+    box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-style: italic;
+    text-transform: none;
+}
+
+.clear-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    background: transparent;
+    color: #0D0D0D;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.clear-btn:hover {
+    background: #D6B370;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
+}
+
+/* Status filter buttons */
+.status-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+}
+
+.status-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    background: transparent;
+    color: #0D0D0D;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+}
+
+.status-btn.active {
+    background: #D6B370;
+    color: #0D0D0D;
+}
+
+.status-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
+}
+
+/* Status badges on cards */
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 1;
+}
+
+.status-prospect {
+    background: rgba(214, 179, 112, 0.2);
+    color: #a67c00;
+    border: 1px solid rgba(214, 179, 112, 0.3);
+}
+
+.status-outreach {
+    background: rgba(37, 82, 255, 0.2);
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 82, 255, 0.3);
+}
+
+.status-responded {
+    background: rgba(34, 197, 94, 0.2);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-spotlighted {
+    background: rgba(249, 115, 22, 0.2);
+    color: #ea580c;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.status-negotiating {
+    background: rgba(147, 51, 234, 0.2);
+    color: #7c3aed;
+    border: 1px solid rgba(147, 51, 234, 0.3);
+}
+
+.status-featured {
+    background: rgba(16, 185, 129, 0.2);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-feature.planned {
+    background: rgba(245, 158, 11, 0.2);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
 @media (max-width: 768px) {
 #filters {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.status-filters {
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.status-btn {
+    width: 100%;
+    text-align: center;
+}
+
+.search-container {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.clear-btn {
+    width: 100%;
+    max-width: 400px;
 }
 }
 
@@ -150,6 +328,7 @@ transform: scale(1.1);
     flex-direction: column;
     gap: 0.75rem;
     font-family: 'Satoshi', sans-serif;
+    position: relative;
     }
     
     .artist-name {
@@ -264,16 +443,18 @@ transform: scale(1.1);
   background-color: #2552FF;
   color: #fff;
   border: none;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.9rem;
-  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 20px;
   cursor: pointer;
-  font-family: inherit;
-  font-weight: 400;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 500;
   width: 100%;
   box-sizing: border-box;
   text-align: center;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  margin-top: 1.85rem;
 }
 
 .filter-reset:hover {
@@ -287,7 +468,7 @@ transform: scale(1.1);
 }
 
 .no-results {
-  color: #fff;
+  color: #666;
   text-align: center;
   padding: 2rem 0;
   font-size: 1.2rem;
@@ -386,6 +567,24 @@ transform: scale(1.1);
     <h2>Ranked by creative fit</h2>
 </div>
 
+<!-- Search Bar -->
+<div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name..." />
+    <button id="resetFilters" class="clear-btn">Clear Filters</button>
+</div>
+
+<!-- Status Filter Buttons -->
+<div class="status-filters">
+    <button class="status-btn active" data-status="all">All</button>
+    <button class="status-btn" data-status="prospect">Prospect</button>
+    <button class="status-btn" data-status="outreach">Outreach</button>
+    <button class="status-btn" data-status="responded">Responded</button>
+    <button class="status-btn" data-status="spotlighted">Spotlighted</button>
+    <button class="status-btn" data-status="negotiating">Negotiating</button>
+    <button class="status-btn" data-status="featured">Featured</button>
+    <button class="status-btn" data-status="feature planned">Feature Planned</button>
+</div>
+
 <!-- Summary Dashboard -->
 <div class="summary" id="summary">
 <div class="summary-item">
@@ -397,8 +596,8 @@ transform: scale(1.1);
 <span class="summary-label">Avg Followers</span>
 </div>
 <div class="summary-item">
-<span class="summary-number" id="contacted">0</span>
-<span class="summary-label">Contacted</span>
+<span class="summary-number" id="statusCounts">0</span>
+<span class="summary-label">Current Filter</span>
 </div>
 <div class="summary-item">
 <span class="summary-number" id="topGenre">-</span>
@@ -413,14 +612,6 @@ transform: scale(1.1);
 </select>
 </div>
 <div class="summary-item">
-<label for="contactedFilter" class="summary-label">Contacted Only</label><br>
-<input type="checkbox" id="contactedFilter" class="filter-checkbox" />
-</div>
-<div class="summary-item">
-<label for="spotlightedFilter" class="summary-label">Spotlighted Only</label><br>
-<input type="checkbox" id="spotlightedFilter" class="filter-checkbox" />
-</div>
-<div class="summary-item">
 <label for="followersFilter" class="summary-label">Followers</label><br>
 <select id="followersFilter" class="filter-select">
   <option value="All">All</option>
@@ -428,10 +619,6 @@ transform: scale(1.1);
   <option value="5kto10k">5k–10k</option>
   <option value="10kplus">10k+</option>
 </select>
-</div>
-<div class="summary-item">
-<label class="summary-label">Reset</label>
-<button id="resetFilters" class="filter-reset">Clear Filters</button>
 </div>
 </div>
 
@@ -446,10 +633,14 @@ transform: scale(1.1);
 <button class="filter-toggle" onclick="toggleFilters()">☰</button>
 
 <script>
+let currentStatusFilter = 'all';
+let currentSearchTerm = '';
+
 function toggleFilters() {
   const filters = document.getElementById("filters");
   filters.style.display = filters.style.display === "none" || filters.style.display === "" ? "flex" : "none";
 }
+
 function parseCSV(csv) {
     const lines = csv.split('\n');
     const result = [];
@@ -484,20 +675,30 @@ function parseCSV(csv) {
     return result;
 }
 
+function getStatusClass(status) {
+    if (!status) return 'status-prospect';
+    const normalized = status.toLowerCase().replace(/\s+/g, '');
+    if (normalized === 'featureplanned') return 'status-feature planned';
+    return `status-${normalized}`;
+}
+
 fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357")
     .then(res => res.text())
     .then(csvData => {
     const data = parseCSV(csvData);
     const genreSelect = document.getElementById("genreFilter");
-    const contactedCheckbox = document.getElementById("contactedFilter");
-    const spotlightedCheckbox = document.getElementById("spotlightedFilter");
     const followersSelect = document.getElementById("followersFilter");
 
     // Store all data for re-filtering
     let fullData = data;
 
+    // Debug: Log the data structure
+    console.log("First row of data:", data[0]);
+    console.log("All column headers:", Object.keys(data[0] || {}));
+
     // Populate genres
     const genres = [...new Set(data.map(row => row["Genre"]).filter(Boolean))];
+    console.log("Found genres:", genres);
     genres.sort().forEach(genre => {
         const option = document.createElement("option");
         option.value = genre;
@@ -505,16 +706,31 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         genreSelect.appendChild(option);
     });
 
+    // Status filter buttons
+    document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentStatusFilter = btn.dataset.status;
+            refreshUI();
+        });
+    });
+
     function filterData() {
         const genre = genreSelect.value;
-        const contactedOnly = contactedCheckbox.checked;
-        const spotlightedOnly = spotlightedCheckbox.checked;
         const followersRange = followersSelect.value;
 
         return fullData.filter(row => {
+        // Status filter
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter.toLowerCase();
+        
+        // Search filter
+        const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
+        const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
+        
         const genreMatch = genre === "All" || row["Genre"] === genre;
-        const contactedMatch = !contactedOnly || (row["Contacted"] && row["Contacted"].toLowerCase().includes("yes"));
-        const spotlightedMatch = !spotlightedOnly || (row["Spotlighted"] && row["Spotlighted"].trim() !== "");
+        
         let followers = 0;
         const raw = row["Instagram Followers - Do not delete"] || '';
         const str = raw.toLowerCase().replace(/,/g, '');
@@ -524,7 +740,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         if (followersRange === "under5k") followersMatch = followers < 5000;
         else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
         else if (followersRange === "10kplus") followersMatch = followers > 10000;
-        return genreMatch && contactedMatch && spotlightedMatch && followersMatch;
+        return statusMatch && searchMatch && genreMatch && followersMatch;
         });
     }
 
@@ -538,6 +754,13 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         dataset.forEach((row) => {
         const card = document.createElement("div");
         card.className = "card";
+
+        // Add status badge
+        const status = row["Current Status"] || "Prospect";
+        const statusBadge = document.createElement("div");
+        statusBadge.className = `status-badge ${getStatusClass(status)}`;
+        statusBadge.textContent = status;
+        card.appendChild(statusBadge);
 
         const name = document.createElement("div");
         name.className = "artist-name";
@@ -569,7 +792,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             { label: "Genre", key: "Genre" },
             { label: "Followers", key: "Instagram Followers - Do not delete" },
             { label: "Where Found", key: "Where Found" },
-            { label: "Contacted", key: "Contacted" },
+            { label: "Current Status", key: "Current Status" },
         ];
 
         fields.forEach(({ label, key }) => {
@@ -624,14 +847,14 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const avgFollowers = followersData.length > 0
         ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
         : 0;
-        const contacted = filtered.filter(r => r["Contacted"] && r["Contacted"].toLowerCase().includes("yes")).length;
+        
         const genres = filtered.map(r => r["Genre"]).filter(Boolean)
         .reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
         const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
         document.getElementById("totalArtists").textContent = filtered.length;
         document.getElementById("avgFollowers").textContent = avgFollowers > 1000 ? (avgFollowers / 1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
-        document.getElementById("contacted").textContent = contacted;
+        document.getElementById("statusCounts").textContent = filtered.length;
         document.getElementById("topGenre").textContent = topGenre;
     }
 
@@ -641,18 +864,27 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         updateStats(filtered);
     }
 
+    // Search input listener
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", (e) => {
+        currentSearchTerm = e.target.value;
+        refreshUI();
+    });
+
     genreSelect.addEventListener("change", refreshUI);
-    contactedCheckbox.addEventListener("change", refreshUI);
-    spotlightedCheckbox.addEventListener("change", refreshUI);
     followersSelect.addEventListener("change", refreshUI);
 
     refreshUI(); // Initial render
+    
     // Reset Filters button
     document.getElementById("resetFilters").addEventListener("click", () => {
       genreSelect.value = "All";
-      contactedCheckbox.checked = false;
-      spotlightedCheckbox.checked = false;
       followersSelect.value = "All";
+      searchInput.value = "";
+      currentSearchTerm = "";
+      currentStatusFilter = 'all';
+      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.status-btn[data-status="all"]').classList.add('active');
       renderCards(fullData);
       updateStats(fullData);
       // On mobile, hide filters after reset
@@ -660,6 +892,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         document.getElementById("filters").style.display = "none";
       }
     });
+    
     // Hide filters on resize to mobile
     window.addEventListener('resize', function() {
       if (window.innerWidth <= 768) {
@@ -668,6 +901,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         document.getElementById("filters").style.display = "grid";
       }
     });
+    
     // Initial state for filters on load (mobile hidden)
     if (window.innerWidth <= 768) {
       document.getElementById("filters").style.display = "none";
