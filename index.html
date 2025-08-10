@@ -764,7 +764,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
         const name = document.createElement("div");
         name.className = "artist-name";
-        name.textContent = row["Instagram Name"] || row["Artist"] || "Untitled";
+        name.textContent = row["Artist"] || row["Instagram Name"] || "Untitled";
         card.appendChild(name);
 
         const insta = document.createElement("a");
