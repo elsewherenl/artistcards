@@ -804,6 +804,15 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             }
         });
 
+        // Show "When Featured" date for Featured or Spotlighted status
+        const cardStatus = (row["Current Status"] || "").toLowerCase().trim();
+        if ((cardStatus === "featured" || cardStatus === "spotlighted") && row["Spotlighted"]) {
+            const whenFeatured = document.createElement("div");
+            whenFeatured.className = "field-item";
+            whenFeatured.innerHTML = `<span class="label">When Featured:</span> ${row["Spotlighted"]}`;
+            card.appendChild(whenFeatured);
+        }
+
         const websiteFields = [
             { label: "Own Website", key: "Own Website" },
             { label: "Easy Commerce", key: "Website with easy commerce" },
