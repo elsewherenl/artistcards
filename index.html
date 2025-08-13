@@ -757,6 +757,59 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         });
     }
 
+    function parseDate(dateString) {
+        if (!dateString) return new Date("1900-01-01");
+        
+        // Handle DD.MM.YY format (like 01.08.25)
+        if (dateString.includes(".") && dateString.length === 8) {
+            const parts = dateString.split(".");
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+                let year = parseInt(parts[2]);
+                
+                // Convert 2-digit year to 4-digit (assuming 20xx for now)
+                if (year < 100) {
+                    year = 2000 + year;
+                }
+                
+                return new Date(year, month, day);
+            }
+        }
+        
+        // Handle DD/MM/YYYY format (European)
+        if (dateString.includes("/")) {
+            const parts = dateString.split("/");
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+                const year = parseInt(parts[2]);
+                return new Date(year, month, day);
+            }
+        }
+        
+        // Handle DD-MM-YYYY format
+        if (dateString.includes("-") && dateString.length === 10) {
+            const parts = dateString.split("-");
+            if (parts.length === 3 && parts[0].length === 2) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1;
+                const year = parseInt(parts[2]);
+                return new Date(year, month, day);
+            }
+        }
+        
+        // Try standard JavaScript parsing (handles YYYY-MM-DD, etc.)
+        const standardDate = new Date(dateString);
+        if (!isNaN(standardDate.getTime())) {
+            return standardDate;
+        }
+        
+        // Fallback if nothing works
+        console.warn("Could not parse date:", dateString);
+        return new Date("1900-01-01");
+    }
+
     function sortData(data) {
         const sortBy = sortBySelect.value;
         
@@ -764,12 +817,20 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         
         return [...data].sort((a, b) => {
             if (sortBy === "newest") {
-                const dateA = new Date(a["When Added"] || "1900-01-01");
-                const dateB = new Date(b["When Added"] || "1900-01-01");
+                const dateA = parseDate(a["When Added"]);
+                const dateB = parseDate(b["When Added"]);
+                
+                // Debug: Log the dates being compared
+                console.log("Sorting newest - A:", a["When Added"], "parsed:", dateA, "B:", b["When Added"], "parsed:", dateB);
+                
                 return dateB - dateA; // Newest first
             } else if (sortBy === "oldest") {
-                const dateA = new Date(a["When Added"] || "2100-01-01");
-                const dateB = new Date(b["When Added"] || "2100-01-01");
+                const dateA = parseDate(a["When Added"]);
+                const dateB = parseDate(b["When Added"]);
+                
+                // Debug: Log the dates being compared
+                console.log("Sorting oldest - A:", a["When Added"], "parsed:", dateA, "B:", b["When Added"], "parsed:", dateB);
+                
                 return dateA - dateB; // Oldest first
             } else if (sortBy === "nameAZ") {
                 const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
@@ -909,7 +970,8 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
     function refreshUI() {
         const filtered = filterData();
-        renderCards(filtered);
+        const sorted = sortData(filtered);
+        renderCards(sorted);
         updateStats(filtered);
     }
 
@@ -922,7 +984,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
     genreSelect.addEventListener("change", refreshUI);
     followersSelect.addEventListener("change", refreshUI);
-    dateAddedSelect.addEventListener("change", refreshUI);
+    sortBySelect.addEventListener("change", refreshUI);
 
     refreshUI(); // Initial render
     
@@ -930,7 +992,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
     document.getElementById("resetFilters").addEventListener("click", () => {
       genreSelect.value = "All";
       followersSelect.value = "All";
-      dateAddedSelect.value = "All";
+      sortBySelect.value = "none";
       searchInput.value = "";
       currentSearchTerm = "";
       currentStatusFilter = 'all';
@@ -959,8 +1021,10 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
     }
     })
     .catch(err => {
-    console.error("Error:", err);
-    document.getElementById("summary").style.display = "none";
+    console.error("Error loading data:", err);
+    console.error("Error details:", err.message);
+    console.error("Stack trace:", err.stack);
+    document.getElementById("summary").innerHTML = "<div style='text-align: center; color: red; padding: 2rem;'>Error loading artist data. Check console for details.</div>";
     });
 </script>
 </body>
