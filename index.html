@@ -1,1284 +1,1028 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events Calendar - Elsewhere Collective</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Satoshi:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --biscuit-gold: #D6B370;
-            --dark-bg: #0D0D0D;
-            --off-white: #F3EFE9;
-            --text-dark: #0D0D0D;
-            --text-gray: #666;
-            --text-light: #888888;
-            --border-light: rgba(214, 179, 112, 0.2);
-            --peach: #CB9D8E;
-            --vibrant-orange: #DF6733;
-            --chartreuse: #B8FF60;
-            --lapis-blue: #2552FF;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<!-- Bookmark/Apple touch icon (stamp logo) -->
+<link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
+<title>Artist Prospecting</title>
+<link href="https://fonts.googleapis.com/css2?family=Avenir&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
+<style>
+    body {
+    font-family: 'Satoshi', sans-serif;
+    background-color: #F3EFE9;
+    margin: 0;
+    padding: 2rem;
+    color: #0D0D0D;
+    position: relative;
+    }
+    
+    .header {
+    position: relative;
+    margin-bottom: 4rem;
+    }
+    
+    .logo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: #F3EFE9;
+    border: 2px solid #0D0D0D;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    color: #0D0D0D;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 0.9;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    padding: 0.5rem;
+    padding-bottom: 0.8rem;
+    box-sizing: border-box;
+    text-decoration: none;
+    }
+    
+    h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    margin-right: 120px;
+    letter-spacing: -0.02em;
+    }
+    
+    h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 0;
+    margin-left: 0;
+    border-bottom: 2px solid #2552FF;
+    padding-bottom: 0.25rem;
+    padding-left: 0;
+    display: inline-block;
+    letter-spacing: -0.01em;
+    }
+    
+    .summary {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(214, 179, 112, 0.15);
+    border-radius: 0;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .summary-item {
+    text-align: center;
+    }
+    
+    .summary-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: #D6B370;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    }
+    
+    .summary-label {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    }
+    
+    .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    }
+    
+.filter-select {
+font-family: 'Satoshi', sans-serif;
+font-size: 1rem;
+font-weight: 400;
+padding: 0.5rem 1rem;
+border: 2px solid #D6B370;
+border-radius: 20px;
+background-color: white;
+color: #0D0D0D;
+width: 100%;
+margin-top: 0.25rem;
+transition: all 0.3s ease;
+cursor: pointer;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+.filter-select:focus {
+    outline: none;
+    border-color: #2552FF;
+    box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+    transform: translateY(-1px);
+}
 
-        body {
-            font-family: 'Satoshi', sans-serif;
-            background: var(--dark-bg);
-            color: var(--off-white);
-            line-height: 1.6;
-            overflow-x: auto;
-        }
+.filter-checkbox {
+width: 1.1rem;
+height: 1.1rem;
+accent-color: #2552FF;
+margin-top: 0.4rem;
+transform: scale(1.1);
+}
 
-        .header {
-            padding: 2rem;
-            border-bottom: 1px solid rgba(243, 239, 233, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+/* Search bar styling */
+.search-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
 
-        .brand {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1rem;
-            font-weight: 400;
-            letter-spacing: 0.02em;
-        }
+.search-input {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    border-radius: 20px;
+    background: white;
+    color: #0D0D0D;
+    width: 100%;
+    max-width: 400px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.1);
+    text-transform: capitalize;
+}
 
-        .year {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1rem;
-            color: var(--text-light);
-            font-weight: 300;
-        }
+.search-input:focus {
+    outline: none;
+    border-color: #2552FF;
+    box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+    transform: translateY(-1px);
+}
 
-        .hero-section {
-            padding: 4rem 2rem 2rem;
-            text-align: left;
-        }
+.search-input::placeholder {
+    color: #999;
+    font-style: italic;
+    text-transform: none;
+}
 
-        .hero-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 300;
-            letter-spacing: -0.02em;
-            margin-bottom: 2rem;
-            line-height: 0.9;
-        }
+.clear-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    background: transparent;
+    color: #0D0D0D;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
 
-        .hero-subtitle {
-            font-family: 'Satoshi', sans-serif;
-            font-size: 1.1rem;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-            font-weight: 400;
-        }
+.clear-btn:hover {
+    background: #D6B370;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
+}
 
-        .hero-description {
-            font-family: 'Satoshi', sans-serif;
-            font-size: 1.1rem;
-            color: var(--text-light);
-            font-weight: 400;
-        }
+/* Status filter buttons */
+.status-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+}
 
-        .legend {
-            padding: 0 2rem 2rem;
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
+.status-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    background: transparent;
+    color: #0D0D0D;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+}
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 400;
-        }
+.status-btn.active {
+    background: #D6B370;
+    color: #0D0D0D;
+}
 
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
+.status-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
+}
 
-        .priority-key { background: var(--chartreuse); }
-        .priority-important { background: var(--vibrant-orange); }
-        .priority-optional { background: var(--peach); }
+/* Status badges on cards */
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 1;
+}
 
-        .calendar-scroll {
-            overflow-x: auto;
-            padding-bottom: 1rem;
-        }
+.status-prospect {
+    background: rgba(214, 179, 112, 0.2);
+    color: #a67c00;
+    border: 1px solid rgba(214, 179, 112, 0.3);
+}
 
-        .calendar-container {
-            display: grid;
-            grid-template-columns: repeat(12, minmax(350px, 1fr));
-            gap: 1.5rem;
-            padding: 2rem;
-            min-width: max-content;
-        }
+.status-outreach {
+    background: rgba(37, 82, 255, 0.2);
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 82, 255, 0.3);
+}
 
-        .month-column {
-            background: rgba(243, 239, 233, 0.03);
-            border: 1px solid rgba(243, 239, 233, 0.1);
-            border-radius: 4px;
-            min-height: 600px;
-            transition: all 0.3s ease;
-        }
+.status-responded {
+    background: rgba(34, 197, 94, 0.2);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
 
-        .month-column:hover {
-            background: rgba(243, 239, 233, 0.05);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
+.status-spotlighted {
+    background: rgba(249, 115, 22, 0.2);
+    color: #ea580c;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
 
-        .month-header {
-            background: var(--biscuit-gold);
-            color: var(--text-dark);
-            padding: 1rem;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 500;
-            font-size: 1rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            text-align: center;
-            border-radius: 4px 4px 0 0;
-        }
+.status-negotiating {
+    background: rgba(147, 51, 234, 0.2);
+    color: #7c3aed;
+    border: 1px solid rgba(147, 51, 234, 0.3);
+}
 
-        .month-content {
-            padding: 1.5rem;
-            height: calc(100% - 60px);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+.status-featured {
+    background: rgba(16, 185, 129, 0.2);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
 
-        .planning-block {
-            background: rgba(214, 179, 112, 0.1);
-            border-left: 3px solid var(--biscuit-gold);
-            padding: 1rem;
-            border-radius: 0 4px 4px 0;
-            margin-bottom: 1rem;
-        }
+.status-feature.planned {
+    background: rgba(245, 158, 11, 0.2);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
 
-        .planning-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--biscuit-gold);
-        }
+@media (max-width: 768px) {
+#filters {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
 
-        .planning-subtitle {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-        }
+.status-filters {
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
-        .planning-details {
-            font-size: 0.75rem;
-            color: var(--text-light);
-            line-height: 1.4;
-        }
+.status-btn {
+    width: 100%;
+    text-align: center;
+}
 
-        .event {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
+.search-container {
+    flex-direction: column;
+    align-items: flex-start;
+}
 
-        .event:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateX(3px);
-        }
+.clear-btn {
+    width: 100%;
+    max-width: 400px;
+}
+}
 
-        .event::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-        }
+    .card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-family: 'Satoshi', sans-serif;
+    position: relative;
+    }
+    
+    .artist-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    }
+    
+    .insta-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    width: fit-content;
+    color: #2552FF;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 500;
+    }
+    
+    .insta-logo {
+    width: 20px;
+    height: 20px;
+    }
+    
+    .image {
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    }
+    
+    .label {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 600;
+    }
+    
+    .notes {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #444;
+    margin-top: 0.5rem;
+    }
+    
+    .field-item {
+    font-family: 'Satoshi', sans-serif;
+    }
+    
+    .website-link {
+    font-family: 'Satoshi', sans-serif;
+    color: #2552FF;
+    text-decoration: none;
+    font-weight: 500;
+    }
+    
+    .website-link:hover {
+    text-decoration: underline;
+    }
+    
+    .footer {
+    text-align: left;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(214, 179, 112, 0.2);
+    }
+    
+    .footer-brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0D0D0D;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+    }
+    
+    .footer-brand:hover {
+    transform: scale(1.05);
+    transform-origin: left center;
+    color: #D6B370;
+    letter-spacing: 0.02em;
+    }
+    
+    @media (max-width: 768px) {
+    .logo {
+        position: relative;
+        margin: 0 auto 1rem auto;
+        width: 80px;
+        height: 80px;
+        font-size: 0.6rem;
+    }
+    
+    h1 {
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    h2 {
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+    
+    .footer {
+        text-align: center;
+    }
+    }
+.filter-reset {
+  background-color: #2552FF;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 500;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  margin-top: 1.85rem;
+}
 
-        .event[data-priority="key"]::before { background: var(--chartreuse); }
-        .event[data-priority="important"]::before { background: var(--vibrant-orange); }
-        .event[data-priority="optional"]::before { background: var(--peach); }
+.filter-reset:hover {
+  background-color: #1f47d4;
+}
 
-        .event-name {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--off-white);
-            line-height: 1.2;
-        }
+#filters {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
 
-        .event-location {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-        }
+.no-results {
+  color: #666;
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
 
-        .event-description {
-            font-size: 0.75rem;
-            color: var(--text-gray);
-            line-height: 1.4;
-        }
+/* Mobile UX improvements */
+@media (max-width: 480px) {
+  .summary-item label,
+  .summary-label {
+    font-size: 0.9rem;
+  }
 
-        .event-date {
-            font-size: 0.8rem;
-            color: var(--biscuit-gold);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
+  .filter-select {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
 
-        .event-website {
-            font-size: 0.7rem;
-            color: var(--lapis-blue);
-            margin-top: 0.5rem;
-            opacity: 0.8;
-            display: inline-block;
-            text-decoration: none;
-        }
-        .event-website:hover { text-decoration: underline; }
+  .filter-checkbox {
+    transform: scale(1.2);
+    margin-top: 0.3rem;
+  }
 
-        .multi-month-event {
-            border-left: 3px dashed var(--biscuit-gold) !important;
-            opacity: 0.9;
-        }
+  #filters {
+    row-gap: 1rem;
+  }
+}
+@media (min-width: 768px) {
+    .card img {
+      transition: transform 0.3s ease;
+    }
 
-        .multi-month-event::after {
-            content: '';
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            width: 8px;
-            height: 8px;
-            background: var(--biscuit-gold);
-            border-radius: 50%;
-            opacity: 0.6;
-        }
+    .card:hover img {
+      transform: scale(1.1);
+    }
+  }
 
-        /* Special large events */
-        .featured-event {
-            background: linear-gradient(135deg, rgba(214, 179, 112, 0.15), rgba(214, 179, 112, 0.05));
-            border: 2px solid rgba(214, 179, 112, 0.3);
-            min-height: 150px;
-        }
-
-        .featured-event .event-name {
-            font-size: 1.1rem;
-            color: var(--biscuit-gold);
-        }
-
-        .featured-event .event-date {
-            font-size: 0.8rem;
-            color: var(--biscuit-gold);
-        }
-
-        /* Controls */
-        .controls {
-            padding: 1rem 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            border-bottom: 1px solid rgba(243, 239, 233, 0.1);
-        }
-
-        .filter-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--light-bg);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Satoshi', sans-serif;
-        }
-
-        .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .filter-btn.active {
-            background: var(--biscuit-gold);
-            color: var(--text-dark);
-            border-color: var(--biscuit-gold);
-        }
-
-        .add-event-btn {
-            background: var(--biscuit-gold);
-            color: var(--text-dark);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            font-family: 'Satoshi', sans-serif;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .add-event-btn:hover {
-            background: #c5a863;
-            transform: translateY(-1px);
-        }
-
-        /* Event Editor Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: #1a1a1a;
-            border: 1px solid rgba(243, 239, 233, 0.2);
-            border-radius: 8px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--biscuit-gold);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--off-white);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            padding: 0.75rem;
-            color: var(--off-white);
-            font-family: 'Satoshi', sans-serif;
-            font-size: 0.9rem;
-        }
-
-        .form-textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--biscuit-gold);
-            box-shadow: 0 0 0 2px rgba(214, 179, 112, 0.2);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            font-family: 'Satoshi', sans-serif;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            background: var(--biscuit-gold);
-            color: var(--text-dark);
-        }
-
-        .btn-primary:hover {
-            background: #c5a863;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--off-white);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-danger {
-            background: #ff4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #cc3333;
-        }
-
-        @media (max-width: 768px) {
-            .calendar-container {
-                grid-template-columns: repeat(12, minmax(280px, 1fr));
-                padding: 1rem;
-            }
-            
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            
-            .controls {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-    </style>
+  /* Mobile filter modal and toggle button styles */
+  @media (max-width: 768px) {
+    #filters {
+      display: none;
+      position: fixed;
+      bottom: 60px;
+      right: 1rem;
+      background-color: #0D0D0D;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      z-index: 1000;
+      max-width: 90vw;
+      flex-direction: column;
+      row-gap: 1rem;
+    }
+    .filter-toggle {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background-color: #2552FF;
+      color: #fff;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+  @media (min-width: 768px) {
+    .filter-toggle {
+      display: none;
+    }
+    #filters {
+      display: grid !important;
+      position: static !important;
+      background-color: inherit !important;
+      border: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="brand">Elsewhere Collective™</div>
-        <div class="year">2025</div>
+<div class="header">
+    <div class="logo">
+    <div>else</div>
+    <div>where</div>
+    <div>collective</div>
     </div>
+    <h1>Artist Prospecting</h1>
+    <h2>Ranked by creative fit</h2>
+</div>
 
-    <div class="hero-section">
-        <h1 class="hero-title">Calendar of events</h1>
-        <p class="hero-subtitle">Focus on Dutch events for regular content creation.</p>
-        <p class="hero-description">Target 2 - 3 major European events to build authority.</p>
-    </div>
+<!-- Search Bar -->
+<div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name..." />
+    <button id="resetFilters" class="clear-btn">Clear Filters</button>
+</div>
 
-    <div class="legend">
-        <div class="legend-item">
-            <div class="legend-dot priority-key"></div>
-            <span>Key</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot priority-important"></div>
-            <span>Important</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot priority-optional"></div>
-            <span>Optional</span>
-        </div>
-    </div>
+<!-- Status Filter Buttons -->
+<div class="status-filters">
+    <button class="status-btn active" data-status="all">All</button>
+    <button class="status-btn" data-status="prospect">Prospect</button>
+    <button class="status-btn" data-status="outreach">Outreach</button>
+    <button class="status-btn" data-status="responded">Responded</button>
+    <button class="status-btn" data-status="spotlighted">Spotlighted</button>
+    <button class="status-btn" data-status="negotiating">Negotiating</button>
+    <button class="status-btn" data-status="featured">Featured</button>
+    <button class="status-btn" data-status="feature planned">Feature Planned</button>
+</div>
 
-    <div class="controls">
-        <button class="filter-btn active" data-filter="all">All Events</button>
-        <button class="filter-btn" data-filter="key">Key</button>
-        <button class="filter-btn" data-filter="important">Important</button>
-        <button class="filter-btn" data-filter="optional">Optional</button>
-        <button class="add-event-btn" onclick="openEventModal()">+ Add Event</button>
-        <button class="add-event-btn" onclick="exportData()" style="background: var(--lapis-blue);">Export Data</button>
-        <button class="add-event-btn" onclick="resetData()" style="background: var(--vibrant-orange);">Reset to Defaults</button>
-    </div>
+<!-- Summary Dashboard -->
+<div class="summary" id="summary">
+<div class="summary-item">
+<span class="summary-number" id="totalArtists">0</span>
+<span class="summary-label">Total Artists</span>
+</div>
+<div class="summary-item">
+<span class="summary-number" id="avgFollowers">0</span>
+<span class="summary-label">Avg Followers</span>
+</div>
+<div class="summary-item">
+<span class="summary-number" id="statusCounts">0</span>
+<span class="summary-label">Current Filter</span>
+</div>
+<div class="summary-item">
+<span class="summary-number" id="topGenre">-</span>
+<span class="summary-label">Top Genre</span>
+</div>
+</div>
+<div class="summary" id="filters" style="margin-top: 1rem; margin-bottom: 2rem;">
+<div class="summary-item">
+<label for="genreFilter" class="summary-label">Genre</label><br>
+<select id="genreFilter" class="filter-select">
+  <option value="All">All</option>
+</select>
+</div>
+<div class="summary-item">
+<label for="followersFilter" class="summary-label">Followers</label><br>
+<select id="followersFilter" class="filter-select">
+  <option value="All">All</option>
+  <option value="under5k">Under 5k</option>
+  <option value="5kto10k">5k–10k</option>
+  <option value="10kplus">10k+</option>
+</select>
+</div>
+<div class="summary-item">
+<label for="sortByFilter" class="summary-label">Sort By</label><br>
+<select id="sortByFilter" class="filter-select">
+  <option value="none">Default</option>
+  <option value="ranking">Ranking (High to Low)</option>
+  <option value="newest">Newest Added</option>
+  <option value="oldest">Oldest Added</option>
+  <option value="nameAZ">Name A-Z</option>
+  <option value="nameZA">Name Z-A</option>
+</select>
+</div>
+</div>
 
-    <div class="calendar-scroll">
-        <div class="calendar-container" id="calendar">
-            <!-- Months will be generated by JavaScript -->
-        </div>
-    </div>
 
-    <!-- Event Editor Modal -->
-    <div class="modal" id="eventModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Add Event</h2>
-            <form id="eventForm">
-                <div class="form-group">
-                    <label class="form-label">Event Name</label>
-                    <input type="text" class="form-input" id="eventName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" class="form-input" id="eventLocation" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="text" class="form-input" id="eventDate" placeholder="e.g., Sept 15-18">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Month</label>
-                    <select class="form-select" id="eventMonth" required>
-                        <option value="">Select Month</option>
-                        <option value="0">August 2025</option>
-                        <option value="1">September 2025</option>
-                        <option value="2">October 2025</option>
-                        <option value="3">November 2025</option>
-                        <option value="4">December 2025</option>
-                        <option value="5">January 2026</option>
-                        <option value="6">February 2026</option>
-                        <option value="7">March 2026</option>
-                        <option value="8">April 2026</option>
-                        <option value="9">May 2026</option>
-                        <option value="10">June 2026</option>
-                        <option value="11">July 2026</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Priority</label>
-                    <select class="form-select" id="eventPriority" required>
-                        <option value="">Select Priority</option>
-                        <option value="key">Key</option>
-                        <option value="important">Important</option>
-                        <option value="optional">Optional</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Website (optional)</label>
-                    <input type="url" class="form-input" id="eventWebsite" placeholder="https://example.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-textarea" id="eventDescription" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="eventFeatured" style="margin-right: 0.5rem;">
-                        Featured Event (larger display)
-                    </label>
-                </div>
-                <div class="modal-actions">
-                    <button type="submit" class="btn btn-primary">Add Event</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="deleteBtn" onclick="deleteEvent()" style="display: none;">Delete</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<div class="grid" id="cards"></div>
 
-    <script>
-        // Initial events data (immutable default)
-        const defaultEventsData = {
-            0: { // August 2025
-                events: [
-                    {
-                        id: 'aug1',
-                        name: "Fotografia Calabria Festival",
-                        location: "Calabria, Italy",
-                        date: "Aug 1 - Oct 12",
-                        description: "Photography festival in southern Italy",
-                        priority: "optional",
-                        featured: false,
-                        website: "https://www.fotografiacalabria.it/",
-                        multiMonth: [0, 1, 2] // Aug, Sep, Oct
-                    },
-                    {
-                        id: 'aug2',
-                        name: "PhEST",
-                        location: "Monopoli, Italy",
-                        date: "Aug - Nov 16",
-                        description: "Photography festival in southern Italy",
-                        priority: "optional",
-                        featured: false,
-                        website: "https://www.phest.info/",
-                        multiMonth: [0, 1, 2, 3] // Aug, Sep, Oct, Nov
-                    }
-                ]
-            },
-            1: { // September 2025
-                events: [
-                    {
-                        id: 'sep2',
-                        name: "Berlin Art Week",
-                        location: "Berlin",
-                        date: "Sept 11-15",
-                        description: "Gallery openings and fairs across the city",
-                        priority: "important",
-                        website: "https://berlinartweek.de/en/",
-                        featured: false
-                    },
-                    {
-                        id: 'sep3',
-                        name: "Viennacontemporary",
-                        location: "Vienna",
-                        date: "Sept 11-14",
-                        description: "Central European art fair",
-                        priority: "optional",
-                        website: "https://www.viennacontemporary.at/en/",
-                        featured: false
-                    }
-                ]
-            },
-            2: { // October 2025
-                events: [
-                    {
-                        id: 'oct1',
-                        name: "Dutch Design Week",
-                        location: "Eindhoven",
-                        date: "Oct 18-26",
-                        description: "Innovation showcase, tech-art crossover networking",
-                        priority: "key",
-                        website: "https://ddw.nl/",
-                        featured: false
-                    },
-                    {
-                        id: 'oct2',
-                        name: "Frieze London",
-                        location: "London",
-                        date: "Oct 9-13",
-                        description: "Contemporary art fair",
-                        priority: "important",
-                        website: "https://www.frieze.com/fairs/frieze-london-frieze-masters",
-                        featured: false
-                    },
-                    {
-                        id: 'oct3',
-                        name: "Brighton Photo Fringe",
-                        location: "Brighton",
-                        date: "Oct 1-31",
-                        description: "Open festival for photography",
-                        priority: "optional",
-                        featured: false,
-                        website: "https://photofringe.org/"
-                    }
-                ]
-            },
-            3: { // November 2025
-                events: [
-                    {
-                        id: 'nov1',
-                        name: "Paris Photo Fair",
-                        location: "Paris",
-                        date: "Nov 13-16",
-                        description: "World's largest photography fair, networking opportunity",
-                        priority: "key",
-                        website: "https://www.parisphoto.com/en-gb/exhibitor/exhibitors_2025.html",
-                        featured: true
-                    },
-                    {
-                        id: 'nov2',
-                        name: "Mois de la Photo",
-                        location: "Paris",
-                        date: "November",
-                        description: "City-wide photography events throughout November",
-                        priority: "optional",
-                        featured: false
-                        // No website provided, leave as is
-                    },
-                    {
-                        id: 'nov3',
-                        name: "Woolwich Art Fair",
-                        location: "London",
-                        date: "Nov 13-16",
-                        description: "Contemporary art fair focusing on emerging artists",
-                        priority: "important",
-                        website: "https://woolwichprintfair.com/",
-                        featured: false
-                    },
-                    {
-                        id: 'nov4',
-                        name: "Head On Festival",
-                        location: "Sydney, Australia",
-                        date: "Nov 7-30",
-                        description: "Photography festival in Sydney - Asia-Pacific market exploration",
-                        priority: "optional",
-                        website: "https://headon.org.au/",
-                        featured: false
-                    }
-                ]
-            },
-            4: { // December 2025
-                events: []
-            },
-            5: { // January 2026
-                events: []
-            },
-            6: { // February 2026
-                events: [
-                ]
-            },
-            7: { // March 2026
-                events: [
-                    {
-                        id: 'mar1',
-                        name: "European Month of Photography",
-                        location: "Berlin",
-                        date: "March 1-31",
-                        description: "Major European photography showcase - perfect for building authority and discovering emerging talent",
-                        priority: "key",
-                        featured: true,
-                        website: "https://emop-berlin.eu/en/about-us/"
-                    },
-                    {
-                        id: 'mar2',
-                        name: "Nock Nock",
-                        location: "Amsterdam",
-                        date: "March 5-8",
-                        description: "Contemporary art fair in Amsterdam",
-                        priority: "key",
-                        website: "https://nocknockart.com/",
-                        featured: false
-                    },
-                    {
-                        id: 'mar3',
-                        name: "Unseen Photo Fair",
-                        location: "Amsterdam",
-                        date: "March 2026 (TBC)",
-                        description: "International photography fair dedicated to contemporary work",
-                        priority: "key",
-                        featured: true,
-                        website: "https://www.unseenamsterdam.com/"
-                    },
-                    {
-                        id: 'artrot26',
-                        name: "Art Rotterdam",
-                        location: "Rotterdam",
-                        date: "Mar 26-29",
-                        description: "Establish Netherlands art fair credibility",
-                        priority: "key",
-                        featured: false,
-                        website: "https://www.artrotterdam.com/"
-                    }
-                ]
-            },
-            8: { // April 2026
-                events: [
-                    {
-                        id: 'apr1',
-                        name: "Art Cologne",
-                        location: "Cologne",
-                        date: "Nov 6-9, 2025",
-                        description: "German market penetration, art fair",
-                        priority: "important",
-                        featured: false,
-                        website: "https://www.artcologne.com/"
-                    },
-                    {
-                        id: 'apr2',
-                        name: "PHotoESPAÑA",
-                        location: "Madrid, Spain",
-                        date: "Apr - Sept",
-                        description: "International photography festival, one of Europe's most important photography events",
-                        priority: "important",
-                        featured: true,
-                        website: "https://www.phe.es/",
-                        multiMonth: [8, 9, 10, 11] // Apr, May, Jun, Jul (continuing into Sept would be next year)
-                    }
-                ]
-            },
-            9: { // May 2026
-                events: [
-                    {
-                        id: 'may1',
-                        name: "KunstRAI",
-                        location: "Amsterdam",
-                        date: "Apr 22-26, 2026",
-                        description: "Art and antiques fair",
-                        priority: "key",
-                        featured: false,
-                        website: "https://kunstrai.nl/en/"
-                    },
-                    {
-                        id: 'may2',
-                        name: "Photo London",
-                        location: "London",
-                        date: "May 14-17, 2026",
-                        description: "Photography fair",
-                        priority: "important",
-                        featured: false,
-                        website: "https://photolondon.org/"
-                    }
-                ]
-            },
-            10: { // June 2026
-                events: [
-                    {
-                        id: 'jun1',
-                        name: "Art Basel",
-                        location: "Basel",
-                        date: "June 11-14",
-                        description: "Global art market leader",
-                        priority: "key",
-                        featured: true,
-                        website: "https://www.artbasel.com/?lang=en"
-                    },
-                    {
-                        id: 'jun2',
-                        name: "Copenhagen Photo Festival",
-                        location: "Copenhagen, Denmark",
-                        date: "June",
-                        description: "Scandinavian photography festival - Nordic market exploration",
-                        priority: "optional",
-                        featured: false,
-                        website: "https://copenhagenphotofestival.com/"
-                    }
-                ]
-            },
-            11: { // July 2026
-                events: [
-                    {
-                        id: 'jul1',
-                        name: "Les Rencontres de la Photographie",
-                        location: "Arles, France",
-                        date: "July - Sept",
-                        description: "Premier photography festival - the most prestigious photography event in Europe",
-                        priority: "key",
-                        featured: true,
-                        website: "https://www.rencontres-arles.com/",
-                        multiMonth: [11] // Jul (extends beyond our calendar range)
-                    }
-                ]
-            }
-        }; 
+<div class="footer">
+    <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
+</div>
 
-        // Persistence helpers
+<!-- Filter Toggle Button (only on mobile) -->
+<button class="filter-toggle" onclick="toggleFilters()">☰</button>
 
-        // Merge missing fields from defaults into saved data while preserving user edits
-        function migrateEventsData(saved, defaults) {
-            const result = JSON.parse(JSON.stringify(saved || {}));
-            for (let m = 0; m < 12; m++) {
-                const defMonth = defaults[m] || {};
-                const savedMonth = result[m] || {};
-                if (!savedMonth.events) savedMonth.events = [];
-                // Index saved events by id for quick lookup
-                const savedById = Object.fromEntries((savedMonth.events || []).map(ev => [ev.id, ev]));
-                // Ensure planning block is present if missing
-                if (defMonth.planning && !savedMonth.planning) {
-                    savedMonth.planning = defMonth.planning;
+<script>
+let currentStatusFilter = 'all';
+let currentSearchTerm = '';
+
+function toggleFilters() {
+  const filters = document.getElementById("filters");
+  filters.style.display = filters.style.display === "none" || filters.style.display === "" ? "flex" : "none";
+}
+
+function parseCSV(csv) {
+    const lines = csv.split('\n');
+    const result = [];
+    const headers = [];
+    let current = '', inQuotes = false;
+    for (let i = 0; i < lines[0].length; i++) {
+    const char = lines[0][i];
+    if (char === '"') inQuotes = !inQuotes;
+    else if (char === ',' && !inQuotes) {
+        headers.push(current.trim().replace(/^"|"$/g, ''));
+        current = '';
+    } else current += char;
+    }
+    headers.push(current.trim().replace(/^"|"$/g, ''));
+
+    for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const values = [], row = {};
+    current = ''; inQuotes = false;
+    for (let j = 0; j < lines[i].length; j++) {
+        const char = lines[i][j];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) {
+        values.push(current.trim().replace(/^"|"$/g, ''));
+        current = '';
+        } else current += char;
+    }
+    values.push(current.trim().replace(/^"|"$/g, ''));
+    headers.forEach((header, idx) => row[header] = values[idx] || '');
+    if (row[headers[0]]) result.push(row);
+    }
+    return result;
+}
+
+function getStatusClass(status) {
+    if (!status) return 'status-prospect';
+    const normalized = status.toLowerCase().replace(/\s+/g, '');
+    if (normalized === 'featureplanned') return 'status-feature planned';
+    return `status-${normalized}`;
+}
+
+fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357")
+    .then(res => res.text())
+    .then(csvData => {
+    const data = parseCSV(csvData);
+    const genreSelect = document.getElementById("genreFilter");
+    const followersSelect = document.getElementById("followersFilter");
+    const sortBySelect = document.getElementById("sortByFilter");
+
+    // Store all data for re-filtering
+    let fullData = data;
+
+    // Debug: Log the data structure
+    console.log("First row of data:", data[0]);
+    console.log("All column headers:", Object.keys(data[0] || {}));
+
+    // Populate genres
+    const genres = [...new Set(data.map(row => row["Genre"]).filter(Boolean))];
+    console.log("Found genres:", genres);
+    genres.sort().forEach(genre => {
+        const option = document.createElement("option");
+        option.value = genre;
+        option.textContent = genre;
+        genreSelect.appendChild(option);
+    });
+
+    // Status filter buttons
+    document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentStatusFilter = btn.dataset.status;
+            refreshUI();
+        });
+    });
+
+    function filterData() {
+        const genre = genreSelect.value;
+        const followersRange = followersSelect.value;
+
+        return fullData.filter(row => {
+        // Status filter
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter.toLowerCase();
+        
+        // Search filter
+        const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
+        const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
+        
+        const genreMatch = genre === "All" || row["Genre"] === genre;
+        
+        // Followers filter
+        let followers = 0;
+        const raw = row["Instagram Followers - Do not delete"] || '';
+        const str = raw.toLowerCase().replace(/,/g, '');
+        if (str.includes('k')) followers = parseFloat(str.replace('k', '')) * 1000;
+        else followers = parseInt(str) || 0;
+        let followersMatch = true;
+        if (followersRange === "under5k") followersMatch = followers < 5000;
+        else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
+        else if (followersRange === "10kplus") followersMatch = followers > 10000;
+        
+        return statusMatch && searchMatch && genreMatch && followersMatch;
+        });
+    }
+
+    function parseDate(dateString) {
+        if (!dateString) return new Date("1900-01-01");
+        
+        // Handle DD.MM.YY format (like 01.08.25)
+        if (dateString.includes(".") && dateString.length === 8) {
+            const parts = dateString.split(".");
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+                let year = parseInt(parts[2]);
+                
+                // Convert 2-digit year to 4-digit (assuming 20xx for now)
+                if (year < 100) {
+                    year = 2000 + year;
                 }
-                // Walk default events and merge missing fields into saved events
-                (defMonth.events || []).forEach(defEv => {
-                    const sEv = savedById[defEv.id];
-                    if (sEv) {
-                        // Copy any fields that are undefined in saved
-                        Object.keys(defEv).forEach(k => {
-                            if (sEv[k] === undefined) sEv[k] = defEv[k];
-                        });
-                    } else {
-                        // New event not in saved — add it
-                        savedMonth.events.push(defEv);
-                    }
-                });
-                result[m] = savedMonth;
+                
+                return new Date(year, month, day);
             }
-            return result;
         }
-
-        function loadEventsData() {
-            const saved = localStorage.getItem('ec_events');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    const migrated = migrateEventsData(parsed, defaultEventsData);
-                    // Persist migrated structure so future loads have websites/fields
-                    localStorage.setItem('ec_events', JSON.stringify(migrated));
-                    return migrated;
-                } catch (e) {
-                    console.warn('Corrupt saved data, falling back to defaults:', e);
-                }
+        
+        // Handle DD/MM/YYYY format (European)
+        if (dateString.includes("/")) {
+            const parts = dateString.split("/");
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+                const year = parseInt(parts[2]);
+                return new Date(year, month, day);
             }
-            return JSON.parse(JSON.stringify(defaultEventsData));
+        }
+        
+        // Handle DD-MM-YYYY format
+        if (dateString.includes("-") && dateString.length === 10) {
+            const parts = dateString.split("-");
+            if (parts.length === 3 && parts[0].length === 2) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1;
+                const year = parseInt(parts[2]);
+                return new Date(year, month, day);
+            }
+        }
+        
+        // Try standard JavaScript parsing (handles YYYY-MM-DD, etc.)
+        const standardDate = new Date(dateString);
+        if (!isNaN(standardDate.getTime())) {
+            return standardDate;
+        }
+        
+        // Fallback if nothing works
+        console.warn("Could not parse date:", dateString);
+        return new Date("1900-01-01");
+    }
+
+    function sortData(data) {
+        const sortBy = sortBySelect.value;
+        
+        if (sortBy === "none") return data;
+        
+        return [...data].sort((a, b) => {
+            if (sortBy === "ranking") {
+                const rankA = parseInt(a["Ranking"] || "6"); // Default to 6 (lowest) if no ranking
+                const rankB = parseInt(b["Ranking"] || "6");
+                return rankA - rankB; // 1 first, then 2, 3, 4, 5
+            } else if (sortBy === "newest") {
+                const dateA = parseDate(a["When Added"]);
+                const dateB = parseDate(b["When Added"]);
+                return dateB - dateA; // Newest first
+            } else if (sortBy === "oldest") {
+                const dateA = parseDate(a["When Added"]);
+                const dateB = parseDate(b["When Added"]);
+                return dateA - dateB; // Oldest first
+            } else if (sortBy === "nameAZ") {
+                const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
+                const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
+                return nameA.localeCompare(nameB);
+            } else if (sortBy === "nameZA") {
+                const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
+                const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
+                return nameB.localeCompare(nameA);
+            }
+            return 0;
+        });
+    }
+
+    function renderCards(dataset) {
+        const container = document.getElementById("cards");
+        if (dataset.length === 0) {
+          container.innerHTML = "<p class='no-results'>No artists match these filters.</p>";
+          return;
+        }
+        container.innerHTML = "";
+        dataset.forEach((row) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        // Add status badge
+        const status = row["Current Status"] || "Prospect";
+        const statusBadge = document.createElement("div");
+        statusBadge.className = `status-badge ${getStatusClass(status)}`;
+        statusBadge.textContent = status;
+        card.appendChild(statusBadge);
+
+        const name = document.createElement("div");
+        name.className = "artist-name";
+        name.textContent = row["Artist"] || row["Instagram Name"] || "Untitled";
+        card.appendChild(name);
+
+        const insta = document.createElement("a");
+        insta.className = "insta-link";
+        insta.href = row["Insta Handle"] || "#";
+        insta.target = "_blank";
+        const img = document.createElement("img");
+        img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
+        img.alt = "Instagram";
+        img.className = "insta-logo";
+        insta.appendChild(img);
+        insta.append("Insta");
+        card.appendChild(insta);
+
+        if (row["Image"]) {
+            const image = document.createElement("img");
+            image.className = "image";
+            image.src = row["Image"];
+            image.alt = row["Instagram Name"];
+            image.loading = "lazy";
+            card.appendChild(image);
         }
 
-        function saveEventsData() {
-            localStorage.setItem('ec_events', JSON.stringify(eventsData));
-        }
-
-        // Working copy of data
-        let eventsData = loadEventsData();
-
-        const monthNames = [
-            "AUG 2025", "SEP 2025", "OCT 2025", "NOV 2025", "DEC 2025", "JAN 2026",
-            "FEB 2026", "MAR 2026", "APR 2026", "MAY 2026", "JUN 2026", "JUL 2026"
+        const fields = [
+            { label: "Genre", key: "Genre" },
+            { label: "Followers", key: "Instagram Followers - Do not delete" },
+            { label: "Where Found", key: "Where Found" },
+            { label: "Current Status", key: "Current Status" },
         ];
 
-        // Infer multi-month spans from the free-text date string
-        function inferMultiMonthFromDate(dateStr) {
-            if (!dateStr || typeof dateStr !== 'string') return null;
-            const s = dateStr
-                .toLowerCase()
-                .replace(/[–—−]/g, '-') // normalize en/em/minus dashes to hyphen
-                .replace(/\s+/g, ' ');
-            // Map month tokens to our 0..11 calendar indices starting at Aug 2025
-            const tokenToIndex = {
-                // Abbreviations
-                'aug': 0,
-                'sep': 1, 'sept': 1,
-                'oct': 2,
-                'nov': 3,
-                'dec': 4,
-                'jan': 5,
-                'feb': 6,
-                'mar': 7,
-                'apr': 8,
-                'may': 9,
-                'jun': 10,
-                'jul': 11,
-                // Full names
-                'august': 0,
-                'september': 1,
-                'october': 2,
-                'november': 3,
-                'december': 4,
-                'january': 5,
-                'february': 6,
-                'march': 7,
-                'april': 8,
-                'june': 10,
-                'july': 11
-            };
-
-            const tokens = Object.keys(tokenToIndex);
-            const found = [];
-            tokens.forEach(t => {
-                const idx = s.indexOf(t);
-                if (idx !== -1) found.push({ t, pos: idx, m: tokenToIndex[t] });
-            });
-            if (found.length === 0) return null;
-            // Sort by position in string to get chronological order as written
-            found.sort((a,b) => a.pos - b.pos);
-
-            const first = found[0].m;
-            const last = found[found.length - 1].m;
-
-            // If only one month token, or same month, no span
-            if (first === last) return null;
-
-            // If span goes forward within our 0..11 range, return inclusive range
-            if (first < last) {
-                const span = [];
-                for (let m = first; m <= last; m++) span.push(m);
-                return span;
+        fields.forEach(({ label, key }) => {
+            if (row[key]) {
+            const el = document.createElement("div");
+            el.className = "field-item";
+            el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
+            card.appendChild(el);
             }
+        });
 
-            // Handle wrap-around spans (e.g., Nov -> Jan) across our custom window
-            // Only support simple three-month wrap like Nov..Jan etc.
-            const span = [];
-            for (let m = first; m <= 11; m++) span.push(m);
-            for (let m = 0; m <= last; m++) span.push(m);
-            return span;
+        // Show "When Featured" date for Featured or Spotlighted status
+        const cardStatus = (row["Current Status"] || "").toLowerCase().trim();
+        if ((cardStatus === "featured" || cardStatus === "spotlighted") && row["Spotlighted"]) {
+            const whenFeatured = document.createElement("div");
+            whenFeatured.className = "field-item";
+            whenFeatured.innerHTML = `<span class="label">When Featured:</span> ${row["Spotlighted"]}`;
+            card.appendChild(whenFeatured);
         }
 
-        let currentEditingEvent = null;
+        const websiteFields = [
+            { label: "Own Website", key: "Own Website" },
+            { label: "Easy Commerce", key: "Website with easy commerce" },
+            { label: "Gallery Rep", key: "Gallery Representation" }
+        ];
 
-        function renderCalendar() {
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = '';
-
-            // First, collect all events including multi-month events
-            const allMonthEvents = {};
-            for (let i = 0; i < 12; i++) {
-                allMonthEvents[i] = [];
-            }
-
-            // Add events to their respective months
-            for (let monthIndex in eventsData) {
-                const monthData = eventsData[monthIndex];
-                if (monthData && monthData.events) {
-                    monthData.events.forEach(event => {
-                        const inferred = (!event.multiMonth || event.multiMonth.length === 0) ? inferMultiMonthFromDate(event.date) : null;
-                        const span = Array.isArray(event.multiMonth) && event.multiMonth.length > 1
-                            ? event.multiMonth
-                            : (Array.isArray(inferred) && inferred.length > 1 ? inferred : null);
-
-                        if (span) {
-                            span.forEach(monthIdx => {
-                                if (monthIdx >= 0 && monthIdx < 12) {
-                                    allMonthEvents[monthIdx].push({ ...event, isMultiMonth: true });
-                                }
-                            });
-                        } else {
-                            // Add to primary month
-                            allMonthEvents[monthIndex].push(event);
-                        }
-                    });
-                }
-            }
-
-            for (let i = 0; i < 12; i++) {
-                const monthColumn = document.createElement('div');
-                monthColumn.className = 'month-column';
-                
-                const header = document.createElement('div');
-                header.className = 'month-header';
-                header.textContent = monthNames[i];
-                
-                const content = document.createElement('div');
-                content.className = 'month-content';
-                
-                // Add planning block if exists
-                const monthData = eventsData[i];
-                if (monthData && monthData.planning) {
-                    const planningBlock = document.createElement('div');
-                    planningBlock.className = 'planning-block';
-                    planningBlock.innerHTML = `
-                        <div class="planning-title">${monthData.planning.title}</div>
-                        <div class="planning-subtitle">${monthData.planning.subtitle}</div>
-                        <div class="planning-details">${monthData.planning.details}</div>
-                    `;
-                    content.appendChild(planningBlock);
-                }
-
-                // Add events for this month
-                allMonthEvents[i].forEach(event => {
-                    const eventEl = document.createElement('div');
-                    eventEl.className = `event ${event.featured ? 'featured-event' : ''} ${event.isMultiMonth ? 'multi-month-event' : ''}`;
-                    eventEl.setAttribute('data-priority', event.priority);
-                    eventEl.setAttribute('data-event-id', event.id);
-                    
-                    // Card click always opens the editor
-                    eventEl.onclick = () => editEvent(event.id);
-                    // Tooltip
-                    eventEl.title = 'Click to edit event';
-                    
-                    eventEl.innerHTML = `
-                        ${event.date ? `<div class="event-date">${event.date}</div>` : ''}
-                        <div class="event-name">${event.name}${event.isMultiMonth ? ' 🔗' : ''}</div>
-                        <div class="event-location">${event.location}</div>
-                        <div class="event-description">${event.description}</div>
-                        ${event.website ? `<a class="event-website" href="${event.website}" target="_blank" rel="noopener noreferrer">🌐 ${event.website.replace(/^https?:\/\//, '')}</a>` : ''}
-                    `;
-                    content.appendChild(eventEl);
-                });
-
-                monthColumn.appendChild(header);
-                monthColumn.appendChild(content);
-                calendar.appendChild(monthColumn);
-            }
-        }
-
-        function filterEvents(priority) {
-            const events = document.querySelectorAll('.event');
-            events.forEach(event => {
-                if (priority === 'all' || event.getAttribute('data-priority') === priority) {
-                    event.style.display = 'block';
-                } else {
-                    event.style.display = 'none';
-                }
-            });
-
-            // Update active filter button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-filter="${priority}"]`).classList.add('active');
-        }
-
-        function openEventModal(eventId = null) {
-            const modal = document.getElementById('eventModal');
-            const form = document.getElementById('eventForm');
-            const deleteBtn = document.getElementById('deleteBtn');
-            
-            if (eventId) {
-                // Edit mode
-                currentEditingEvent = eventId;
-                const event = findEventById(eventId);
-                if (event) {
-                    document.getElementById('eventName').value = event.name;
-                    document.getElementById('eventLocation').value = event.location;
-                    document.getElementById('eventDate').value = event.date || '';
-                    document.getElementById('eventMonth').value = findMonthByEventId(eventId);
-                    document.getElementById('eventPriority').value = event.priority;
-                    document.getElementById('eventWebsite').value = event.website || '';
-                    document.getElementById('eventDescription').value = event.description;
-                    document.getElementById('eventFeatured').checked = event.featured;
-                    deleteBtn.style.display = 'block';
-                    document.querySelector('.modal-title').textContent = 'Edit Event';
-                }
+        websiteFields.forEach(({ label, key }) => {
+            if (row[key]) {
+            const el = document.createElement("div");
+            el.className = "field-item";
+            if (key === "Own Website" && row[key] !== "No") {
+                el.innerHTML = `<span class="label">${label}:</span> <a href="${row[key]}" target="_blank" class="website-link">Visit Site</a>`;
             } else {
-                // Add mode
-                currentEditingEvent = null;
-                form.reset();
-                deleteBtn.style.display = 'none';
-                document.querySelector('.modal-title').textContent = 'Add Event';
+                el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
             }
-            
-            modal.classList.add('active');
-        }
-
-        function closeEventModal() {
-            document.getElementById('eventModal').classList.remove('active');
-            currentEditingEvent = null;
-        }
-
-        function findEventById(eventId) {
-            for (let month in eventsData) {
-                const event = eventsData[month].events?.find(e => e.id === eventId);
-                if (event) return event;
-            }
-            return null;
-        }
-
-        function findMonthByEventId(eventId) {
-            for (let month in eventsData) {
-                const event = eventsData[month].events?.find(e => e.id === eventId);
-                if (event) return month;
-            }
-            return null;
-        }
-
-        function generateEventId() {
-            return 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function saveEvent() {
-            const name = document.getElementById('eventName').value;
-            const location = document.getElementById('eventLocation').value;
-            const date = document.getElementById('eventDate').value;
-            const month = document.getElementById('eventMonth').value;
-            const priority = document.getElementById('eventPriority').value;
-            const website = document.getElementById('eventWebsite').value;
-            const description = document.getElementById('eventDescription').value;
-            const featured = document.getElementById('eventFeatured').checked;
-
-            if (!name || !location || month === '' || !priority) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            const eventData = {
-                name,
-                location,
-                date,
-                description,
-                priority,
-                featured
-            };
-
-            // Infer multi-month span from the Date field (e.g., "Aug 1 - Oct 12")
-            const inferredMulti = inferMultiMonthFromDate(date);
-            if (inferredMulti && inferredMulti.length > 1) {
-                eventData.multiMonth = inferredMulti;
-            } else if (currentEditingEvent) {
-                // Preserve existing multiMonth if present and not re-inferred as a span
-                const oldMonthKey = findMonthByEventId(currentEditingEvent);
-                const existing = eventsData[oldMonthKey]?.events?.find(e => e.id === currentEditingEvent);
-                if (existing && Array.isArray(existing.multiMonth)) {
-                    eventData.multiMonth = existing.multiMonth;
-                }
-            }
-
-            // Add website if provided
-            if (website) {
-                eventData.website = website;
-            }
-
-            if (currentEditingEvent) {
-                // Edit existing event
-                const oldMonth = findMonthByEventId(currentEditingEvent);
-                const eventIndex = eventsData[oldMonth].events.findIndex(e => e.id === currentEditingEvent);
-                
-                if (oldMonth !== month) {
-                    // Moving to different month
-                    eventsData[oldMonth].events.splice(eventIndex, 1);
-                    eventData.id = currentEditingEvent;
-                    if (!eventsData[month]) eventsData[month] = { events: [] };
-                    if (!eventsData[month].events) eventsData[month].events = [];
-                    eventsData[month].events.push(eventData);
-                } else {
-                    // Same month
-                    eventsData[oldMonth].events[eventIndex] = { ...eventsData[oldMonth].events[eventIndex], ...eventData };
-                }
-            } else {
-                // Add new event
-                eventData.id = generateEventId();
-                if (!eventsData[month]) eventsData[month] = { events: [] };
-                if (!eventsData[month].events) eventsData[month].events = [];
-                eventsData[month].events.push(eventData);
-            }
-
-            // Save to localStorage
-            saveEventsData();
-            renderCalendar();
-            closeEventModal();
-        }
-
-        function deleteEvent() {
-            if (!currentEditingEvent) return;
-            
-            if (confirm('Are you sure you want to delete this event?')) {
-                const month = findMonthByEventId(currentEditingEvent);
-                const eventIndex = eventsData[month].events.findIndex(e => e.id === currentEditingEvent);
-                eventsData[month].events.splice(eventIndex, 1);
-                
-                // Save to localStorage
-                saveEventsData();
-                renderCalendar();
-                closeEventModal();
-            }
-        }
-
-        function editEvent(eventId) {
-            openEventModal(eventId);
-        }
-
-        // Export data as JSON file
-        function exportData() {
-            const dataStr = JSON.stringify(eventsData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'elsewhere-collective-events.json';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        // Reset to default data
-        function resetData() {
-            if (confirm('Are you sure you want to reset all events to defaults? This will remove any custom events you\'ve added.')) {
-                eventsData = JSON.parse(JSON.stringify(defaultEventsData)); // Deep copy
-                saveEventsData();
-                renderCalendar();
-            }
-        }
-
-        // Event listeners
-        document.getElementById('eventForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveEvent();
-        });
-
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                filterEvents(this.getAttribute('data-filter'));
-            });
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('eventModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeEventModal();
+            card.appendChild(el);
             }
         });
 
-        // Initialize calendar
-        renderCalendar();
-    </script>
+        if (row["Notes"]) {
+            const notes = document.createElement("div");
+            notes.className = "notes";
+            notes.textContent = row["Notes"];
+            card.appendChild(notes);
+        }
+
+        container.appendChild(card);
+        });
+    }
+
+    function updateStats(filtered) {
+        const followersData = filtered
+        .map(row => {
+            const followers = row["Instagram Followers - Do not delete"];
+            if (!followers) return 0;
+            const str = followers.toString().toLowerCase().replace(/,/g, '');
+            return str.includes('k')
+            ? parseFloat(str.replace('k', '')) * 1000
+            : parseInt(str) || 0;
+        }).filter(n => n > 0);
+        const avgFollowers = followersData.length > 0
+        ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
+        : 0;
+        
+        const genres = filtered.map(r => r["Genre"]).filter(Boolean)
+        .reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
+        const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+
+        document.getElementById("totalArtists").textContent = filtered.length;
+        document.getElementById("avgFollowers").textContent = avgFollowers > 1000 ? (avgFollowers / 1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
+        document.getElementById("statusCounts").textContent = filtered.length;
+        document.getElementById("topGenre").textContent = topGenre;
+    }
+
+    function refreshUI() {
+        const filtered = filterData();
+        const sorted = sortData(filtered);
+        renderCards(sorted);
+        updateStats(filtered);
+    }
+
+    // Search input listener
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", (e) => {
+        currentSearchTerm = e.target.value;
+        refreshUI();
+    });
+
+    genreSelect.addEventListener("change", refreshUI);
+    followersSelect.addEventListener("change", refreshUI);
+    sortBySelect.addEventListener("change", refreshUI);
+
+    refreshUI(); // Initial render
+    
+    // Reset Filters button
+    document.getElementById("resetFilters").addEventListener("click", () => {
+      genreSelect.value = "All";
+      followersSelect.value = "All";
+      sortBySelect.value = "none";
+      searchInput.value = "";
+      currentSearchTerm = "";
+      currentStatusFilter = 'all';
+      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+      renderCards(fullData);
+      updateStats(fullData);
+      // On mobile, hide filters after reset
+      if (window.innerWidth <= 768) {
+        document.getElementById("filters").style.display = "none";
+      }
+    });
+    
+    // Hide filters on resize to mobile
+    window.addEventListener('resize', function() {
+      if (window.innerWidth <= 768) {
+        document.getElementById("filters").style.display = "none";
+      } else {
+        document.getElementById("filters").style.display = "grid";
+      }
+    });
+    
+    // Initial state for filters on load (mobile hidden)
+    if (window.innerWidth <= 768) {
+      document.getElementById("filters").style.display = "none";
+    }
+    })
+    .catch(err => {
+    console.error("Error loading data:", err);
+    console.error("Error details:", err.message);
+    console.error("Stack trace:", err.stack);
+    document.getElementById("summary").innerHTML = "<div style='text-align: center; color: red; padding: 2rem;'>Error loading artist data. Check console for details.</div>";
+    });
+</script>
 </body>
 </html>
