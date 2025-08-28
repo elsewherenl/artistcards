@@ -738,7 +738,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter.toLowerCase();
         
         // Search filter
-        const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
+        const artistName = (row["Artist"] || row["Instagram Name"] || "").toLowerCase();
         const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
         
         const genreMatch = genre === "All" || row["Genre"] === genre;
