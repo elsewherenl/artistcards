@@ -257,6 +257,12 @@ transform: scale(1.1);
     border: 1px solid rgba(214, 179, 112, 0.3);
 }
 
+.status-planned-outreach {
+    background: rgba(168, 85, 247, 0.2);
+    color: #7c3aed;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
 .status-outreach {
     background: rgba(37, 82, 255, 0.2);
     color: #1d4ed8;
@@ -577,6 +583,7 @@ transform: scale(1.1);
 <div class="status-filters">
     <button class="status-btn active" data-status="all">All</button>
     <button class="status-btn" data-status="prospect">Prospect</button>
+    <button class="status-btn" data-status="planned outreach">Planned Outreach</button>
     <button class="status-btn" data-status="outreach">Outreach</button>
     <button class="status-btn" data-status="responded">Responded</button>
     <button class="status-btn" data-status="spotlighted">Spotlighted</button>
@@ -624,7 +631,6 @@ transform: scale(1.1);
 <label for="sortByFilter" class="summary-label">Sort By</label><br>
 <select id="sortByFilter" class="filter-select">
   <option value="none">Default</option>
-  <option value="ranking">Ranking (High to Low)</option>
   <option value="newest">Newest Added</option>
   <option value="oldest">Oldest Added</option>
   <option value="nameAZ">Name A-Z</option>
@@ -690,6 +696,7 @@ function getStatusClass(status) {
     if (!status) return 'status-prospect';
     const normalized = status.toLowerCase().replace(/\s+/g, '');
     if (normalized === 'featureplanned') return 'status-feature planned';
+    if (normalized === 'plannedoutreach') return 'status-planned-outreach';
     return `status-${normalized}`;
 }
 
@@ -738,7 +745,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter.toLowerCase();
         
         // Search filter
-        const artistName = (row["Artist"] || row["Instagram Name"] || "").toLowerCase();
+        const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
         const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
         
         const genreMatch = genre === "All" || row["Genre"] === genre;
@@ -817,17 +824,21 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         if (sortBy === "none") return data;
         
         return [...data].sort((a, b) => {
-            if (sortBy === "ranking") {
-                const rankA = parseInt(a["Ranking"] || "6"); // Default to 6 (lowest) if no ranking
-                const rankB = parseInt(b["Ranking"] || "6");
-                return rankA - rankB; // 1 first, then 2, 3, 4, 5
-            } else if (sortBy === "newest") {
+            if (sortBy === "newest") {
                 const dateA = parseDate(a["When Added"]);
                 const dateB = parseDate(b["When Added"]);
+                
+                // Debug: Log the dates being compared
+                console.log("Sorting newest - A:", a["When Added"], "parsed:", dateA, "B:", b["When Added"], "parsed:", dateB);
+                
                 return dateB - dateA; // Newest first
             } else if (sortBy === "oldest") {
                 const dateA = parseDate(a["When Added"]);
                 const dateB = parseDate(b["When Added"]);
+                
+                // Debug: Log the dates being compared
+                console.log("Sorting oldest - A:", a["When Added"], "parsed:", dateA, "B:", b["When Added"], "parsed:", dateB);
+                
                 return dateA - dateB; // Oldest first
             } else if (sortBy === "nameAZ") {
                 const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
@@ -912,7 +923,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         }
 
         const websiteFields = [
-            { label: "Own Website", key: "Links" },
+            { label: "Own Website", key: "Own Website" },
             { label: "Easy Commerce", key: "Website with easy commerce" },
             { label: "Gallery Rep", key: "Gallery Representation" }
         ];
@@ -921,7 +932,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             if (row[key]) {
             const el = document.createElement("div");
             el.className = "field-item";
-            if (key === "Links" && row[key] !== "No") {
+            if (key === "Own Website" && row[key] !== "No") {
                 el.innerHTML = `<span class="label">${label}:</span> <a href="${row[key]}" target="_blank" class="website-link">Visit Site</a>`;
             } else {
                 el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
