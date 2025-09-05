@@ -590,6 +590,88 @@ transform: scale(1.1);
       box-shadow: none !important;
     }
   }
+/* Mobile-only refinements */
+@media (max-width: 600px) {
+  /* Navigation fixes */
+  .nav-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.25rem;
+    margin: 0;
+  }
+  .nav-title {
+    font-size: 1.2rem !important;
+  }
+  .logo {
+    position: relative !important;
+    margin: 0 auto 0.5rem auto;
+    width: 60px;
+    height: 60px;
+    font-size: 0.55rem;
+  }
+
+  /* Enhanced search bar & filters for mobile */
+  .search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto 1rem auto;
+    gap: 0.5rem;
+  }
+  .search-input {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.8rem;
+    width: 90%;
+    max-width: 90%;
+    box-sizing: border-box;
+  }
+  .clear-btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.8rem;
+    width: 90%;
+    max-width: 90%;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+    display: block;
+  }
+  .status-filters {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+  .status-btn {
+    width: 90%;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.7rem;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  #filters {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Analytics grid */
+  .analytics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  .chart-card {
+    margin: 0 auto;
+    width: 100% !important;
+  }
+
+  /* Headings */
+  h1, h2 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+}
 </style>
 </head>
 <body>
