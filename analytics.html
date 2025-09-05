@@ -291,6 +291,90 @@ a.activity-item:hover {
         justify-content: center;
     }
 }
+
+/* Mobile-only refinements for iOS Safari */
+@media only screen and (max-width: 600px) {
+  /* Header and logo */
+  .header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    margin-bottom: 2rem !important;
+  }
+  .logo {
+    position: relative !important;
+    margin: 0 auto 1rem auto !important;
+    width: 70px !important;
+    height: 70px !important;
+    font-size: 0.55rem !important;
+  }
+  .nav-section {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+  .nav-title {
+    font-size: 1.2rem !important;
+  }
+
+  /* Search bar & filters */
+  .search-container,
+  #filters {
+    width: 90% !important;
+    max-width: 360px !important;
+    margin: 0 auto 1rem auto !important;
+  }
+  .search-input, .clear-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  .status-filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  .status-btn {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Analytics grid */
+  .analytics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .chart-card {
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  /* Ensure charts fit mobile width */
+  .chart-container {
+    padding: 1rem !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  .bar-chart,
+  #pipelineTimeline,
+  canvas {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+  }
+
+  /* Headings */
+  h1, h2 {
+    font-size: 1.4rem !important;
+    text-align: center !important;
+    margin: 0.5rem 0 !important;
+  }
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
