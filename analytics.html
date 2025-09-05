@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Analytics - Elsewhere Collective</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
+<style>
+body {
+    font-family: 'Satoshi', sans-serif;
+    background-color: #F3EFE9;
+    margin: 0;
+    padding: 2rem;
+    color: #0D0D0D;
+}
+
+.header {
+    position: relative;
+    margin-bottom: 4rem;
+}
+
+.logo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: #F3EFE9;
+    border: 2px solid #0D0D0D;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    color: #0D0D0D;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 0.9;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    padding: 0.5rem;
+    padding-bottom: 0.8rem;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+.nav-section {
+    display: flex;
+    gap: 3rem;
+    align-items: baseline;
+    margin-right: 120px;
+}
+
+.nav-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-title.active {
+    color: #0D0D0D;
+}
+
+.nav-title:not(.active) {
+    color: #666;
+}
+
+.nav-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(214, 179, 112, 0.15);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.chart-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: #0D0D0D;
+}
+
+.chart-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.bar-chart {
+    min-height: 300px;
+}
+
+.bar-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.bar-label {
+    width: 150px;
+    font-size: 0.8rem;
+    color: #0D0D0D;
+    flex-shrink: 0;
+    text-align: right;
+    margin-right: 0.5rem;
+}
+
+.bar {
+    height: 20px;
+    background: #D6B370;
+    border-radius: 4px;
+    margin: 0 0.8rem;
+    min-width: 10px;
+    max-width: 300px;
+}
+
+.genre-bar {
+    background: #2552FF;
+}
+
+.bar-value {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #0D0D0D;
+    min-width: 25px;
+}
+
+.funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.funnel-stage {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+}
+
+.funnel-prospect {
+    background: rgba(214, 179, 112, 0.2);
+    border: 1px solid rgba(214, 179, 112, 0.3);
+    width: 100%;
+}
+
+.funnel-planned-outreach {
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    width: 85%;
+}
+
+.funnel-outreach {
+    background: rgba(37, 82, 255, 0.2);
+    border: 1px solid rgba(37, 82, 255, 0.3);
+    width: 70%;
+}
+
+
+.funnel-responded {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    width: 50%;
+}
+
+.funnel-negotiating {
+    background: rgba(147, 51, 234, 0.2);
+    border: 1px solid rgba(147, 51, 234, 0.3);
+    width: 40%;
+}
+
+.funnel-showcased {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    width: 30%;
+}
+
+.funnel-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.funnel-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.funnel-percentage {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.activity-table {
+    height: 280px;
+    overflow-y: auto;
+}
+
+ .activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(214, 179, 112, 0.1);
+}
+
+a.activity-item {
+    text-decoration: none !important;
+    color: inherit;
+}
+a.activity-item:hover {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+.activity-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.activity-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(214, 179, 112, 0.3);
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-name {
+    font-weight: 500;
+    color: #0D0D0D;
+    margin-bottom: 0.2rem;
+}
+
+.activity-source {
+    font-size: 0.8rem;
+    color: #666;
+    background: rgba(214, 179, 112, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.activity-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.recent-full-width {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nav-section {
+        margin-right: 0;
+        gap: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div>else</div>
+            <div>where</div>
+            <div>collective</div>
+        </div>
+   <div class="nav-section">
+  <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
+  <div class="nav-title active">Analytics</div>
+</div>
+        </div>
+    </div>
+    
+    <div class="analytics-grid">
+        <div class="chart-container">
+            <div class="chart-title">Where Found</div>
+            <div class="chart-subtitle">Where you're discovering artists</div>
+            <div class="bar-chart" id="whereFoundChart">Loading...</div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Pipeline Funnel</div>
+            <div class="chart-subtitle"></div>
+            <div class="funnel" id="pipelineFunnel">Loading...</div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Genres Spotlighted</div>
+            <div class="chart-subtitle">Art styles you're featuring</div>
+            <div class="bar-chart" id="genresChart">Loading...</div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Pipeline Over Time</div>
+            <div class="chart-subtitle">Weekly adds vs total pipeline size</div>
+            <canvas id="pipelineTimeline"></canvas>
+        </div>
+        
+        <div class="chart-container recent-full-width">
+            <div class="chart-title">Recent Additions</div>
+            <div class="chart-subtitle">Last 10 artists added</div>
+            <div class="activity-table" id="recentActivity">Loading...</div>
+        </div>
+    </div>
+
+<script>
+function getWeekNumber(d) {
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+function renderPipelineTimeline(data) {
+    const weeklyAdds = {};
+    const sorted = data
+        .filter(row => row["When Added"])
+        .map(row => ({ date: parseDate(row["When Added"]) }))
+        .filter(r => r.date && !isNaN(r.date))
+        .sort((a, b) => a.date - b.date);
+
+    let cumulative = 0;
+    sorted.forEach(r => {
+        const week = `${r.date.getFullYear()}-W${getWeekNumber(r.date)}`;
+        if (!weeklyAdds[week]) weeklyAdds[week] = 0;
+        weeklyAdds[week]++;
+    });
+
+    const labels = Object.keys(weeklyAdds).sort();
+    const adds = labels.map(week => weeklyAdds[week]);
+    const cumulativeTotals = [];
+    adds.forEach(a => {
+        cumulative += a;
+        cumulativeTotals.push(cumulative);
+    });
+
+    const ctx = document.getElementById("pipelineTimeline").getContext("2d");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [
+                { label: "New Artists", data: adds, backgroundColor: "#D6B370" },
+                { label: "Total Pipeline", data: cumulativeTotals, type: "line", borderColor: "#2552FF", borderWidth: 2, fill: false }
+            ]
+        },
+        options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+    });
+}
+function parseCSV(csv) {
+    const lines = csv.split('\n');
+    const result = [];
+    const headers = [];
+    let current = '', inQuotes = false;
+
+    // Parse header row
+    for (let i = 0; i < lines[0].length; i++) {
+        const char = lines[0][i];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) {
+            headers.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    headers.push(current.trim().replace(/^"|"$/g, ''));
+
+    // Parse data rows
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const values = [], row = {};
+        current = ''; inQuotes = false;
+        for (let j = 0; j < lines[i].length; j++) {
+            const char = lines[i][j];
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) {
+                values.push(current.trim().replace(/^"|"$/g, ''));
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        values.push(current.trim().replace(/^"|"$/g, ''));
+        headers.forEach((header, idx) => row[header] = values[idx] || '');
+        if (row[headers[0]]) result.push(row);
+    }
+    return result;
+}
+
+function renderWhereFound(data) {
+    const counts = {};
+    data.forEach(row => {
+        const source = row["Where Found"];
+        if (source) counts[source] = (counts[source] || 0) + 1;
+    });
+
+    // New logic: group sources with >=5, rest as "Other"
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const totalWhereFound = entries.reduce((sum, [, c]) => sum + c, 0);
+    const top = entries.filter(([, count]) => count >= 5);
+    const shownTotal = top.reduce((sum, [, c]) => sum + c, 0);
+    const otherCount = totalWhereFound - shownTotal;
+
+    const container = document.getElementById('whereFoundChart');
+    container.innerHTML = '';
+
+    // Update subtitle to clarify scope
+    const wfSubtitle = document.querySelector('.chart-container:nth-of-type(1) .chart-subtitle');
+    if (wfSubtitle) {
+      wfSubtitle.textContent = `Sources with ≥5 artists — showing ${shownTotal} of ${totalWhereFound}`;
+    }
+
+    if (entries.length === 0) return;
+    const maxCount = Math.max(...top.map(([, count]) => count), otherCount || 0);
+
+    // Render top N
+    (top).forEach(([source, count]) => {
+      const barItem = document.createElement('div');
+      barItem.className = 'bar-item';
+      const widthPixels = Math.round((count / maxCount) * 250);
+      barItem.innerHTML = `
+          <div class="bar-label">${source}</div>
+          <div class="bar" style="width: ${widthPixels}px !important;"></div>
+          <div class="bar-value">${count}</div>
+      `;
+      container.appendChild(barItem);
+    });
+
+    // Render Other bucket if there are remaining sources
+    if (otherCount > 0) {
+      const barItem = document.createElement('div');
+      barItem.className = 'bar-item';
+      const widthPixels = Math.round((otherCount / maxCount) * 250);
+      barItem.innerHTML = `
+          <div class="bar-label">Other</div>
+          <div class="bar" style="width: ${widthPixels}px !important; background: #999;"></div>
+          <div class="bar-value">${otherCount}</div>
+      `;
+      container.appendChild(barItem);
+    }
+}
+
+function renderGenres(data) {
+    const counts = {};
+    data.forEach(row => {
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        if (status === "spotlighted" || status === "featured" || status === "feature planned") {
+            const genre = row["Genre"];
+            if (genre) counts[genre] = (counts[genre] || 0) + 1;
+        }
+    });
+
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const container = document.getElementById('genresChart');
+    container.innerHTML = '';
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #666;">No featured artists yet</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...sorted.map(([, count]) => count));
+    console.log("Genres - Max count:", maxCount, "Data:", sorted);
+    
+    sorted.forEach(([genre, count]) => {
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        const widthPixels = Math.round((count / maxCount) * 250); // Use pixels instead of percentage
+        console.log(`${genre}: ${count} items, width: ${widthPixels}px`);
+        
+        barItem.innerHTML = `
+            <div class="bar-label">${genre}</div>
+            <div class="bar genre-bar" style="width: ${widthPixels}px !important;"></div>
+            <div class="bar-value">${count}</div>
+        `;
+        container.appendChild(barItem);
+    });
+}
+
+function renderFunnel(data) {
+    // Map to hold canonical label for each stage (from sheet values)
+    const canonicalLabels = {
+        prospect: null,
+        plannedOutreach: null,
+        outreach: null,
+        responded: null,
+        negotiating: null,
+        showcased: null
+    };
+    // Counts for each stage
+    const stageCounts = {
+        prospect: 0,
+        plannedOutreach: 0,
+        outreach: 0,
+        responded: 0,
+        negotiating: 0,
+        showcased: 0
+    };
+    // For each row, classify and count, and record the first exact value for each stage
+    data.forEach(row => {
+        let rawStatus = (row["Current Status"] || "");
+        let status = rawStatus.toLowerCase().replace(/[–—-]/g, ' ')
+            .replace(/[:;,().]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        // Helper for punctuationless comparison
+        let norm = status.replace(/[^\w\s]/g, '').trim();
+        // Determine stage
+        if (status.startsWith("prospect")) {
+            stageCounts.prospect++;
+            if (!canonicalLabels.prospect) canonicalLabels.prospect = rawStatus;
+        } else if (status.includes("planned") && status.includes("outreach")) {
+            stageCounts.plannedOutreach++;
+            if (!canonicalLabels.plannedOutreach) canonicalLabels.plannedOutreach = rawStatus;
+        } else if (status.includes("outreach")) {
+            stageCounts.outreach++;
+            if (!canonicalLabels.outreach) canonicalLabels.outreach = rawStatus;
+        } else if (status.startsWith("respond") || status.startsWith("reply")) {
+            stageCounts.responded++;
+            if (!canonicalLabels.responded) canonicalLabels.responded = rawStatus;
+        } else if (status.includes("negotiat")) {
+            stageCounts.negotiating++;
+            if (!canonicalLabels.negotiating) canonicalLabels.negotiating = rawStatus;
+        } else if (
+            status.includes("feature planned") ||
+            status.includes("spotlight") ||
+            status.includes("featured") ||
+            status.includes("showcas")
+        ) {
+            stageCounts.showcased++;
+            if (!canonicalLabels.showcased) canonicalLabels.showcased = rawStatus;
+        }
+    });
+    // Use fallback labels if no canonical label found
+    const fallbackLabels = {
+        prospect: "Prospect",
+        plannedOutreach: "Planned Outreach",
+        outreach: "Outreach",
+        responded: "Responded",
+        negotiating: "Negotiating",
+        showcased: "Showcased"
+    };
+    // Build ordered array for funnel
+    const funnelStages = [
+        { key: "prospect", label: canonicalLabels.prospect || fallbackLabels.prospect, count: stageCounts.prospect },
+        { key: "plannedOutreach", label: canonicalLabels.plannedOutreach || fallbackLabels.plannedOutreach, count: stageCounts.plannedOutreach },
+        { key: "outreach", label: canonicalLabels.outreach || fallbackLabels.outreach, count: stageCounts.outreach },
+        { key: "responded", label: canonicalLabels.responded || fallbackLabels.responded, count: stageCounts.responded },
+        { key: "negotiating", label: canonicalLabels.negotiating || fallbackLabels.negotiating, count: stageCounts.negotiating },
+        { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
+    ];
+    const total = data.length;
+    document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle').innerText =
+        `Total: ${total}`;
+    // Funnel stage widths in order
+    const stageWidths = ["100%", "85%", "70%", "55%", "40%", "25%"];
+    const stageClasses = [
+        "funnel-prospect",
+        "funnel-planned-outreach",
+        "funnel-outreach",
+        "funnel-responded",
+        "funnel-negotiating",
+        "funnel-showcased"
+    ];
+    // Compose funnel HTML
+    let funnelHtml = "";
+    for (let i = 0; i < funnelStages.length; i++) {
+        const s = funnelStages[i];
+        const percent = total > 0 ? Math.round((s.count / total) * 100) : 0;
+        funnelHtml += `
+            <div class="funnel-stage ${stageClasses[i]}" style="width: ${stageWidths[i]};">
+                <div class="funnel-label">${s.label}</div>
+                <div>
+                    <div class="funnel-number">${s.count}</div>
+                    <div class="funnel-percentage">${percent}%</div>
+                </div>
+            </div>
+        `;
+    }
+    document.getElementById('pipelineFunnel').innerHTML = funnelHtml;
+}
+
+function parseDate(dateString) {
+    if (!dateString) return null;
+    
+    // Handle DD/MM/YY format (like 12/06/25 = 12 June 2025)
+    if (dateString.includes("/") && dateString.length === 8) {
+        const parts = dateString.split("/");
+        if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+            let year = parseInt(parts[2]);
+            if (year < 100) {
+                year = 2000 + year;
+            }
+            return new Date(year, month, day);
+        }
+    }
+    
+    return new Date(dateString);
+}
+
+function renderRecent(data) {
+    const recent = data
+        .filter(row => row["When Added"])
+        .map(row => ({
+            ...row,
+            parsedDate: parseDate(row["When Added"])
+        }))
+        .filter(row => row.parsedDate && !isNaN(row.parsedDate))
+        .sort((a, b) => b.parsedDate - a.parsedDate) // Most recent first
+        .slice(0, 10);
+
+    const container = document.getElementById('recentActivity');
+    container.innerHTML = '';
+
+    recent.forEach(row => {
+        const artistName = row["Artist"] || row["Instagram Name"] || "Unknown";
+        const whereFound = row["Where Found"] || "Unknown";
+        const avatarSrc = row["Image"] || "https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face";
+        const instaHandle = row["Insta Handle"] || "#";
+        
+        // Calculate days ago properly
+        const daysAgo = Math.floor((new Date() - row.parsedDate) / (1000 * 60 * 60 * 24));
+        let dateText;
+        if (daysAgo === 0) dateText = "Today";
+        else if (daysAgo === 1) dateText = "Yesterday";
+        else if (daysAgo < 0) dateText = "Future date"; // This shouldn't happen but helps debug
+        else dateText = `${daysAgo} days ago`;
+
+        const item = document.createElement('a');
+        item.className = 'activity-item';
+        item.href = instaHandle;
+        item.target = "_blank";
+        item.innerHTML = `
+            <div class="activity-left">
+                <img src="${avatarSrc}" alt="${artistName}" class="activity-avatar" onerror="this.src='https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face'">
+                <div class="activity-info">
+                    <div class="activity-name">${artistName}</div>
+                    <div class="activity-source">${whereFound}</div>
+                </div>
+            </div>
+            <div class="activity-date">${dateText}</div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357&timestamp=${Date.now()}`)
+    .then(res => res.text())
+    .then(csvData => {
+        const data = parseCSV(csvData);
+        renderWhereFound(data);
+        renderGenres(data);
+        renderPipelineTimeline(data);
+        renderFunnel(data);
+        renderRecent(data);
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        document.getElementById('whereFoundChart').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('genresChart').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('pipelineFunnel').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('recentActivity').innerHTML = '<div style="color: red;">Error loading data</div>';
+    });
+</script>
+</body>
+</html>
