@@ -682,7 +682,7 @@ transform: scale(1.1);
 <button class="filter-toggle" onclick="toggleFilters()">☰</button>
 
 <script>
-let currentStatusFilter = 'all';
+let currentStatusFilter = ['all'];
 let currentSearchTerm = '';
 
 function toggleFilters() {
@@ -757,12 +757,37 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         genreSelect.appendChild(option);
     });
 
-    // Status filter buttons
+    // Status filter buttons - now supports multi-select with metaKey/ctrlKey
     document.querySelectorAll('.status-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentStatusFilter = btn.dataset.status;
+        btn.addEventListener('click', (event) => {
+            const status = btn.dataset.status;
+            let changed = false;
+            if (event.metaKey || event.ctrlKey) {
+                // Multi-select: toggle this status in the array
+                if (status === 'all') {
+                    currentStatusFilter = ['all'];
+                } else {
+                    // Remove 'all' if present
+                    currentStatusFilter = currentStatusFilter.filter(s => s !== 'all');
+                    const idx = currentStatusFilter.indexOf(status);
+                    if (idx > -1) {
+                        currentStatusFilter.splice(idx, 1);
+                    } else {
+                        currentStatusFilter.push(status);
+                    }
+                    // If none selected, revert to 'all'
+                    if (currentStatusFilter.length === 0) currentStatusFilter = ['all'];
+                }
+            } else {
+                // Single select: only this status
+                currentStatusFilter = [status];
+            }
+            // Update button classes
+            document.querySelectorAll('.status-btn').forEach(b => {
+                const s = b.dataset.status;
+                if (currentStatusFilter.includes(s)) b.classList.add('active');
+                else b.classList.remove('active');
+            });
             refreshUI();
         });
     });
@@ -772,28 +797,33 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const followersRange = followersSelect.value;
 
         return fullData.filter(row => {
-        // Status filter
-        const status = (row["Current Status"] || "").toLowerCase().trim();
-        const statusMatch = currentStatusFilter === 'all' || status === currentStatusFilter.toLowerCase();
-        
-        // Search filter
-        const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
-        const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
-        
-        const genreMatch = genre === "All" || row["Genre"] === genre;
-        
-        // Followers filter
-        let followers = 0;
-        const raw = row["Instagram Followers - Do not delete"] || '';
-        const str = raw.toLowerCase().replace(/,/g, '');
-        if (str.includes('k')) followers = parseFloat(str.replace('k', '')) * 1000;
-        else followers = parseInt(str) || 0;
-        let followersMatch = true;
-        if (followersRange === "under5k") followersMatch = followers < 5000;
-        else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
-        else if (followersRange === "10kplus") followersMatch = followers > 10000;
-        
-        return statusMatch && searchMatch && genreMatch && followersMatch;
+            // Status filter
+            const status = (row["Current Status"] || "").toLowerCase().trim();
+            let statusMatch = false;
+            if (currentStatusFilter.includes('all')) {
+                statusMatch = true;
+            } else {
+                // Match if any selected status matches
+                statusMatch = currentStatusFilter.some(s => status === s.toLowerCase());
+            }
+            // Search filter
+            const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
+            const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
+
+            const genreMatch = genre === "All" || row["Genre"] === genre;
+
+            // Followers filter
+            let followers = 0;
+            const raw = row["Instagram Followers - Do not delete"] || '';
+            const str = raw.toLowerCase().replace(/,/g, '');
+            if (str.includes('k')) followers = parseFloat(str.replace('k', '')) * 1000;
+            else followers = parseInt(str) || 0;
+            let followersMatch = true;
+            if (followersRange === "under5k") followersMatch = followers < 5000;
+            else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
+            else if (followersRange === "10kplus") followersMatch = followers > 10000;
+
+            return statusMatch && searchMatch && genreMatch && followersMatch;
         });
     }
 
@@ -1025,7 +1055,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
       sortBySelect.value = "none";
       searchInput.value = "";
       currentSearchTerm = "";
-      currentStatusFilter = 'all';
+      currentStatusFilter = ['all'];
       document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
       document.querySelector('.status-btn[data-status="all"]').classList.add('active');
       renderCards(fullData);
