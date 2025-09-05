@@ -420,6 +420,37 @@ transform: scale(1.1);
     color: #D6B370;
     letter-spacing: 0.02em;
     }
+
+    /* Navigation section styles (updated to match Analytics.html) */
+    .nav-section {
+        display: flex;
+        gap: 3rem;
+        align-items: baseline;
+        margin-right: 120px;
+    }
+
+    .nav-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 500;
+        margin: 0;
+        letter-spacing: -0.02em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .nav-title.active {
+        color: #0D0D0D;
+    }
+
+    .nav-title:not(.active) {
+        color: #666;
+    }
+
+    .nav-title a {
+        color: inherit;
+        text-decoration: none;
+    }
     
     @media (max-width: 768px) {
     .logo {
@@ -429,7 +460,6 @@ transform: scale(1.1);
         height: 80px;
         font-size: 0.6rem;
     }
-    
     h1 {
         margin-right: 0;
         text-align: center;
@@ -569,8 +599,10 @@ transform: scale(1.1);
     <div>where</div>
     <div>collective</div>
     </div>
-    <h1>Artist Prospecting</h1>
-    <h2>Ranked by creative fit</h2>
+  <div class="nav-section">
+  <div class="nav-title active"><a href="index.html">Artist Prospecting</a></div>
+  <div class="nav-title"><a href="analytics.html">Analytics</a></div>
+    </div>
 </div>
 
 <!-- Search Bar -->
@@ -820,25 +852,15 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
     function sortData(data) {
         const sortBy = sortBySelect.value;
-        
         if (sortBy === "none") return data;
-        
         return [...data].sort((a, b) => {
             if (sortBy === "newest") {
                 const dateA = parseDate(a["When Added"]);
                 const dateB = parseDate(b["When Added"]);
-                
-                // Debug: Log the dates being compared
-                console.log("Sorting newest - A:", a["When Added"], "parsed:", dateA, "B:", b["When Added"], "parsed:", dateB);
-                
                 return dateB - dateA; // Newest first
             } else if (sortBy === "oldest") {
                 const dateA = parseDate(a["When Added"]);
                 const dateB = parseDate(b["When Added"]);
-                
-                // Debug: Log the dates being compared
-                console.log("Sorting oldest - A:", a["When Added"], "parsed:", dateA, "B:", b["When Added"], "parsed:", dateB);
-                
                 return dateA - dateB; // Oldest first
             } else if (sortBy === "nameAZ") {
                 const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
