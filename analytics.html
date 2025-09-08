@@ -78,6 +78,7 @@ body {
 .analytics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -279,6 +280,10 @@ a.activity-item:hover {
     grid-column: 1 / -1;
 }
 
+.post-performance-full {
+    grid-column: 1 / -1;
+}
+
 @media (max-width: 768px) {
     .analytics-grid {
         grid-template-columns: 1fr;
@@ -417,6 +422,12 @@ a.activity-item:hover {
             <canvas id="pipelineTimeline"></canvas>
         </div>
         
+        <div class="chart-container post-performance-full">
+            <div class="chart-title">Post Performance</div>
+            <div class="chart-subtitle">Reach, views, and engagement rate per post</div>
+            <canvas id="postPerformanceChart" width="800" height="300"></canvas>
+        </div>
+        
         <div class="chart-container recent-full-width">
             <div class="chart-title">Recent Additions</div>
             <div class="chart-subtitle">Last 10 artists added</div>
@@ -469,6 +480,100 @@ function renderPipelineTimeline(data) {
         options: { responsive: true, plugins: { legend: { position: "bottom" } } }
     });
 }
+
+function renderPostPerformance(data) {
+    const sortedData = data
+        .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
+        .map(row => ({
+            date: row["Post Date"],
+            title: row["Post Title"] || "Untitled",
+            artist: row["Artist"] || "Unknown",
+            reach: parseInt(row["Reach"]) || 0,
+            views: parseInt(row["Views"]) || 0,
+            engagementRate: parseFloat(row["Likes / Reach"]) || 0,
+            notes: row["Notes"] || ""
+        }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date)) // Oldest first (left to right)
+        .slice(-10); // Take last 10 (most recent chronologically)
+
+    const ctx = document.getElementById('postPerformanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedData.map(post => post.title),
+            datasets: [
+                {
+                    label: 'Reach',
+                    data: sortedData.map(post => post.reach),
+                    backgroundColor: '#2552FF',
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Views',
+                    data: sortedData.map(post => post.views),
+                    backgroundColor: 'rgba(37, 82, 255, 0.6)',
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Engagement Rate (%)',
+                    data: sortedData.map(post => post.engagementRate),
+                    type: 'line',
+                    borderColor: '#D6B370',
+                    backgroundColor: '#D6B370',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.2,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Reach / Views'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Engagement Rate (%)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const dataIndex = context.dataIndex;
+                            const post = sortedData[dataIndex];
+                            const tooltip = [`Date: ${post.date}`, `Artist: ${post.artist}`];
+                            if (post.notes) {
+                                tooltip.push(`Notes: ${post.notes}`);
+                            }
+                            return tooltip;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 function parseCSV(csv) {
     const lines = csv.split('\n');
     const result = [];
@@ -778,6 +883,14 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderPipelineTimeline(data);
         renderFunnel(data);
         renderRecent(data);
+        
+        // Fetch Instagram analytics data
+        return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
+    })
+    .then(res => res.text())
+    .then(igCsvData => {
+        const igData = parseCSV(igCsvData);
+        renderPostPerformance(igData);
     })
     .catch(err => {
         console.error("Error:", err);
@@ -785,6 +898,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         document.getElementById('genresChart').innerHTML = '<div style="color: red;">Error loading data</div>';
         document.getElementById('pipelineFunnel').innerHTML = '<div style="color: red;">Error loading data</div>';
         document.getElementById('recentActivity').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('postPerformanceChart').getContext('2d').fillText('Error loading post data', 50, 50);
     });
 </script>
 </body>
