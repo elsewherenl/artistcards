@@ -733,6 +733,12 @@ transform: scale(1.1);
 </select>
 </div>
 <div class="summary-item">
+<label for="whereFoundFilter" class="summary-label">Where Found</label><br>
+<select id="whereFoundFilter" class="filter-select">
+  <option value="All">All</option>
+</select>
+</div>
+<div class="summary-item">
 <label for="followersFilter" class="summary-label">Followers</label><br>
 <select id="followersFilter" class="filter-select">
   <option value="All">All</option>
@@ -819,6 +825,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
     .then(csvData => {
     const data = parseCSV(csvData);
     const genreSelect = document.getElementById("genreFilter");
+    const whereFoundSelect = document.getElementById("whereFoundFilter");
     const followersSelect = document.getElementById("followersFilter");
     const sortBySelect = document.getElementById("sortByFilter");
 
@@ -837,6 +844,16 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         option.value = genre;
         option.textContent = genre;
         genreSelect.appendChild(option);
+    });
+
+    // Populate where found options
+    const whereFoundOptions = [...new Set(data.map(row => row["Where Found"]).filter(Boolean))];
+    console.log("Found where found options:", whereFoundOptions);
+    whereFoundOptions.sort().forEach(whereFound => {
+        const option = document.createElement("option");
+        option.value = whereFound;
+        option.textContent = whereFound;
+        whereFoundSelect.appendChild(option);
     });
 
     // Status filter buttons - now supports multi-select with metaKey/ctrlKey
@@ -876,6 +893,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
     function filterData() {
         const genre = genreSelect.value;
+        const whereFound = whereFoundSelect.value;
         const followersRange = followersSelect.value;
 
         return fullData.filter(row => {
@@ -893,6 +911,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
 
             const genreMatch = genre === "All" || row["Genre"] === genre;
+            const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
 
             // Followers filter
             let followers = 0;
@@ -905,7 +924,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
             else if (followersRange === "10kplus") followersMatch = followers > 10000;
 
-            return statusMatch && searchMatch && genreMatch && followersMatch;
+            return statusMatch && searchMatch && genreMatch && whereFoundMatch && followersMatch;
         });
     }
 
@@ -1125,6 +1144,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
     });
 
     genreSelect.addEventListener("change", refreshUI);
+    whereFoundSelect.addEventListener("change", refreshUI);
     followersSelect.addEventListener("change", refreshUI);
     sortBySelect.addEventListener("change", refreshUI);
 
@@ -1133,6 +1153,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
     // Reset Filters button
     document.getElementById("resetFilters").addEventListener("click", () => {
       genreSelect.value = "All";
+      whereFoundSelect.value = "All";
       followersSelect.value = "All";
       sortBySelect.value = "none";
       searchInput.value = "";
