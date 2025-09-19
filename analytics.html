@@ -93,6 +93,19 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* ADDED: Special styling for post performance to maximize space */
+.post-performance-full .chart-container {
+    padding: 1.5rem; /* REDUCED padding to maximize chart space */
+}
+
+.post-performance-full .chart-title {
+    margin-bottom: 1rem; /* REDUCED margin */
+}
+
+.post-performance-full .chart-subtitle {
+    margin-bottom: 1.5rem; /* REDUCED margin */
+}
+
 .chart-title {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 1.3rem;
@@ -284,6 +297,63 @@ a.activity-item:hover {
     grid-column: 1 / -1;
 }
 
+/* NEW: Enhanced Post Performance Chart with Horizontal Scrolling */
+.post-performance-container {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 15px; /* INCREASED space for scrollbar */
+    margin-bottom: 1rem;
+    height: 450px; /* ADDED fixed height container */
+}
+
+.post-performance-container::-webkit-scrollbar {
+    height: 12px; /* INCREASED scrollbar height */
+}
+
+.post-performance-container::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.1);
+    border-radius: 6px; /* INCREASED border radius */
+}
+
+.post-performance-container::-webkit-scrollbar-thumb {
+    background: #D6B370;
+    border-radius: 6px; /* INCREASED border radius */
+}
+
+.post-performance-container::-webkit-scrollbar-thumb:hover {
+    background: #B8965A;
+}
+
+.post-chart-wrapper {
+    min-width: fit-content;
+    width: max-content;
+    height: 100%; /* ADDED to fill container */
+}
+
+/* Scroll hint styling */
+.scroll-hint {
+    position: absolute;
+    top: 50%;
+    right: 2rem;
+    transform: translateY(-50%);
+    background: rgba(214, 179, 112, 0.9);
+    color: #0D0D0D;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.post-performance-container:hover .scroll-hint {
+    opacity: 1;
+}
+
 @media (max-width: 768px) {
     .analytics-grid {
         grid-template-columns: 1fr;
@@ -294,6 +364,11 @@ a.activity-item:hover {
         gap: 2rem;
         flex-wrap: wrap;
         justify-content: center;
+    }
+
+    .post-performance-container {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
     }
 }
 
@@ -424,8 +499,13 @@ a.activity-item:hover {
         
         <div class="chart-container post-performance-full">
             <div class="chart-title">Post Performance</div>
-            <div class="chart-subtitle">Reach, views, and engagement rate per post</div>
-            <canvas id="postPerformanceChart" width="800" height="300"></canvas>
+            <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
+            <div class="post-performance-container">
+                <div class="post-chart-wrapper">
+                    <canvas id="postPerformanceChart"></canvas>
+                </div>
+                <div class="scroll-hint">← Scroll to see all posts →</div>
+            </div>
         </div>
         
         <div class="chart-container recent-full-width">
@@ -551,6 +631,7 @@ function renderPipelineTimeline(data) {
 }
 
 function renderPostPerformance(data) {
+    // REMOVED: .slice(-10) limit - now shows ALL posts
     const sortedData = data
         .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
         .map(row => ({
@@ -562,10 +643,26 @@ function renderPostPerformance(data) {
             engagementRate: parseFloat(row["Likes / Reach"]) || 0,
             notes: row["Notes"] || ""
         }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date)) // Oldest first (left to right)
-        .slice(-10); // Take last 10 (most recent chronologically)
+        .sort((a, b) => new Date(a.date) - new Date(b.date)); // Oldest first (left to right)
 
-    const ctx = document.getElementById('postPerformanceChart').getContext('2d');
+    // Calculate dynamic width based on number of posts - INCREASED bar width for more space usage
+    const minBarWidth = 120; // INCREASED from 60 to 120px per bar
+    const chartWidth = Math.max(1200, sortedData.length * minBarWidth); // INCREASED minimum from 800 to 1200px
+    
+    // Set canvas width dynamically - INCREASED height too
+    const canvas = document.getElementById('postPerformanceChart');
+    canvas.width = chartWidth;
+    canvas.height = 400; // INCREASED from 300 to 400px
+    canvas.style.width = chartWidth + 'px';
+    canvas.style.height = '400px'; // INCREASED height
+
+    // Update subtitle to show total count
+    const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
+    if (postSubtitle) {
+        postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total — scroll to see all`;
+    }
+
+    const ctx = canvas.getContext('2d');
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -597,7 +694,8 @@ function renderPostPerformance(data) {
             ]
         },
         options: {
-            responsive: true,
+            responsive: false, // CHANGED: Disable responsive to maintain fixed width
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     type: 'linear',
@@ -618,6 +716,12 @@ function renderPostPerformance(data) {
                     },
                     grid: {
                         drawOnChartArea: false
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
                     }
                 }
             },
