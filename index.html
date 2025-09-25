@@ -1076,21 +1076,44 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         }
 
         const websiteFields = [
-            { label: "Own Website", key: "Own Website" },
             { label: "Easy Commerce", key: "Website with easy commerce" },
             { label: "Gallery Rep", key: "Gallery Representation" }
         ];
 
         websiteFields.forEach(({ label, key }) => {
-            if (row[key]) {
-            const el = document.createElement("div");
-            el.className = "field-item";
-            if (key === "Own Website" && row[key] !== "No") {
-                el.innerHTML = `<span class="label">${label}:</span> <a href="${row[key]}" target="_blank" class="website-link">Visit Site</a>`;
-            } else {
-                el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
+            if (row[key] && row[key].toString().trim()) {
+                const cellValue = row[key].toString().trim();
+                const el = document.createElement("div");
+                el.className = "field-item";
+                el.innerHTML = `<span class="label">${label}:</span> ${cellValue}`;
+                card.appendChild(el);
             }
-            card.appendChild(el);
+        });
+
+        // Handle website link from "Links" column
+        if (row["Links"] && row["Links"].toString().trim()) {
+            const websiteUrl = row["Links"].toString().trim();
+            if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                el.innerHTML = `<span class="label">Website:</span> <a href="${websiteUrl}" target="_blank" class="website-link">Visit Site</a>`;
+                card.appendChild(el);
+            }
+        }
+
+        // Add Instagram follow status fields - these will be after Gallery Rep
+        const followFields = [
+            { label: "Follow on IG", key: "Follow on IG" },
+            { label: "Follows me on IG", key: "Follows Me on IG?" }
+        ];
+
+        followFields.forEach(({ label, key }) => {
+            // If we found a value and it's "Yes" (case insensitive), display it
+            if (row[key] && row[key].toString().toLowerCase().trim() === "yes") {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                el.innerHTML = `<span class="label">${label}:</span> Y`;
+                card.appendChild(el);
             }
         });
 
