@@ -93,17 +93,16 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* ADDED: Special styling for post performance to maximize space */
 .post-performance-full .chart-container {
-    padding: 1.5rem; /* REDUCED padding to maximize chart space */
+    padding: 1.5rem;
 }
 
 .post-performance-full .chart-title {
-    margin-bottom: 1rem; /* REDUCED margin */
+    margin-bottom: 1rem;
 }
 
 .post-performance-full .chart-subtitle {
-    margin-bottom: 1.5rem; /* REDUCED margin */
+    margin-bottom: 0.5rem;
 }
 
 .chart-title {
@@ -118,6 +117,13 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 2rem;
+}
+
+.post-summary-stats {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
 }
 
 .bar-chart {
@@ -193,7 +199,6 @@ body {
     width: 70%;
 }
 
-
 .funnel-responded {
     background: rgba(34, 197, 94, 0.2);
     border: 1px solid rgba(34, 197, 94, 0.3);
@@ -233,7 +238,7 @@ body {
     overflow-y: auto;
 }
 
- .activity-item {
+.activity-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -245,6 +250,7 @@ a.activity-item {
     text-decoration: none !important;
     color: inherit;
 }
+
 a.activity-item:hover {
     text-decoration: none !important;
     color: inherit;
@@ -297,29 +303,28 @@ a.activity-item:hover {
     grid-column: 1 / -1;
 }
 
-/* NEW: Enhanced Post Performance Chart with Horizontal Scrolling */
 .post-performance-container {
     position: relative;
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 15px; /* INCREASED space for scrollbar */
+    padding-bottom: 15px;
     margin-bottom: 1rem;
-    height: 450px; /* ADDED fixed height container */
+    height: 450px;
 }
 
 .post-performance-container::-webkit-scrollbar {
-    height: 12px; /* INCREASED scrollbar height */
+    height: 12px;
 }
 
 .post-performance-container::-webkit-scrollbar-track {
     background: rgba(214, 179, 112, 0.1);
-    border-radius: 6px; /* INCREASED border radius */
+    border-radius: 6px;
 }
 
 .post-performance-container::-webkit-scrollbar-thumb {
     background: #D6B370;
-    border-radius: 6px; /* INCREASED border radius */
+    border-radius: 6px;
 }
 
 .post-performance-container::-webkit-scrollbar-thumb:hover {
@@ -329,10 +334,9 @@ a.activity-item:hover {
 .post-chart-wrapper {
     min-width: fit-content;
     width: max-content;
-    height: 100%; /* ADDED to fill container */
+    height: 100%;
 }
 
-/* Scroll hint styling */
 .scroll-hint {
     position: absolute;
     top: 50%;
@@ -372,9 +376,7 @@ a.activity-item:hover {
     }
 }
 
-/* Mobile-only refinements for iOS Safari */
 @media only screen and (max-width: 600px) {
-  /* Header and logo */
   .header {
     display: flex !important;
     flex-direction: column !important;
@@ -400,7 +402,6 @@ a.activity-item:hover {
     font-size: 1.2rem !important;
   }
 
-  /* Search bar & filters */
   .search-container,
   #filters {
     width: 90% !important;
@@ -422,7 +423,6 @@ a.activity-item:hover {
     text-align: center !important;
   }
 
-  /* Analytics grid */
   .analytics-grid {
     grid-template-columns: 1fr !important;
     gap: 1rem !important;
@@ -432,7 +432,6 @@ a.activity-item:hover {
     margin: 0 auto !important;
   }
 
-  /* Ensure charts fit mobile width */
   .chart-container {
     padding: 1rem !important;
     width: 100% !important;
@@ -447,14 +446,12 @@ a.activity-item:hover {
     display: block;
   }
 
-  /* Headings */
   h1, h2 {
     font-size: 1.4rem !important;
     text-align: center !important;
     margin: 0.5rem 0 !important;
   }
 }
-
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -465,10 +462,9 @@ a.activity-item:hover {
             <div>where</div>
             <div>collective</div>
         </div>
-   <div class="nav-section">
-  <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
-  <div class="nav-title active">Analytics</div>
-</div>
+        <div class="nav-section">
+            <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
+            <div class="nav-title active">Analytics</div>
         </div>
     </div>
     
@@ -500,6 +496,7 @@ a.activity-item:hover {
         <div class="chart-container post-performance-full">
             <div class="chart-title">Post Performance</div>
             <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
+            <div class="post-summary-stats" id="postSummaryStats">Loading...</div>
             <div class="post-performance-container">
                 <div class="post-chart-wrapper">
                     <canvas id="postPerformanceChart"></canvas>
@@ -547,12 +544,10 @@ function renderPipelineTimeline(data) {
         cumulativeTotals.push(cumulative);
     });
 
-    // Calculate average adds per week (rounded up)
     const totalArtists = sorted.length;
     const totalWeeks = labels.length;
     const avgAddsPerWeek = totalWeeks > 0 ? Math.ceil(totalArtists / totalWeeks) : 0;
 
-    // Convert week labels to readable dates
     const readableLabels = labels.map(weekLabel => {
         const [year, week] = weekLabel.split('-W');
         const jan1 = new Date(parseInt(year), 0, 1);
@@ -563,13 +558,11 @@ function renderPipelineTimeline(data) {
         return `w/c ${day} ${month}`;
     });
 
-    // Update subtitle with live average
     const timelineSubtitle = document.querySelector('.chart-container:nth-of-type(4) .chart-subtitle');
     if (timelineSubtitle) {
         timelineSubtitle.textContent = `Weekly adds vs total pipeline size — Avg: ${avgAddsPerWeek} artists/week`;
     }
 
-    // Calculate better scale limits
     const maxAdds = Math.max(...adds);
     const maxTotal = Math.max(...cumulativeTotals);
     
@@ -608,7 +601,7 @@ function renderPipelineTimeline(data) {
                         text: 'Weekly Adds'
                     },
                     beginAtZero: true,
-                    max: Math.ceil(maxAdds * 1.3) // Add 30% padding above highest bar
+                    max: Math.ceil(maxAdds * 1.3)
                 },
                 y1: {
                     type: 'linear',
@@ -619,7 +612,7 @@ function renderPipelineTimeline(data) {
                         text: 'Total Pipeline'
                     },
                     beginAtZero: true,
-                    max: Math.ceil(maxTotal * 1.1), // Add 10% padding above line
+                    max: Math.ceil(maxTotal * 1.1),
                     grid: {
                         drawOnChartArea: false
                     }
@@ -631,7 +624,6 @@ function renderPipelineTimeline(data) {
 }
 
 function renderPostPerformance(data) {
-    // REMOVED: .slice(-10) limit - now shows ALL posts
     const sortedData = data
         .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
         .map(row => ({
@@ -640,23 +632,30 @@ function renderPostPerformance(data) {
             artist: row["Artist"] || "Unknown",
             reach: parseInt(row["Reach"]) || 0,
             views: parseInt(row["Views"]) || 0,
+            likes: parseInt(row["Likes"]) || 0,
             engagementRate: parseFloat(row["Likes / Reach"]) || 0,
             notes: row["Notes"] || ""
         }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date)); // Oldest first (left to right)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // Calculate dynamic width based on number of posts - INCREASED bar width for more space usage
-    const minBarWidth = 120; // INCREASED from 60 to 120px per bar
-    const chartWidth = Math.max(1200, sortedData.length * minBarWidth); // INCREASED minimum from 800 to 1200px
+    const totalPosts = sortedData.length;
+    const avgReach = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.reach, 0) / totalPosts) : 0;
+    const avgViews = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.views, 0) / totalPosts) : 0;
+    const avgLikes = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.likes, 0) / totalPosts) : 0;
+    const avgEngagement = totalPosts > 0 ? (sortedData.reduce((sum, p) => sum + p.engagementRate, 0) / totalPosts).toFixed(2) : '0.00';
+
+    const summaryStatsHTML = `Avg Reach: ${avgReach.toLocaleString()} | Avg Views: ${avgViews.toLocaleString()} | Avg Likes: ${avgLikes.toLocaleString()} | Avg Engagement Rate: ${avgEngagement}%`;
+    document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
+
+    const minBarWidth = 120;
+    const chartWidth = Math.max(1200, sortedData.length * minBarWidth);
     
-    // Set canvas width dynamically - INCREASED height too
     const canvas = document.getElementById('postPerformanceChart');
     canvas.width = chartWidth;
-    canvas.height = 400; // INCREASED from 300 to 400px
+    canvas.height = 400;
     canvas.style.width = chartWidth + 'px';
-    canvas.style.height = '400px'; // INCREASED height
+    canvas.style.height = '400px';
 
-    // Update subtitle to show total count
     const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
     if (postSubtitle) {
         postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total — scroll to see all`;
@@ -694,7 +693,7 @@ function renderPostPerformance(data) {
             ]
         },
         options: {
-            responsive: false, // CHANGED: Disable responsive to maintain fixed width
+            responsive: false,
             maintainAspectRatio: false,
             scales: {
                 y: {
@@ -753,7 +752,6 @@ function parseCSV(csv) {
     const headers = [];
     let current = '', inQuotes = false;
 
-    // Parse header row
     for (let i = 0; i < lines[0].length; i++) {
         const char = lines[0][i];
         if (char === '"') inQuotes = !inQuotes;
@@ -766,7 +764,6 @@ function parseCSV(csv) {
     }
     headers.push(current.trim().replace(/^"|"$/g, ''));
 
-    // Parse data rows
     for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
         const values = [], row = {};
@@ -795,7 +792,6 @@ function renderWhereFound(data) {
         if (source) counts[source] = (counts[source] || 0) + 1;
     });
 
-    // New logic: group sources with >=5, rest as "Other"
     const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     const totalWhereFound = entries.reduce((sum, [, c]) => sum + c, 0);
     const top = entries.filter(([, count]) => count >= 5);
@@ -805,7 +801,6 @@ function renderWhereFound(data) {
     const container = document.getElementById('whereFoundChart');
     container.innerHTML = '';
 
-    // Update subtitle to clarify scope
     const wfSubtitle = document.querySelector('.chart-container:nth-of-type(1) .chart-subtitle');
     if (wfSubtitle) {
       wfSubtitle.textContent = `Sources with ≥5 artists — showing ${shownTotal} of ${totalWhereFound}`;
@@ -814,8 +809,7 @@ function renderWhereFound(data) {
     if (entries.length === 0) return;
     const maxCount = Math.max(...top.map(([, count]) => count), otherCount || 0);
 
-    // Render top N
-    (top).forEach(([source, count]) => {
+    top.forEach(([source, count]) => {
       const barItem = document.createElement('div');
       barItem.className = 'bar-item';
       const widthPixels = Math.round((count / maxCount) * 250);
@@ -827,7 +821,6 @@ function renderWhereFound(data) {
       container.appendChild(barItem);
     });
 
-    // Render Other bucket if there are remaining sources
     if (otherCount > 0) {
       const barItem = document.createElement('div');
       barItem.className = 'bar-item';
@@ -861,13 +854,11 @@ function renderGenres(data) {
     }
 
     const maxCount = Math.max(...sorted.map(([, count]) => count));
-    console.log("Genres - Max count:", maxCount, "Data:", sorted);
     
     sorted.forEach(([genre, count]) => {
         const barItem = document.createElement('div');
         barItem.className = 'bar-item';
-        const widthPixels = Math.round((count / maxCount) * 250); // Use pixels instead of percentage
-        console.log(`${genre}: ${count} items, width: ${widthPixels}px`);
+        const widthPixels = Math.round((count / maxCount) * 250);
         
         barItem.innerHTML = `
             <div class="bar-label">${genre}</div>
@@ -879,7 +870,6 @@ function renderGenres(data) {
 }
 
 function renderFunnel(data) {
-    // Map to hold canonical label for each stage (from sheet values)
     const canonicalLabels = {
         prospect: null,
         plannedOutreach: null,
@@ -888,7 +878,6 @@ function renderFunnel(data) {
         negotiating: null,
         showcased: null
     };
-    // Counts for each stage
     const stageCounts = {
         prospect: 0,
         plannedOutreach: 0,
@@ -897,16 +886,12 @@ function renderFunnel(data) {
         negotiating: 0,
         showcased: 0
     };
-    // For each row, classify and count, and record the first exact value for each stage
     data.forEach(row => {
         let rawStatus = (row["Current Status"] || "");
         let status = rawStatus.toLowerCase().replace(/[–—-]/g, ' ')
             .replace(/[:;,().]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-        // Helper for punctuationless comparison
-        let norm = status.replace(/[^\w\s]/g, '').trim();
-        // Determine stage
         if (status.startsWith("prospect")) {
             stageCounts.prospect++;
             if (!canonicalLabels.prospect) canonicalLabels.prospect = rawStatus;
@@ -932,7 +917,6 @@ function renderFunnel(data) {
             if (!canonicalLabels.showcased) canonicalLabels.showcased = rawStatus;
         }
     });
-    // Use fallback labels if no canonical label found
     const fallbackLabels = {
         prospect: "Prospect",
         plannedOutreach: "Planned Outreach",
@@ -941,7 +925,6 @@ function renderFunnel(data) {
         negotiating: "Negotiating",
         showcased: "Showcased"
     };
-    // Build ordered array for funnel
     const funnelStages = [
         { key: "prospect", label: canonicalLabels.prospect || fallbackLabels.prospect, count: stageCounts.prospect },
         { key: "plannedOutreach", label: canonicalLabels.plannedOutreach || fallbackLabels.plannedOutreach, count: stageCounts.plannedOutreach },
@@ -951,9 +934,7 @@ function renderFunnel(data) {
         { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
     ];
     const total = data.length;
-    document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle').innerText =
-        `Total: ${total}`;
-    // Funnel stage widths in order
+    document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle').innerText = `Total: ${total}`;
     const stageWidths = ["100%", "85%", "70%", "55%", "40%", "25%"];
     const stageClasses = [
         "funnel-prospect",
@@ -963,7 +944,6 @@ function renderFunnel(data) {
         "funnel-negotiating",
         "funnel-showcased"
     ];
-    // Compose funnel HTML
     let funnelHtml = "";
     for (let i = 0; i < funnelStages.length; i++) {
         const s = funnelStages[i];
@@ -984,12 +964,11 @@ function renderFunnel(data) {
 function parseDate(dateString) {
     if (!dateString) return null;
     
-    // Handle DD/MM/YY format (like 12/06/25 = 12 June 2025)
     if (dateString.includes("/") && dateString.length === 8) {
         const parts = dateString.split("/");
         if (parts.length === 3) {
             const day = parseInt(parts[0]);
-            const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+            const month = parseInt(parts[1]) - 1;
             let year = parseInt(parts[2]);
             if (year < 100) {
                 year = 2000 + year;
@@ -1009,7 +988,7 @@ function renderRecent(data) {
             parsedDate: parseDate(row["When Added"])
         }))
         .filter(row => row.parsedDate && !isNaN(row.parsedDate))
-        .sort((a, b) => b.parsedDate - a.parsedDate) // Most recent first
+        .sort((a, b) => b.parsedDate - a.parsedDate)
         .slice(0, 10);
 
     const container = document.getElementById('recentActivity');
@@ -1021,12 +1000,11 @@ function renderRecent(data) {
         const avatarSrc = row["Image"] || "https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face";
         const instaHandle = row["Insta Handle"] || "#";
         
-        // Calculate days ago properly
         const daysAgo = Math.floor((new Date() - row.parsedDate) / (1000 * 60 * 60 * 24));
         let dateText;
         if (daysAgo === 0) dateText = "Today";
         else if (daysAgo === 1) dateText = "Yesterday";
-        else if (daysAgo < 0) dateText = "Future date"; // This shouldn't happen but helps debug
+        else if (daysAgo < 0) dateText = "Future date";
         else dateText = `${daysAgo} days ago`;
 
         const item = document.createElement('a');
@@ -1057,7 +1035,6 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderFunnel(data);
         renderRecent(data);
         
-        // Fetch Instagram analytics data
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
     })
     .then(res => res.text())
