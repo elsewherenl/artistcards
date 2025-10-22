@@ -510,6 +510,14 @@ a.activity-item:hover {
             <div class="chart-subtitle">Last 10 artists added</div>
             <div class="activity-table" id="recentActivity">Loading...</div>
         </div>
+
+        <div class="chart-container recent-full-width">
+            <div class="chart-title">Follower Growth</div>
+            <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
+            <div id="followerGrowthContainer">
+                <canvas id="followerGrowthChart"></canvas>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -963,9 +971,12 @@ function renderFunnel(data) {
 
 function parseDate(dateString) {
     if (!dateString) return null;
-    
-    if (dateString.includes("/") && dateString.length === 8) {
-        const parts = dateString.split("/");
+
+    const trimmed = String(dateString).trim();
+
+    // Handle DD/MM/YY or DD/MM/YYYY format
+    if (trimmed.includes("/")) {
+        const parts = trimmed.split("/");
         if (parts.length === 3) {
             const day = parseInt(parts[0]);
             const month = parseInt(parts[1]) - 1;
@@ -973,11 +984,16 @@ function parseDate(dateString) {
             if (year < 100) {
                 year = 2000 + year;
             }
-            return new Date(year, month, day);
+            const date = new Date(year, month, day);
+            console.log(`Parsed date: ${trimmed} -> ${date}`);
+            return date;
         }
     }
-    
-    return new Date(dateString);
+
+    // Try standard Date parsing
+    const date = new Date(trimmed);
+    console.log(`Parsed date: ${trimmed} -> ${date}`);
+    return date;
 }
 
 function renderRecent(data) {
@@ -999,7 +1015,7 @@ function renderRecent(data) {
         const whereFound = row["Where Found"] || "Unknown";
         const avatarSrc = row["Image"] || "https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face";
         const instaHandle = row["Insta Handle"] || "#";
-        
+
         const daysAgo = Math.floor((new Date() - row.parsedDate) / (1000 * 60 * 60 * 24));
         let dateText;
         if (daysAgo === 0) dateText = "Today";
@@ -1025,6 +1041,178 @@ function renderRecent(data) {
     });
 }
 
+function renderFollowerGrowth(data) {
+    console.log('=== FOLLOWER GROWTH DEBUG ===');
+    console.log('Raw follower data received:', data);
+    console.log('Data length:', data.length);
+    if (data.length > 0) {
+        console.log('First 3 rows:', data.slice(0, 3));
+        console.log('Column names:', Object.keys(data[0]));
+    }
+
+    // Try to find the right columns even if names don't match exactly
+    const dateColumn = Object.keys(data[0] || {}).find(key =>
+        key.trim().toLowerCase().includes('date')
+    );
+    const followerColumn = Object.keys(data[0] || {}).find(key =>
+        key.trim().toLowerCase().includes('follower')
+    );
+
+    console.log('Detected date column:', dateColumn);
+    console.log('Detected follower column:', followerColumn);
+
+    if (!dateColumn || !followerColumn) {
+        const container = document.getElementById('followerGrowthContainer');
+        if (container) {
+            container.innerHTML = `<div style="text-align: center; color: #666; padding: 2rem;">
+                Cannot find required columns.<br>
+                Available columns: ${Object.keys(data[0] || {}).join(', ')}<br>
+                Looking for: "Date" and "# Followers"
+            </div>`;
+        }
+        return;
+    }
+
+    const followerData = data
+        .filter(row => row[dateColumn] && row[followerColumn])
+        .map(row => {
+            const followerStr = String(row[followerColumn]).replace(/,/g, '').replace(/\s/g, '').trim();
+            const followers = parseInt(followerStr) || 0;
+            const parsedDate = parseDate(row[dateColumn]);
+
+            console.log('Processing row:', {
+                rawDate: row[dateColumn],
+                rawFollowers: row[followerColumn],
+                parsedDate: parsedDate,
+                parsedFollowers: followers,
+                isValidDate: parsedDate && !isNaN(parsedDate),
+                isValidFollowers: followers > 0
+            });
+
+            return {
+                date: parsedDate,
+                followers: followers,
+                rawDate: row[dateColumn],
+                rawFollowers: row[followerColumn]
+            };
+        })
+        .filter(row => {
+            const valid = row.date && !isNaN(row.date) && row.followers > 0;
+            if (!valid) {
+                console.log('❌ Filtered out row:', row, 'Reason:', {
+                    noDate: !row.date,
+                    invalidDate: row.date && isNaN(row.date),
+                    noFollowers: row.followers <= 0
+                });
+            } else {
+                console.log('✓ Valid row:', row);
+            }
+            return valid;
+        })
+        .sort((a, b) => a.date - b.date);
+
+    console.log('Processed follower data:', followerData);
+    console.log('Valid data points:', followerData.length);
+
+    const container = document.getElementById('followerGrowthContainer');
+
+    if (followerData.length === 0) {
+        if (container) {
+            container.innerHTML = `<div style="text-align: center; color: #666; padding: 2rem;">
+                No valid follower data found.<br>
+                Rows received: ${data.length}<br>
+                Check browser console (F12) for details.
+            </div>`;
+        }
+        return;
+    }
+
+    const totalDataPoints = followerData.length;
+    const startFollowers = followerData[0].followers;
+    const endFollowers = followerData[followerData.length - 1].followers;
+    const totalGrowth = endFollowers - startFollowers;
+    const growthPercentage = startFollowers > 0 ? ((totalGrowth / startFollowers) * 100).toFixed(1) : 0;
+
+    // Calculate time span and average weekly growth
+    const startDate = followerData[0].date;
+    const endDate = followerData[followerData.length - 1].date;
+    const daysDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const weeksDiff = daysDiff / 7;
+    const avgWeeklyGrowth = weeksDiff > 0 ? Math.round(totalGrowth / weeksDiff) : 0;
+
+    // Format start date
+    const startDateStr = `${startDate.getDate()} ${startDate.toLocaleString('default', { month: 'short' })} ${startDate.getFullYear()}`;
+
+    const subtitle = document.getElementById('followerGrowthSubtitle');
+    if (subtitle) {
+        subtitle.innerHTML = `
+            <strong>+${totalGrowth.toLocaleString()} followers (+${growthPercentage}% since ${startDateStr})</strong><br>
+            Avg weekly growth: ${avgWeeklyGrowth.toLocaleString()} followers/week
+        `;
+    }
+
+    const labels = followerData.map(d => {
+        const month = d.date.toLocaleString('default', { month: 'short' });
+        const day = d.date.getDate();
+        return `${day} ${month}`;
+    });
+
+    const ctx = document.getElementById('followerGrowthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Followers',
+                data: followerData.map(d => d.followers),
+                borderColor: '#2552FF',
+                backgroundColor: 'rgba(37, 82, 255, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: '#2552FF',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 3,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Followers: ${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357&timestamp=${Date.now()}`)
     .then(res => res.text())
     .then(csvData => {
@@ -1034,13 +1222,27 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderPipelineTimeline(data);
         renderFunnel(data);
         renderRecent(data);
-        
+
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
     })
     .then(res => res.text())
     .then(igCsvData => {
         const igData = parseCSV(igCsvData);
         renderPostPerformance(igData);
+
+        return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1441529947&timestamp=${Date.now()}`);
+    })
+    .then(res => res.text())
+    .then(followerCsvData => {
+        console.log('Raw follower CSV (first 800 chars):', followerCsvData.substring(0, 800));
+
+        // Clean up CSV - remove empty rows at the beginning
+        const lines = followerCsvData.split('\n').filter(line => line.trim());
+        const cleanedCsv = lines.join('\n');
+
+        const followerData = parseCSV(cleanedCsv);
+        console.log('Parsed follower data rows:', followerData.length);
+        renderFollowerGrowth(followerData);
     })
     .catch(err => {
         console.error("Error:", err);
@@ -1049,6 +1251,10 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         document.getElementById('pipelineFunnel').innerHTML = '<div style="color: red;">Error loading data</div>';
         document.getElementById('recentActivity').innerHTML = '<div style="color: red;">Error loading data</div>';
         document.getElementById('postPerformanceChart').getContext('2d').fillText('Error loading post data', 50, 50);
+        const followerCanvas = document.getElementById('followerGrowthChart');
+        if (followerCanvas && followerCanvas.getContext) {
+            followerCanvas.getContext('2d').fillText('Error loading follower data', 50, 50);
+        }
     });
 </script>
 </body>
