@@ -358,6 +358,22 @@ a.activity-item:hover {
     opacity: 1;
 }
 
+.scroll-hint-below {
+    text-align: center;
+    background: rgba(214, 179, 112, 0.9);
+    color: #0D0D0D;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    display: inline-block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
 .sort-btn {
     padding: 0.5rem 1rem;
     background: rgba(214, 179, 112, 0.1);
@@ -532,8 +548,8 @@ a.activity-item:hover {
                 <div class="post-chart-wrapper">
                     <canvas id="postPerformanceChart"></canvas>
                 </div>
-                <div class="scroll-hint">← Scroll to see all posts →</div>
             </div>
+            <div class="scroll-hint-below">← Scroll horizontally to see all posts →</div>
         </div>
         
         <div class="chart-container recent-full-width">
