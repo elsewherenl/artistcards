@@ -358,6 +358,30 @@ a.activity-item:hover {
     opacity: 1;
 }
 
+.sort-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(214, 179, 112, 0.1);
+    border: 1px solid rgba(214, 179, 112, 0.3);
+    border-radius: 6px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    color: #0D0D0D;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sort-btn:hover {
+    background: rgba(214, 179, 112, 0.2);
+    border-color: rgba(214, 179, 112, 0.5);
+}
+
+.sort-btn.active {
+    background: #D6B370;
+    border-color: #D6B370;
+    color: #FFF;
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
     .analytics-grid {
         grid-template-columns: 1fr;
@@ -497,6 +521,13 @@ a.activity-item:hover {
             <div class="chart-title">Post Performance</div>
             <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
             <div class="post-summary-stats" id="postSummaryStats">Loading...</div>
+            <div class="post-sort-controls" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.85rem; color: #666; margin-right: 0.5rem; align-self: center;">Sort by:</span>
+                <button class="sort-btn active" data-sort="date">Date</button>
+                <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
+                <button class="sort-btn" data-sort="views">Views (High to Low)</button>
+                <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
+            </div>
             <div class="post-performance-container">
                 <div class="post-chart-wrapper">
                     <canvas id="postPerformanceChart"></canvas>
@@ -631,20 +662,58 @@ function renderPipelineTimeline(data) {
     });
 }
 
-function renderPostPerformance(data) {
-    const sortedData = data
-        .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
-        .map(row => ({
-            date: row["Post Date"],
-            title: row["Post Title"] || "Untitled",
-            artist: row["Artist"] || "Unknown",
-            reach: parseInt(row["Reach"]) || 0,
-            views: parseInt(row["Views"]) || 0,
-            likes: parseInt(row["Likes"]) || 0,
-            engagementRate: parseFloat(row["Likes / Reach"]) || 0,
-            notes: row["Notes"] || ""
-        }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
+let postPerformanceRawData = [];
+let postPerformanceChart = null;
+
+function renderPostPerformance(data, sortBy = 'date') {
+    // Check if this is raw CSV data or already processed
+    const isRawData = data.length > 0 && data[0].hasOwnProperty("Post Date");
+
+    let processedData;
+    if (isRawData) {
+        // Process raw CSV data
+        processedData = data
+            .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
+            .map(row => ({
+                date: row["Post Date"],
+                title: row["Post Title"] || "Untitled",
+                artist: row["Artist"] || "Unknown",
+                reach: parseInt(row["Reach"]) || 0,
+                views: parseInt(row["Views"]) || 0,
+                likes: parseInt(row["Likes"]) || 0,
+                engagementRate: parseFloat(row["Likes / Reach"]) || 0,
+                notes: row["Notes"] || ""
+            }));
+        // Store raw data for re-sorting
+        postPerformanceRawData = data;
+    } else {
+        // Already processed, use stored raw data
+        processedData = postPerformanceRawData
+            .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
+            .map(row => ({
+                date: row["Post Date"],
+                title: row["Post Title"] || "Untitled",
+                artist: row["Artist"] || "Unknown",
+                reach: parseInt(row["Reach"]) || 0,
+                views: parseInt(row["Views"]) || 0,
+                likes: parseInt(row["Likes"]) || 0,
+                engagementRate: parseFloat(row["Likes / Reach"]) || 0,
+                notes: row["Notes"] || ""
+            }));
+    }
+
+    // Sort based on selected option
+    let sortedData;
+    if (sortBy === 'reach') {
+        sortedData = [...processedData].sort((a, b) => b.reach - a.reach);
+    } else if (sortBy === 'views') {
+        sortedData = [...processedData].sort((a, b) => b.views - a.views);
+    } else if (sortBy === 'engagement') {
+        sortedData = [...processedData].sort((a, b) => b.engagementRate - a.engagementRate);
+    } else {
+        // Default: sort by date
+        sortedData = [...processedData].sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
 
     const totalPosts = sortedData.length;
     const avgReach = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.reach, 0) / totalPosts) : 0;
@@ -670,7 +739,13 @@ function renderPostPerformance(data) {
     }
 
     const ctx = canvas.getContext('2d');
-    new Chart(ctx, {
+
+    // Destroy existing chart if it exists
+    if (postPerformanceChart) {
+        postPerformanceChart.destroy();
+    }
+
+    postPerformanceChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: sortedData.map(post => post.title),
@@ -752,6 +827,22 @@ function renderPostPerformance(data) {
             }
         }
     });
+
+    // Setup sort button listeners (only once)
+    if (!window.postSortListenersAdded) {
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-render with new sort
+                const sortType = this.getAttribute('data-sort');
+                renderPostPerformance([], sortType);
+            });
+        });
+        window.postSortListenersAdded = true;
+    }
 }
 
 function parseCSV(csv) {
