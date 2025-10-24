@@ -890,7 +890,8 @@ transform: scale(1.1);
 <div class="summary-item">
 <label for="sortByFilter" class="summary-label">Sort By</label><br>
 <select id="sortByFilter" class="filter-select">
-  <option value="none">Default</option>
+  <option value="rankingHighLow">Highest to Lowest Ranking</option>
+  <option value="rankingLowHigh">Lowest to Highest Ranking</option>
   <option value="newest">Newest Added</option>
   <option value="oldest">Oldest Added</option>
   <option value="nameAZ">Name A-Z</option>
@@ -1197,9 +1198,18 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
     function sortData(data) {
         const sortBy = sortBySelect.value;
-        if (sortBy === "none") return data;
         return [...data].sort((a, b) => {
-            if (sortBy === "newest") {
+            if (sortBy === "rankingHighLow") {
+                // Highest to Lowest: 5 → 1 (descending)
+                const rankA = parseInt(a["Ranking"]) || 0;
+                const rankB = parseInt(b["Ranking"]) || 0;
+                return rankB - rankA; // Higher numbers first
+            } else if (sortBy === "rankingLowHigh") {
+                // Lowest to Highest: 1 → 5 (ascending)
+                const rankA = parseInt(a["Ranking"]) || 0;
+                const rankB = parseInt(b["Ranking"]) || 0;
+                return rankA - rankB; // Lower numbers first
+            } else if (sortBy === "newest") {
                 const dateA = parseDate(a["When Added"]);
                 const dateB = parseDate(b["When Added"]);
                 return dateB - dateA; // Newest first
@@ -1408,14 +1418,13 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
       genreSelect.value = "All";
       whereFoundSelect.value = "All";
       followersSelect.value = "All";
-      sortBySelect.value = "none";
+      sortBySelect.value = "rankingHighLow";
       searchInput.value = "";
       currentSearchTerm = "";
       currentStatusFilter = ['all'];
       document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
       document.querySelector('.status-btn[data-status="all"]').classList.add('active');
-      renderCards(fullData);
-      updateStats(fullData);
+      refreshUI();
       // On mobile, hide filters after reset
       if (window.innerWidth <= 768) {
         document.getElementById("filters").style.display = "none";
