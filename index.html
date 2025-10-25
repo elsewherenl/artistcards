@@ -1200,15 +1200,15 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const sortBy = sortBySelect.value;
         return [...data].sort((a, b) => {
             if (sortBy === "rankingHighLow") {
-                // Highest to Lowest: 5 → 1 (descending)
+                // Highest to Lowest: 1 → 5 (best to worst)
                 const rankA = parseInt(a["Ranking"]) || 0;
                 const rankB = parseInt(b["Ranking"]) || 0;
-                return rankB - rankA; // Higher numbers first
+                return rankA - rankB; // Lower numbers (better rankings) first
             } else if (sortBy === "rankingLowHigh") {
-                // Lowest to Highest: 1 → 5 (ascending)
+                // Lowest to Highest: 5 → 1 (worst to best)
                 const rankA = parseInt(a["Ranking"]) || 0;
                 const rankB = parseInt(b["Ranking"]) || 0;
-                return rankA - rankB; // Lower numbers first
+                return rankB - rankA; // Higher numbers (worse rankings) first
             } else if (sortBy === "newest") {
                 const dateA = parseDate(a["When Added"]);
                 const dateB = parseDate(b["When Added"]);
