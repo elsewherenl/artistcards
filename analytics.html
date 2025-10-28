@@ -195,6 +195,7 @@ canvas {
     flex-direction: column;
     justify-content: center;
     flex-grow: 1;
+    overflow: hidden;
 }
 
 .bar-item {
@@ -207,11 +208,15 @@ canvas {
 .bar-label {
     width: 120px;
     min-width: 80px;
+    max-width: 150px;
     font-size: 0.8rem;
     color: #0D0D0D;
     flex-shrink: 0;
     text-align: right;
     margin-right: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .bar {
@@ -220,7 +225,8 @@ canvas {
     border-radius: 4px;
     margin: 0 0.8rem;
     min-width: 10px;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    max-width: calc(100% - 200px);
 }
 
 .genre-bar {
@@ -232,6 +238,7 @@ canvas {
     font-weight: 500;
     color: #0D0D0D;
     min-width: 25px;
+    flex-shrink: 0;
 }
 
 .funnel {
@@ -544,6 +551,8 @@ a.activity-item:hover {
     width: 60px !important;
     height: 60px !important;
     font-size: 0.55rem !important;
+    padding: 0.3rem !important;
+    padding-bottom: 0.48rem !important;
   }
 
   .nav-section {
@@ -665,35 +674,49 @@ a.activity-item:hover {
   }
 
   .post-summary-stats {
-    font-size: 0.75rem !important;
+    font-size: 0.7rem !important;
     text-align: center !important;
-    line-height: 1.8 !important;
+    line-height: 1.6 !important;
+    margin-bottom: 1rem !important;
   }
 
   .post-sort-controls {
     justify-content: center !important;
-    gap: 0.4rem !important;
+    gap: 0.3rem !important;
+    flex-direction: column !important;
   }
 
   .post-sort-controls span {
     width: 100% !important;
     text-align: center !important;
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important;
+    margin-bottom: 0.3rem !important;
   }
 
   .sort-btn {
-    font-size: 0.75rem !important;
-    padding: 0.4rem 0.8rem !important;
+    font-size: 0.7rem !important;
+    padding: 0.35rem 0.6rem !important;
+    width: 100% !important;
   }
 
   .post-performance-container {
-    height: 350px !important;
+    height: 300px !important;
     margin-bottom: 0.5rem !important;
+    padding-bottom: 10px !important;
   }
 
   .scroll-hint-below {
-    font-size: 0.75rem !important;
-    padding: 0.4rem 0.8rem !important;
+    font-size: 0.7rem !important;
+    padding: 0.35rem 0.6rem !important;
+  }
+
+  /* Reduce chart canvas size on mobile */
+  #postPerformanceChart {
+    max-height: 280px !important;
+  }
+
+  .post-chart-wrapper {
+    height: 100% !important;
   }
 
   /* Recent additions - centered */
@@ -1027,14 +1050,17 @@ function renderPostPerformance(data, sortBy = 'date') {
     const summaryStatsHTML = `Avg Reach: ${avgReach.toLocaleString()} | Avg Views: ${avgViews.toLocaleString()} | Avg Likes: ${avgLikes.toLocaleString()} | Avg Engagement Rate: ${avgEngagement}%`;
     document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
 
-    const minBarWidth = 120;
-    const chartWidth = Math.max(1200, sortedData.length * minBarWidth);
-    
+    // Set responsive dimensions based on viewport
+    const isMobile = window.innerWidth <= 600;
+    const minBarWidth = isMobile ? 80 : 120;
+    const chartWidth = Math.max(isMobile ? 800 : 1200, sortedData.length * minBarWidth);
+    const chartHeight = isMobile ? 280 : 400;
+
     const canvas = document.getElementById('postPerformanceChart');
     canvas.width = chartWidth;
-    canvas.height = 400;
+    canvas.height = chartHeight;
     canvas.style.width = chartWidth + 'px';
-    canvas.style.height = '400px';
+    canvas.style.height = chartHeight + 'px';
 
     const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
     if (postSubtitle) {
@@ -1071,7 +1097,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                     type: 'line',
                     borderColor: '#D6B370',
                     backgroundColor: '#D6B370',
-                    borderWidth: 3,
+                    borderWidth: isMobile ? 2 : 3,
                     fill: false,
                     tension: 0.2,
                     yAxisID: 'y1'
@@ -1087,8 +1113,16 @@ function renderPostPerformance(data, sortBy = 'date') {
                     display: true,
                     position: 'left',
                     title: {
-                        display: true,
-                        text: 'Reach / Views'
+                        display: !isMobile,
+                        text: 'Reach / Views',
+                        font: {
+                            size: isMobile ? 10 : 12
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: isMobile ? 9 : 11
+                        }
                     }
                 },
                 y1: {
@@ -1096,8 +1130,16 @@ function renderPostPerformance(data, sortBy = 'date') {
                     display: true,
                     position: 'right',
                     title: {
-                        display: true,
-                        text: 'Engagement Rate (%)'
+                        display: !isMobile,
+                        text: 'Engagement Rate (%)',
+                        font: {
+                            size: isMobile ? 10 : 12
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: isMobile ? 9 : 11
+                        }
                     },
                     grid: {
                         drawOnChartArea: false
@@ -1106,15 +1148,31 @@ function renderPostPerformance(data, sortBy = 'date') {
                 x: {
                     ticks: {
                         maxRotation: 45,
-                        minRotation: 45
+                        minRotation: 45,
+                        font: {
+                            size: isMobile ? 9 : 11
+                        }
                     }
                 }
             },
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: isMobile ? 10 : 12
+                        },
+                        padding: isMobile ? 8 : 10,
+                        boxWidth: isMobile ? 20 : 40
+                    }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: isMobile ? 10 : 12
+                    },
+                    titleFont: {
+                        size: isMobile ? 11 : 13
+                    },
                     callbacks: {
                         afterLabel: function(context) {
                             const dataIndex = context.dataIndex;
