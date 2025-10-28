@@ -399,12 +399,11 @@ transform: scale(1.1);
     }
 
     .lightbox-content {
-    max-width: 90%;
+    max-width: calc(100vw - 240px - 8rem);
     max-height: 90vh;
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    animation: zoomIn 0.3s ease;
     }
 
     @keyframes zoomIn {
@@ -412,10 +411,58 @@ transform: scale(1.1);
     to { transform: scale(1); opacity: 1; }
     }
 
+    .lightbox-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 90%;
+    max-height: 90vh;
+    align-items: center;
+    justify-content: center;
+    animation: zoomIn 0.3s ease;
+    }
+
+    .lightbox-info {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1.25rem;
+    border-radius: 8px;
+    width: 240px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    font-family: 'Satoshi', sans-serif;
+    z-index: 10000;
+    }
+
+    .lightbox-info-item {
+    margin-bottom: 1rem;
+    }
+
+    .lightbox-info-item:last-child {
+    margin-bottom: 0;
+    }
+
+    .lightbox-info-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 0.35rem;
+    color: #0D0D0D;
+    display: block;
+    }
+
+    .lightbox-info-item span:not(.lightbox-info-label) {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: #D6B370;
+    line-height: 1.4;
+    }
+
     .lightbox-close {
     position: absolute;
     top: 2rem;
-    right: 2rem;
+    right: calc(240px + 4rem + 1rem);
     color: white;
     font-size: 3rem;
     font-weight: 300;
@@ -429,6 +476,7 @@ transform: scale(1.1);
     justify-content: center;
     line-height: 1;
     transition: all 0.3s ease;
+    z-index: 10001;
     }
 
     .lightbox-close:hover {
@@ -441,7 +489,7 @@ transform: scale(1.1);
     top: 50%;
     transform: translateY(-50%);
     color: white;
-    font-size: 3rem;
+    font-size: 2.5rem;
     cursor: pointer;
     background: rgba(0, 0, 0, 0.5);
     width: 60px;
@@ -452,10 +500,14 @@ transform: scale(1.1);
     justify-content: center;
     transition: all 0.3s ease;
     user-select: none;
+    line-height: 1;
+    padding: 0;
+    z-index: 10002;
     }
 
     .lightbox-arrow:hover {
-    background: rgba(214, 179, 112, 0.8);
+    background: rgba(214, 179, 112, 0.9);
+    transform: translateY(-50%) scale(1.1);
     }
 
     .lightbox-arrow-left {
@@ -463,7 +515,7 @@ transform: scale(1.1);
     }
 
     .lightbox-arrow-right {
-    right: 2rem;
+    right: 1.5rem;
     }
 
     .lightbox-counter {
@@ -480,6 +532,38 @@ transform: scale(1.1);
     }
 
     @media (max-width: 768px) {
+    .lightbox-container {
+        flex-direction: column;
+        max-width: 95%;
+        gap: 1rem;
+    }
+
+    .lightbox-content {
+        max-width: 95vw;
+        max-height: 50vh;
+    }
+
+    .lightbox-info {
+        position: static;
+        transform: none;
+        min-width: auto;
+        width: 100%;
+        max-width: 95vw;
+        padding: 1rem;
+    }
+
+    .lightbox-info-item {
+        margin-bottom: 0.75rem;
+    }
+
+    .lightbox-info-label {
+        font-size: 0.9rem;
+    }
+
+    .lightbox-info-item span:not(.lightbox-info-label) {
+        font-size: 0.8rem;
+    }
+
     .lightbox-close {
         top: 1rem;
         right: 1rem;
@@ -495,11 +579,11 @@ transform: scale(1.1);
     }
 
     .lightbox-arrow-left {
-        left: 1rem;
+        left: 0.5rem;
     }
 
     .lightbox-arrow-right {
-        right: 1rem;
+        right: 0.5rem;
     }
 
     .lightbox-counter {
@@ -533,6 +617,19 @@ transform: scale(1.1);
     }
     
     .website-link:hover {
+    text-decoration: underline;
+    }
+
+    .similar-artist-link {
+    color: #2552FF;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-weight: 500;
+    }
+
+    .similar-artist-link:hover {
+    color: #D6B370;
     text-decoration: underline;
     }
     
@@ -732,6 +829,16 @@ transform: scale(1.1);
   }
 /* Mobile-only refinements */
 @media (max-width: 600px) {
+  /* Reduce excessive padding on mobile */
+  body {
+    padding: 1rem;
+  }
+
+  /* Reduce header spacing */
+  .header {
+    margin-bottom: 2rem;
+  }
+
   /* Navigation fixes */
   .nav-section {
     flex-direction: column;
@@ -790,10 +897,29 @@ transform: scale(1.1);
     padding: 0.35rem 0.7rem;
     margin: 0 auto;
     box-sizing: border-box;
+    min-height: 48px; /* Ensure minimum touch target size */
   }
   #filters {
     max-width: 100%;
     margin: 0 auto;
+  }
+
+  /* Adjust card grid for smaller screens */
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  /* Reduce card image height on mobile */
+  .image {
+    max-height: 240px;
+  }
+
+  /* Ensure status badges don't overlap on narrow cards */
+  .status-badge {
+    max-width: calc(100% - 2rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Analytics grid */
@@ -915,7 +1041,15 @@ transform: scale(1.1);
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
     <span class="lightbox-arrow lightbox-arrow-left" onclick="event.stopPropagation(); navigateLightbox(-1)">&#8249;</span>
     <span class="lightbox-arrow lightbox-arrow-right" onclick="event.stopPropagation(); navigateLightbox(1)">&#8250;</span>
-    <img class="lightbox-content" id="lightboxImage" src="" alt="" onclick="event.stopPropagation()">
+    <div class="lightbox-container" onclick="event.stopPropagation()">
+        <img class="lightbox-content" id="lightboxImage" src="" alt="">
+        <div class="lightbox-info" id="lightboxInfo">
+            <div class="lightbox-info-item"><span class="lightbox-info-label">Artist:</span> <span id="lightboxArtist"></span></div>
+            <div class="lightbox-info-item"><span class="lightbox-info-label">Genre:</span> <span id="lightboxGenre"></span></div>
+            <div class="lightbox-info-item"><span class="lightbox-info-label">Status:</span> <span id="lightboxStatus"></span></div>
+            <div class="lightbox-info-item" id="lightboxSimilarArtistsContainer" style="display: none;"><span class="lightbox-info-label">Similar Artists:</span> <span id="lightboxSimilarArtists"></span></div>
+        </div>
+    </div>
     <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
@@ -924,6 +1058,7 @@ transform: scale(1.1);
 let currentLightboxIndex = 0;
 let lightboxImages = [];
 let lightboxCardElements = [];
+let lightboxArtistData = [];
 
 // Lightbox functions
 function openLightbox(imageIndex) {
@@ -941,6 +1076,23 @@ function updateLightboxImage() {
     if (lightboxImages.length > 0) {
         lightboxImage.src = lightboxImages[currentLightboxIndex];
         lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${lightboxImages.length}`;
+
+        // Update artist info
+        const artistData = lightboxArtistData[currentLightboxIndex];
+        if (artistData) {
+            document.getElementById('lightboxArtist').textContent = artistData.artist || '-';
+            document.getElementById('lightboxGenre').textContent = artistData.genre || '-';
+            document.getElementById('lightboxStatus').textContent = artistData.status || '-';
+
+            // Handle Similar Artists (Col V) - only show if filled in
+            const similarArtistsContainer = document.getElementById('lightboxSimilarArtistsContainer');
+            if (artistData.similarArtists && artistData.similarArtists.trim()) {
+                document.getElementById('lightboxSimilarArtists').textContent = artistData.similarArtists;
+                similarArtistsContainer.style.display = 'block';
+            } else {
+                similarArtistsContainer.style.display = 'none';
+            }
+        }
     }
 }
 
@@ -1243,10 +1395,14 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         // Reset gallery arrays
         lightboxImages = [];
         lightboxCardElements = [];
+        lightboxArtistData = [];
 
         dataset.forEach((row, index) => {
         const card = document.createElement("div");
         card.className = "card";
+        // Add unique ID to card based on artist name
+        const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-');
+        card.id = `artist-${artistNameForId}`;
 
         // Add status badge
         const status = row["Current Status"] || "Prospect";
@@ -1276,6 +1432,12 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             // Add to gallery arrays
             lightboxImages.push(row["Image"]);
             lightboxCardElements.push(card);
+            lightboxArtistData.push({
+                artist: row["Artist"] || row["Instagram Name"] || "Unknown",
+                genre: row["Genre"] || "-",
+                status: row["Current Status"] || "-",
+                similarArtists: row["Similar Artists"] || ""
+            });
 
             const image = document.createElement("img");
             image.className = "image";
@@ -1288,6 +1450,12 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             // If no image, add placeholder to keep indices aligned
             lightboxImages.push(null);
             lightboxCardElements.push(card);
+            lightboxArtistData.push({
+                artist: row["Artist"] || row["Instagram Name"] || "Unknown",
+                genre: row["Genre"] || "-",
+                status: row["Current Status"] || "-",
+                similarArtists: row["Similar Artists"] || ""
+            });
         }
 
         const fields = [
@@ -1357,6 +1525,23 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             }
         });
 
+        // Add Similar Artists if present
+        if (row["Similar Artists"] && row["Similar Artists"].toString().trim()) {
+            const el = document.createElement("div");
+            el.className = "field-item";
+            const similarArtistsText = row["Similar Artists"].toString().trim();
+
+            // Split by comma and make each artist name clickable
+            const artistNames = similarArtistsText.split(',').map(name => name.trim());
+            const clickableNames = artistNames.map(name => {
+                const nameForId = name.toLowerCase().replace(/\s+/g, '-');
+                return `<span class="similar-artist-link" data-artist-id="artist-${nameForId}">${name}</span>`;
+            }).join(', ');
+
+            el.innerHTML = `<span class="label">Similar Artists:</span> ${clickableNames}`;
+            card.appendChild(el);
+        }
+
         if (row["Notes"]) {
             const notes = document.createElement("div");
             notes.className = "notes";
@@ -1365,6 +1550,62 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         }
 
         container.appendChild(card);
+        });
+
+        // Add click handlers for similar artist links
+        document.querySelectorAll('.similar-artist-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-artist-id');
+                let targetCard = document.getElementById(targetId);
+
+                // If the card is not currently visible (due to filters), clear filters first
+                if (!targetCard) {
+                    // Clear search
+                    currentSearchTerm = '';
+                    document.getElementById('searchInput').value = '';
+
+                    // Reset to "All" status
+                    currentStatusFilter = ['all'];
+                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+
+                    // Reset other filters
+                    document.getElementById('genreFilter').value = 'All';
+                    document.getElementById('whereFoundFilter').value = 'All';
+                    document.getElementById('followersFilter').value = 'All';
+
+                    // Refresh the UI to show all artists
+                    refreshUI();
+
+                    // Wait for DOM to update, then try again
+                    setTimeout(() => {
+                        targetCard = document.getElementById(targetId);
+                        if (targetCard) {
+                            targetCard.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                            // Add highlight effect
+                            targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                            setTimeout(() => {
+                                targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                            }, 2000);
+                        }
+                    }, 100);
+                } else {
+                    // Card is already visible, just scroll to it
+                    targetCard.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    // Add highlight effect
+                    targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                    setTimeout(() => {
+                        targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                    }, 2000);
+                }
+            });
         });
     }
 
@@ -1412,7 +1653,32 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
     sortBySelect.addEventListener("change", refreshUI);
 
     refreshUI(); // Initial render
-    
+
+    // Handle hash navigation (from analytics page links)
+    function handleHashNavigation() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#artist-')) {
+            setTimeout(() => {
+                const targetCard = document.getElementById(hash.substring(1));
+                if (targetCard) {
+                    targetCard.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    // Add highlight effect
+                    targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                    setTimeout(() => {
+                        targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                    }, 2000);
+                }
+            }, 500); // Wait for cards to render
+        }
+    }
+
+    // Call on load and on hash change
+    handleHashNavigation();
+    window.addEventListener('hashchange', handleHashNavigation);
+
     // Reset Filters button
     document.getElementById("resetFilters").addEventListener("click", () => {
       genreSelect.value = "All";
