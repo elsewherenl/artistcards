@@ -75,13 +75,48 @@ body {
     text-decoration: none;
 }
 
+.summary {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(214, 179, 112, 0.15);
+    border-radius: 0;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: #D6B370;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.summary-label {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
 .analytics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto auto;
     gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
 }
 
 .chart-container {
@@ -89,8 +124,12 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(214, 179, 112, 0.15);
     border-radius: 12px;
-    padding: 2rem;
+    padding: 1.5rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .post-performance-full .chart-container {
@@ -105,18 +144,41 @@ body {
     margin-bottom: 0.5rem;
 }
 
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+#pipelineTimeline,
+#followerGrowthChart {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+#followerGrowthContainer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.activity-table {
+    flex-grow: 1;
+}
+
 .chart-title {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 1.3rem;
     font-weight: 500;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
     color: #0D0D0D;
 }
 
 .chart-subtitle {
     font-size: 0.9rem;
     color: #666;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .post-summary-stats {
@@ -127,17 +189,24 @@ body {
 }
 
 .bar-chart {
-    min-height: 300px;
+    min-height: 200px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
 }
 
 .bar-item {
     display: flex;
     align-items: center;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
+    width: 100%;
 }
 
 .bar-label {
-    width: 150px;
+    width: 120px;
+    min-width: 80px;
     font-size: 0.8rem;
     color: #0D0D0D;
     flex-shrink: 0;
@@ -146,12 +215,12 @@ body {
 }
 
 .bar {
-    height: 20px;
+    height: 18px;
     background: #D6B370;
     border-radius: 4px;
     margin: 0 0.8rem;
     min-width: 10px;
-    max-width: 300px;
+    flex-shrink: 0;
 }
 
 .genre-bar {
@@ -168,64 +237,53 @@ body {
 .funnel {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.3rem;
+    padding: 1rem 0;
+    width: 100%;
     align-items: center;
-    padding: 0.5rem 0;
+    justify-content: center;
+    flex-grow: 1;
 }
 
 .funnel-stage {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
+    justify-content: center;
+    height: 50px;
+    background: linear-gradient(to right, rgba(214, 179, 112, 0.2), rgba(214, 179, 112, 0.1));
+    border-left: 2px solid rgba(214, 179, 112, 0.4);
+    border-right: 2px solid rgba(214, 179, 112, 0.4);
+    clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%);
 }
 
-.funnel-prospect {
-    background: rgba(214, 179, 112, 0.2);
-    border: 1px solid rgba(214, 179, 112, 0.3);
-    width: 100%;
+.funnel-stage:first-child {
+    border-top: 2px solid rgba(214, 179, 112, 0.4);
+    clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%);
 }
 
-.funnel-planned-outreach {
-    background: rgba(168, 85, 247, 0.2);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    width: 85%;
+.funnel-stage:last-child {
+    border-bottom: 2px solid rgba(214, 179, 112, 0.4);
 }
 
-.funnel-outreach {
-    background: rgba(37, 82, 255, 0.2);
-    border: 1px solid rgba(37, 82, 255, 0.3);
-    width: 70%;
-}
-
-.funnel-responded {
-    background: rgba(34, 197, 94, 0.2);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    width: 50%;
-}
-
-.funnel-negotiating {
-    background: rgba(147, 51, 234, 0.2);
-    border: 1px solid rgba(147, 51, 234, 0.3);
-    width: 40%;
-}
-
-.funnel-showcased {
-    background: rgba(16, 185, 129, 0.2);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    width: 30%;
+.funnel-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1;
 }
 
 .funnel-label {
+    font-size: 0.85rem;
+    color: #0D0D0D;
     font-weight: 500;
-    font-size: 0.9rem;
 }
 
 .funnel-number {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0D0D0D;
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 500;
 }
 
 .funnel-percentage {
@@ -398,11 +456,22 @@ a.activity-item:hover {
     font-weight: 500;
 }
 
+@media (max-width: 1200px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
 @media (max-width: 768px) {
     .analytics-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .nav-section {
         margin-right: 0;
         gap: 2rem;
@@ -414,9 +483,33 @@ a.activity-item:hover {
         overflow-x: scroll;
         -webkit-overflow-scrolling: touch;
     }
+
+    .bar-label {
+        width: 100px;
+        min-width: 60px;
+        font-size: 0.75rem;
+    }
+
+    .funnel-label {
+        font-size: 0.75rem;
+    }
+
+    .funnel-number {
+        font-size: 0.9rem;
+    }
+
+    .funnel-stage {
+        height: 45px;
+    }
 }
 
 @media only screen and (max-width: 600px) {
+  /* Reduce body padding for mobile */
+  body {
+    padding: 1rem !important;
+  }
+
+  /* Header improvements */
   .header {
     display: flex !important;
     flex-direction: column !important;
@@ -424,13 +517,35 @@ a.activity-item:hover {
     text-align: center !important;
     margin-bottom: 2rem !important;
   }
+
+  /* Summary bar - mobile */
+  .summary {
+    padding: 1rem !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .summary-item:nth-child(5) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .summary-number {
+    font-size: 1.3rem !important;
+  }
+
+  .summary-label {
+    font-size: 0.7rem !important;
+  }
+
   .logo {
     position: relative !important;
     margin: 0 auto 1rem auto !important;
-    width: 70px !important;
-    height: 70px !important;
+    width: 60px !important;
+    height: 60px !important;
     font-size: 0.55rem !important;
   }
+
   .nav-section {
     flex-direction: column !important;
     align-items: center !important;
@@ -438,52 +553,200 @@ a.activity-item:hover {
     margin: 0 auto !important;
     text-align: center !important;
   }
+
   .nav-title {
     font-size: 1.2rem !important;
   }
 
-  .search-container,
-  #filters {
-    width: 90% !important;
-    max-width: 360px !important;
-    margin: 0 auto 1rem auto !important;
-  }
-  .search-input, .clear-btn {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box;
-  }
-  .status-filters {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 0.5rem !important;
-  }
-  .status-btn {
-    width: 100% !important;
-    text-align: center !important;
-  }
-
+  /* Analytics grid - centrally aligned */
   .analytics-grid {
     grid-template-columns: 1fr !important;
-    gap: 1rem !important;
+    gap: 1.5rem !important;
+    max-width: 100% !important;
+    padding: 0 !important;
   }
-  .chart-card {
+
+  /* Chart containers - centered and full width */
+  .chart-container {
+    padding: 1.25rem !important;
     width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
     margin: 0 auto !important;
   }
 
-  .chart-container {
-    padding: 1rem !important;
-    width: 100% !important;
-    box-sizing: border-box;
+  .chart-title {
+    font-size: 1.1rem !important;
+    text-align: center !important;
+    margin-bottom: 0.75rem !important;
   }
-  .bar-chart,
-  #pipelineTimeline,
+
+  .chart-subtitle {
+    font-size: 0.8rem !important;
+    text-align: center !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  /* Bar charts - centered alignment */
+  .bar-chart {
+    min-height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .bar-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .bar-label {
+    width: 100% !important;
+    text-align: center !important;
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .bar {
+    max-width: 90% !important;
+    margin: 0 auto 0.5rem auto !important;
+  }
+
+  .bar-value {
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 1rem !important;
+  }
+
+  /* Pipeline funnel - centered */
+  .funnel {
+    width: 100% !important;
+    padding: 0.5rem 0 !important;
+  }
+
+  .funnel-stage {
+    height: 40px !important;
+  }
+
+  .funnel-label {
+    font-size: 0.7rem !important;
+  }
+
+  .funnel-number {
+    font-size: 0.85rem !important;
+  }
+
+  .funnel-percentage {
+    font-size: 0.65rem !important;
+  }
+
+  /* Canvas charts - centered and responsive */
   canvas {
     max-width: 100% !important;
     width: 100% !important;
     height: auto !important;
-    display: block;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  #pipelineTimeline {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Post performance - better mobile layout */
+  .post-performance-full .chart-container {
+    padding: 1rem !important;
+  }
+
+  .post-summary-stats {
+    font-size: 0.75rem !important;
+    text-align: center !important;
+    line-height: 1.8 !important;
+  }
+
+  .post-sort-controls {
+    justify-content: center !important;
+    gap: 0.4rem !important;
+  }
+
+  .post-sort-controls span {
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 0.8rem !important;
+  }
+
+  .sort-btn {
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+
+  .post-performance-container {
+    height: 350px !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .scroll-hint-below {
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+
+  /* Recent additions - centered */
+  .activity-table {
+    height: auto !important;
+    max-height: 400px !important;
+  }
+
+  .activity-item {
+    padding: 0.75rem 0 !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .activity-left {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .activity-avatar {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .activity-info {
+    align-items: center !important;
+  }
+
+  .activity-name {
+    text-align: center !important;
+  }
+
+  .activity-source {
+    text-align: center !important;
+    font-size: 0.75rem !important;
+  }
+
+  .activity-date {
+    text-align: center !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Follower growth - centered */
+  #followerGrowthSubtitle {
+    font-size: 0.8rem !important;
+    text-align: center !important;
+  }
+
+  #followerGrowthContainer {
+    width: 100% !important;
   }
 
   h1, h2 {
@@ -507,7 +770,31 @@ a.activity-item:hover {
             <div class="nav-title active">Analytics</div>
         </div>
     </div>
-    
+
+    <!-- Summary Dashboard -->
+    <div class="summary" id="summary">
+        <div class="summary-item">
+            <span class="summary-number" id="summaryNewArtists">0</span>
+            <span class="summary-label">New Artists (Last 2 Weeks)</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="summaryPlannedOutreach">0</span>
+            <span class="summary-label">Planned Outreach</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="summaryPlannedFeature">0</span>
+            <span class="summary-label">Planned Feature</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="summaryFollowerGrowth">-</span>
+            <span class="summary-label" id="summaryFollowerGrowthLabel">Follower Growth</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="summaryAvgEngagement">-</span>
+            <span class="summary-label">Avg Engagement</span>
+        </div>
+    </div>
+
     <div class="analytics-grid">
         <div class="chart-container">
             <div class="chart-title">Where Found</div>
@@ -554,7 +841,7 @@ a.activity-item:hover {
         
         <div class="chart-container recent-full-width">
             <div class="chart-title">Recent Additions</div>
-            <div class="chart-subtitle">Last 10 artists added</div>
+            <div class="chart-subtitle">Last 20 artists added</div>
             <div class="activity-table" id="recentActivity">Loading...</div>
         </div>
 
@@ -927,10 +1214,10 @@ function renderWhereFound(data) {
     top.forEach(([source, count]) => {
       const barItem = document.createElement('div');
       barItem.className = 'bar-item';
-      const widthPixels = Math.round((count / maxCount) * 250);
+      const widthPercent = Math.round((count / maxCount) * 100);
       barItem.innerHTML = `
           <div class="bar-label">${source}</div>
-          <div class="bar" style="width: ${widthPixels}px !important;"></div>
+          <div class="bar" style="width: ${widthPercent}%;"></div>
           <div class="bar-value">${count}</div>
       `;
       container.appendChild(barItem);
@@ -939,10 +1226,10 @@ function renderWhereFound(data) {
     if (otherCount > 0) {
       const barItem = document.createElement('div');
       barItem.className = 'bar-item';
-      const widthPixels = Math.round((otherCount / maxCount) * 250);
+      const widthPercent = Math.round((otherCount / maxCount) * 100);
       barItem.innerHTML = `
           <div class="bar-label">Other</div>
-          <div class="bar" style="width: ${widthPixels}px !important; background: #999;"></div>
+          <div class="bar" style="width: ${widthPercent}%; background: #999;"></div>
           <div class="bar-value">${otherCount}</div>
       `;
       container.appendChild(barItem);
@@ -973,11 +1260,11 @@ function renderGenres(data) {
     sorted.forEach(([genre, count]) => {
         const barItem = document.createElement('div');
         barItem.className = 'bar-item';
-        const widthPixels = Math.round((count / maxCount) * 250);
-        
+        const widthPercent = Math.round((count / maxCount) * 100);
+
         barItem.innerHTML = `
             <div class="bar-label">${genre}</div>
-            <div class="bar genre-bar" style="width: ${widthPixels}px !important;"></div>
+            <div class="bar genre-bar" style="width: ${widthPercent}%;"></div>
             <div class="bar-value">${count}</div>
         `;
         container.appendChild(barItem);
@@ -1050,25 +1337,22 @@ function renderFunnel(data) {
     ];
     const total = data.length;
     document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle').innerText = `Total: ${total}`;
-    const stageWidths = ["100%", "85%", "70%", "55%", "40%", "25%"];
-    const stageClasses = [
-        "funnel-prospect",
-        "funnel-planned-outreach",
-        "funnel-outreach",
-        "funnel-responded",
-        "funnel-negotiating",
-        "funnel-showcased"
-    ];
+
+    // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 25%)
+    const funnelWidths = [100, 85, 70, 55, 40, 25];
+
     let funnelHtml = "";
     for (let i = 0; i < funnelStages.length; i++) {
         const s = funnelStages[i];
         const percent = total > 0 ? Math.round((s.count / total) * 100) : 0;
+        const width = funnelWidths[i];
+
         funnelHtml += `
-            <div class="funnel-stage ${stageClasses[i]}" style="width: ${stageWidths[i]};">
-                <div class="funnel-label">${s.label}</div>
-                <div>
-                    <div class="funnel-number">${s.count}</div>
-                    <div class="funnel-percentage">${percent}%</div>
+            <div class="funnel-stage" style="width: ${width}%;">
+                <div class="funnel-content">
+                    <span class="funnel-label">${s.label}:</span>
+                    <span class="funnel-number">${s.count}</span>
+                    <span class="funnel-percentage">(${percent}%)</span>
                 </div>
             </div>
         `;
@@ -1112,7 +1396,7 @@ function renderRecent(data) {
         }))
         .filter(row => row.parsedDate && !isNaN(row.parsedDate))
         .sort((a, b) => b.parsedDate - a.parsedDate)
-        .slice(0, 10);
+        .slice(0, 20);
 
     const container = document.getElementById('recentActivity');
     container.innerHTML = '';
@@ -1123,6 +1407,10 @@ function renderRecent(data) {
         const avatarSrc = row["Image"] || "https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face";
         const instaHandle = row["Insta Handle"] || "#";
 
+        // Create artist ID for linking to main page
+        const artistNameForId = artistName.toLowerCase().replace(/\s+/g, '-');
+        const artistCardLink = `index.html#artist-${artistNameForId}`;
+
         const daysAgo = Math.floor((new Date() - row.parsedDate) / (1000 * 60 * 60 * 24));
         let dateText;
         if (daysAgo === 0) dateText = "Today";
@@ -1132,8 +1420,7 @@ function renderRecent(data) {
 
         const item = document.createElement('a');
         item.className = 'activity-item';
-        item.href = instaHandle;
-        item.target = "_blank";
+        item.href = artistCardLink;
         item.innerHTML = `
             <div class="activity-left">
                 <img src="${avatarSrc}" alt="${artistName}" class="activity-avatar" onerror="this.src='https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face'">
@@ -1146,6 +1433,97 @@ function renderRecent(data) {
         `;
         container.appendChild(item);
     });
+}
+
+function updateSummary(data, followerData = null, postData = null) {
+    // New Artists (last 2 weeks)
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    const newArtists = data.filter(row => {
+        const addedDate = parseDate(row["When Added"]);
+        return addedDate && addedDate >= twoWeeksAgo;
+    }).length;
+
+    // Count Planned Outreach
+    const plannedOutreach = data.filter(row => {
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        return status === "planned outreach" || status.includes("planned") && status.includes("outreach");
+    }).length;
+
+    // Count Planned Feature
+    const plannedFeature = data.filter(row => {
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        return status === "feature planned" || (status.includes("feature") && status.includes("planned"));
+    }).length;
+
+    // Update basic stats
+    document.getElementById('summaryNewArtists').textContent = newArtists;
+    document.getElementById('summaryPlannedOutreach').textContent = plannedOutreach;
+    document.getElementById('summaryPlannedFeature').textContent = plannedFeature;
+
+    // Follower Growth (from follower data)
+    if (followerData && followerData.length > 0) {
+        const validData = followerData
+            .map(row => {
+                const dateColumn = Object.keys(row).find(key => key.toLowerCase().includes('date'));
+                const followerColumn = Object.keys(row).find(key => key.toLowerCase().includes('follower'));
+                if (!dateColumn || !followerColumn) return null;
+
+                const followerStr = String(row[followerColumn]).replace(/,/g, '').replace(/\s/g, '').trim();
+                const followers = parseInt(followerStr) || 0;
+                const date = parseDate(row[dateColumn]);
+
+                return { date, followers };
+            })
+            .filter(d => d && d.date && !isNaN(d.date) && d.followers > 0)
+            .sort((a, b) => a.date - b.date);
+
+        if (validData.length >= 2) {
+            const oldestFollowers = validData[0].followers;
+            const latestFollowers = validData[validData.length - 1].followers;
+            const growth = latestFollowers - oldestFollowers;
+
+            // Calculate time period
+            const oldestDate = validData[0].date;
+            const latestDate = validData[validData.length - 1].date;
+            const daysDiff = Math.floor((latestDate - oldestDate) / (1000 * 60 * 60 * 24));
+
+            let timePeriod;
+            if (daysDiff < 30) {
+                timePeriod = `${daysDiff} days`;
+            } else if (daysDiff < 60) {
+                timePeriod = '1 month';
+            } else if (daysDiff < 365) {
+                const months = Math.floor(daysDiff / 30);
+                timePeriod = `${months} months`;
+            } else {
+                const years = Math.floor(daysDiff / 365);
+                const remainingMonths = Math.floor((daysDiff % 365) / 30);
+                if (remainingMonths > 0) {
+                    timePeriod = `${years} year${years > 1 ? 's' : ''} ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                } else {
+                    timePeriod = `${years} year${years > 1 ? 's' : ''}`;
+                }
+            }
+
+            const growthText = growth > 0 ? `+${growth.toLocaleString()}` : growth.toLocaleString();
+            document.getElementById('summaryFollowerGrowth').textContent = growthText;
+            document.getElementById('summaryFollowerGrowthLabel').textContent = `Follower Growth (in ${timePeriod})`;
+        }
+    }
+
+    // Avg Engagement (from post data)
+    if (postData && postData.length > 0) {
+        const validPosts = postData.filter(row => row["Likes / Reach"]);
+        if (validPosts.length > 0) {
+            const totalEngagement = validPosts.reduce((sum, row) => {
+                return sum + (parseFloat(row["Likes / Reach"]) || 0);
+            }, 0);
+            const avgEngagement = (totalEngagement / validPosts.length).toFixed(2);
+            document.getElementById('summaryAvgEngagement').textContent = avgEngagement + '%';
+        }
+    }
 }
 
 function renderFollowerGrowth(data) {
@@ -1320,22 +1698,29 @@ function renderFollowerGrowth(data) {
     });
 }
 
+// Store data globally for summary updates
+let artistData = [];
+let postPerformanceData = [];
+let followerGrowthData = [];
+
 fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357&timestamp=${Date.now()}`)
     .then(res => res.text())
     .then(csvData => {
-        const data = parseCSV(csvData);
-        renderWhereFound(data);
-        renderGenres(data);
-        renderPipelineTimeline(data);
-        renderFunnel(data);
-        renderRecent(data);
+        artistData = parseCSV(csvData);
+        updateSummary(artistData, followerGrowthData, postPerformanceData);
+        renderWhereFound(artistData);
+        renderGenres(artistData);
+        renderPipelineTimeline(artistData);
+        renderFunnel(artistData);
+        renderRecent(artistData);
 
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
     })
     .then(res => res.text())
     .then(igCsvData => {
-        const igData = parseCSV(igCsvData);
-        renderPostPerformance(igData);
+        postPerformanceData = parseCSV(igCsvData);
+        renderPostPerformance(postPerformanceData);
+        updateSummary(artistData, followerGrowthData, postPerformanceData);
 
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1441529947&timestamp=${Date.now()}`);
     })
@@ -1347,9 +1732,10 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const lines = followerCsvData.split('\n').filter(line => line.trim());
         const cleanedCsv = lines.join('\n');
 
-        const followerData = parseCSV(cleanedCsv);
-        console.log('Parsed follower data rows:', followerData.length);
-        renderFollowerGrowth(followerData);
+        followerGrowthData = parseCSV(cleanedCsv);
+        console.log('Parsed follower data rows:', followerGrowthData.length);
+        renderFollowerGrowth(followerGrowthData);
+        updateSummary(artistData, followerGrowthData, postPerformanceData);
     })
     .catch(err => {
         console.error("Error:", err);
