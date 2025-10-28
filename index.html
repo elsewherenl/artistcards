@@ -632,6 +632,19 @@ transform: scale(1.1);
     color: #D6B370;
     text-decoration: underline;
     }
+
+    .tag-link {
+    color: #2552FF;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-weight: 500;
+    }
+
+    .tag-link:hover {
+    color: #D6B370;
+    text-decoration: underline;
+    }
     
     .footer {
     text-align: left;
@@ -1139,6 +1152,7 @@ document.addEventListener('keydown', function(event) {
 
 let currentStatusFilter = ['all'];
 let currentSearchTerm = '';
+let currentTagFilter = null;
 
 function toggleFilters() {
   const filters = document.getElementById("filters");
@@ -1280,6 +1294,18 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             const genreMatch = genre === "All" || row["Genre"] === genre;
             const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
 
+            // Tag filter
+            let tagMatch = true;
+            if (currentTagFilter) {
+                const artistTags = (row["Tags"] || "").toString().trim();
+                if (artistTags) {
+                    const tagsList = artistTags.split(',').map(tag => tag.trim());
+                    tagMatch = tagsList.includes(currentTagFilter);
+                } else {
+                    tagMatch = false;
+                }
+            }
+
             // Followers filter
             let followers = 0;
             const raw = row["Instagram Followers - Do not delete"] || '';
@@ -1291,7 +1317,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
             else if (followersRange === "10kplus") followersMatch = followers > 10000;
 
-            return statusMatch && searchMatch && genreMatch && whereFoundMatch && followersMatch;
+            return statusMatch && searchMatch && genreMatch && whereFoundMatch && tagMatch && followersMatch;
         });
     }
 
@@ -1424,6 +1450,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
         img.alt = "Instagram";
         img.className = "insta-logo";
+        img.loading = "lazy";
         insta.appendChild(img);
         insta.append("Insta");
         card.appendChild(insta);
@@ -1542,6 +1569,22 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             card.appendChild(el);
         }
 
+        // Add Tags if present (Column W)
+        if (row["Tags"] && row["Tags"].toString().trim()) {
+            const el = document.createElement("div");
+            el.className = "field-item";
+            const tagsText = row["Tags"].toString().trim();
+
+            // Split by comma and make each tag clickable
+            const tagsList = tagsText.split(',').map(tag => tag.trim());
+            const clickableTags = tagsList.map(tag => {
+                return `<span class="tag-link" data-tag="${tag}">${tag}</span>`;
+            }).join(', ');
+
+            el.innerHTML = `<span class="label">Tags:</span> ${clickableTags}`;
+            card.appendChild(el);
+        }
+
         if (row["Notes"]) {
             const notes = document.createElement("div");
             notes.className = "notes";
@@ -1575,6 +1618,9 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
                     document.getElementById('whereFoundFilter').value = 'All';
                     document.getElementById('followersFilter').value = 'All';
 
+                    // Clear tag filter
+                    currentTagFilter = null;
+
                     // Refresh the UI to show all artists
                     refreshUI();
 
@@ -1605,6 +1651,26 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
                         targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
                     }, 2000);
                 }
+            });
+        });
+
+        // Add click handlers for tag links
+        document.querySelectorAll('.tag-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tag = this.getAttribute('data-tag');
+
+                // Set the tag filter
+                currentTagFilter = tag;
+
+                // Scroll to top of page to see filtered results
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+
+                // Refresh UI to apply tag filter
+                refreshUI();
             });
         });
     }
@@ -1688,6 +1754,7 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
       searchInput.value = "";
       currentSearchTerm = "";
       currentStatusFilter = ['all'];
+      currentTagFilter = null;
       document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
       document.querySelector('.status-btn[data-status="all"]').classList.add('active');
       refreshUI();
