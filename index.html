@@ -1119,7 +1119,7 @@
     <script>
     // *** IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE ***
     // After deploying the Google Apps Script, paste the URL below
-    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbzXKY_3izM2hcwqqEZ6TFpAhBs76I4OrqXChHzecTUgJAvGukwBAtNtwxZMMsiJGOw9/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
 
     // Available status options
     const STATUS_OPTIONS = [
@@ -1284,17 +1284,26 @@
 
             const response = await fetch(url, {
                 method: 'GET',
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
             });
 
             console.log('Response received:', response);
             console.log('Response status:', response.status);
-            console.log('Response type:', response.type);
+            console.log('Response ok:', response.ok);
 
-            // With no-cors mode, we can't read the response, so just assume success
-            // The status will show as 0 and type as 'opaque'
-            if (response.type === 'opaque' || response.ok || response.status === 0) {
+            // Try to read the response
+            let result;
+            try {
+                const text = await response.text();
+                console.log('Response text:', text);
+                result = JSON.parse(text);
+                console.log('Parsed result:', result);
+            } catch (e) {
+                console.log('Could not parse response:', e);
+                result = { success: true }; // Assume success if we can't parse
+            }
+
+            if (response.ok && result.success !== false) {
                 // Update badge
                 statusBadge.textContent = newStatus;
                 statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
@@ -1306,18 +1315,17 @@
                 // Show success message
                 showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
             } else {
-                throw new Error('Response status: ' + response.status);
+                throw new Error(result.message || 'Update failed - check Google Apps Script logs');
             }
 
         } catch (error) {
             console.error('Error updating status:', error);
             console.error('Error name:', error.name);
             console.error('Error message:', error.message);
-            console.error('Full error:', JSON.stringify(error, null, 2));
             statusBadge.classList.remove('status-updating');
             statusBadge.textContent = statusBadge.getAttribute('data-original-status');
             selector.remove();
-            showStatusMessage('✗ Failed to update: ' + error.message + ' (Check console for details)', 'error');
+            showStatusMessage('✗ Failed to update: ' + error.message, 'error');
         }
     }
 
