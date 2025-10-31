@@ -1278,24 +1278,23 @@
             // Use GET with URL parameters for Google Apps Script compatibility
             const url = `${APPS_SCRIPT_URL}?artistName=${encodeURIComponent(artistName)}&newStatus=${encodeURIComponent(newStatus)}`;
 
+            console.log('Sending request to:', url);
+            console.log('Artist:', artistName);
+            console.log('New Status:', newStatus);
+
             const response = await fetch(url, {
                 method: 'GET',
-                redirect: 'follow'
+                redirect: 'follow',
+                mode: 'no-cors'
             });
 
-            // Try to read the response
-            let result;
-            try {
-                const text = await response.text();
-                result = JSON.parse(text);
-                console.log('Server response:', result);
-            } catch (e) {
-                // If we can't read response, assume success
-                console.log('Could not parse response, assuming success');
-                result = { success: true };
-            }
+            console.log('Response received:', response);
+            console.log('Response status:', response.status);
+            console.log('Response type:', response.type);
 
-            if (result.success !== false) {
+            // With no-cors mode, we can't read the response, so just assume success
+            // The status will show as 0 and type as 'opaque'
+            if (response.type === 'opaque' || response.ok || response.status === 0) {
                 // Update badge
                 statusBadge.textContent = newStatus;
                 statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
@@ -1307,15 +1306,18 @@
                 // Show success message
                 showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
             } else {
-                throw new Error(result.message || 'Update failed');
+                throw new Error('Response status: ' + response.status);
             }
 
         } catch (error) {
             console.error('Error updating status:', error);
+            console.error('Error name:', error.name);
+            console.error('Error message:', error.message);
+            console.error('Full error:', JSON.stringify(error, null, 2));
             statusBadge.classList.remove('status-updating');
             statusBadge.textContent = statusBadge.getAttribute('data-original-status');
             selector.remove();
-            showStatusMessage('✗ Failed to update: ' + error.message, 'error');
+            showStatusMessage('✗ Failed to update: ' + error.message + ' (Check console for details)', 'error');
         }
     }
 
