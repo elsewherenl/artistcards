@@ -1699,16 +1699,13 @@
 
                 const image = document.createElement("img");
                 image.className = "image";
-                // Add timestamp to force reload and bypass cache
                 const imageUrl = row["Image"];
-                const cacheBuster = imageUrl.includes('?') ? '&' : '?';
-                image.src = imageUrl + cacheBuster + 't=' + new Date().getTime();
+                image.src = imageUrl;
                 image.alt = row["Instagram Name"];
-                image.loading = "eager"; // Changed from lazy to eager for immediate loading
-                // Force reload if image fails to load
+                image.loading = "lazy";
                 image.onerror = function() {
-                    console.log("Retrying image load for:", imageUrl);
-                    this.src = imageUrl + cacheBuster + 't=' + new Date().getTime() + '&retry=1';
+                    console.log("Failed to load image:", imageUrl);
+                    this.style.display = 'none';
                 };
                 image.onclick = function() { openLightbox(index); };
                 card.appendChild(image);
