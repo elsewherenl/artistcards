@@ -249,6 +249,56 @@ transform: scale(1.1);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     z-index: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.status-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Status selector dropdown */
+.status-selector {
+    position: absolute;
+    top: 3rem;
+    right: 1rem;
+    background: white;
+    border: 2px solid #D6B370;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 150px;
+    display: none;
+}
+
+.status-selector.active {
+    display: block;
+}
+
+.status-option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid rgba(214, 179, 112, 0.2);
+}
+
+.status-option:last-child {
+    border-bottom: none;
+}
+
+.status-option:hover {
+    background: rgba(37, 82, 255, 0.1);
+}
+
+.status-updating {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .status-prospect {
@@ -1067,6 +1117,22 @@ transform: scale(1.1);
 </div>
 
 <script>
+// *** IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE ***
+// After deploying the Google Apps Script, paste the URL below
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbxUm2BkCFuu6TXMwlPsBq-LDZjhi_KwOrPnt_DZbLKlKNV_-789HoSe0AphONs9vNWS/exec';
+
+// Available status options
+const STATUS_OPTIONS = [
+    'Prospect',
+    'Planned Outreach',
+    'Outreach',
+    'Responded',
+    'Spotlighted',
+    'Negotiating',
+    'Featured',
+    'Feature Planned'
+];
+
 // Lightbox gallery state
 let currentLightboxIndex = 0;
 let lightboxImages = [];
@@ -1149,6 +1215,147 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+// Status update functions
+function createStatusSelector(statusBadge, currentStatus, artistName) {
+    // Remove any existing selectors
+    const existingSelector = statusBadge.parentElement.querySelector('.status-selector');
+    if (existingSelector) {
+        existingSelector.remove();
+        return;
+    }
+
+    // Create dropdown
+    const selector = document.createElement('div');
+    selector.className = 'status-selector active';
+
+    // Add all status options
+    STATUS_OPTIONS.forEach(status => {
+        const option = document.createElement('div');
+        option.className = 'status-option';
+        option.textContent = status;
+
+        // Highlight current status
+        if (status.toLowerCase() === currentStatus.toLowerCase()) {
+            option.style.background = 'rgba(214, 179, 112, 0.2)';
+            option.style.fontWeight = '700';
+        }
+
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateArtistStatus(artistName, status, statusBadge, selector);
+        });
+
+        selector.appendChild(option);
+    });
+
+    statusBadge.parentElement.appendChild(selector);
+
+    // Close selector when clicking outside
+    setTimeout(() => {
+        document.addEventListener('click', function closeSelector(e) {
+            if (!selector.contains(e.target) && e.target !== statusBadge) {
+                selector.remove();
+                document.removeEventListener('click', closeSelector);
+            }
+        });
+    }, 10);
+}
+
+async function updateArtistStatus(artistName, newStatus, statusBadge, selector) {
+    // Check if Apps Script URL is configured
+    if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+        alert('Please configure the Google Apps Script URL first!\n\nSee the setup instructions in GoogleAppsScript.gs');
+        selector.remove();
+        return;
+    }
+
+    // Add updating state
+    statusBadge.classList.add('status-updating');
+    statusBadge.textContent = 'Updating...';
+
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Required for Google Apps Script
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                artistName: artistName,
+                newStatus: newStatus
+            })
+        });
+
+        // Note: With no-cors mode, we can't read the response
+        // We'll assume success and update the UI
+        // The data will be correct on next page refresh
+
+        // Update badge
+        statusBadge.textContent = newStatus;
+        statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
+        statusBadge.classList.remove('status-updating');
+
+        // Remove selector
+        selector.remove();
+
+        // Show success message
+        showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
+
+        // Note: Due to no-cors mode, we can't verify the update
+        // You may want to refresh data after a short delay
+        // setTimeout(() => location.reload(), 1500);
+
+    } catch (error) {
+        console.error('Error updating status:', error);
+        statusBadge.classList.remove('status-updating');
+        statusBadge.textContent = statusBadge.getAttribute('data-original-status');
+        selector.remove();
+        showStatusMessage('✗ Failed to update status', 'error');
+    }
+}
+
+function showStatusMessage(message, type) {
+    // Create toast notification
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'success' ? '#10b981' : '#ef4444'};
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        animation: slideDown 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'slideUp 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Add animations for toast
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideDown {
+        from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    @keyframes slideUp {
+        from { transform: translateX(-50%) translateY(0); opacity: 1; }
+        to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
 
 let currentStatusFilter = ['all'];
 let currentSearchTerm = '';
@@ -1430,11 +1637,21 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-');
         card.id = `artist-${artistNameForId}`;
 
-        // Add status badge
+        // Add status badge (now clickable)
         const status = row["Current Status"] || "Prospect";
+        const artistName = row["Artist"] || row["Instagram Name"] || "Untitled";
         const statusBadge = document.createElement("div");
         statusBadge.className = `status-badge ${getStatusClass(status)}`;
         statusBadge.textContent = status;
+        statusBadge.setAttribute('data-original-status', status);
+        statusBadge.setAttribute('title', 'Click to change status');
+
+        // Make status badge clickable
+        statusBadge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            createStatusSelector(statusBadge, status, artistName);
+        });
+
         card.appendChild(statusBadge);
 
         const name = document.createElement("div");
@@ -1468,9 +1685,17 @@ fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
 
             const image = document.createElement("img");
             image.className = "image";
-            image.src = row["Image"];
+            // Add timestamp to force reload and bypass cache
+            const imageUrl = row["Image"];
+            const cacheBuster = imageUrl.includes('?') ? '&' : '?';
+            image.src = imageUrl + cacheBuster + 't=' + new Date().getTime();
             image.alt = row["Instagram Name"];
-            image.loading = "lazy";
+            image.loading = "eager"; // Changed from lazy to eager for immediate loading
+            // Force reload if image fails to load
+            image.onerror = function() {
+                console.log("Retrying image load for:", imageUrl);
+                this.src = imageUrl + cacheBuster + 't=' + new Date().getTime() + '&retry=1';
+            };
             image.onclick = function() { openLightbox(index); };
             card.appendChild(image);
         } else {
