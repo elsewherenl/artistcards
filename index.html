@@ -1119,7 +1119,7 @@ transform: scale(1.1);
 <script>
 // *** IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE ***
 // After deploying the Google Apps Script, paste the URL below
-const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbxUm2BkCFuu6TXMwlPsBq-LDZjhi_KwOrPnt_DZbLKlKNV_-789HoSe0AphONs9vNWS/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbxogbVGOKLcuIz8zr8_aWxJvOU2ZlsqTGwwozufo1gvcW7B2sp8OMXpk-_bXyVmkvid/exec';
 
 // Available status options
 const STATUS_OPTIONS = [
@@ -1275,43 +1275,53 @@ async function updateArtistStatus(artistName, newStatus, statusBadge, selector) 
     statusBadge.textContent = 'Updating...';
 
     try {
+        // Use URLSearchParams for Google Apps Script compatibility
+        const formData = new URLSearchParams();
+        formData.append('artistName', artistName);
+        formData.append('newStatus', newStatus);
+
+        // Alternative: Use fetch with proper content type
         const response = await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // Required for Google Apps Script
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({
-                artistName: artistName,
-                newStatus: newStatus
-            })
+            body: formData.toString()
         });
 
-        // Note: With no-cors mode, we can't read the response
-        // We'll assume success and update the UI
-        // The data will be correct on next page refresh
+        // Try to read the response
+        let result;
+        try {
+            const text = await response.text();
+            result = JSON.parse(text);
+            console.log('Server response:', result);
+        } catch (e) {
+            // If we can't read response, assume success
+            console.log('Could not parse response, assuming success');
+            result = { success: true };
+        }
 
-        // Update badge
-        statusBadge.textContent = newStatus;
-        statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
-        statusBadge.classList.remove('status-updating');
+        if (result.success !== false) {
+            // Update badge
+            statusBadge.textContent = newStatus;
+            statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
+            statusBadge.classList.remove('status-updating');
 
-        // Remove selector
-        selector.remove();
+            // Remove selector
+            selector.remove();
 
-        // Show success message
-        showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
-
-        // Note: Due to no-cors mode, we can't verify the update
-        // You may want to refresh data after a short delay
-        // setTimeout(() => location.reload(), 1500);
+            // Show success message
+            showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
+        } else {
+            throw new Error(result.message || 'Update failed');
+        }
 
     } catch (error) {
         console.error('Error updating status:', error);
         statusBadge.classList.remove('status-updating');
         statusBadge.textContent = statusBadge.getAttribute('data-original-status');
         selector.remove();
-        showStatusMessage('✗ Failed to update status', 'error');
+        showStatusMessage('✗ Failed to update: ' + error.message, 'error');
     }
 }
 
