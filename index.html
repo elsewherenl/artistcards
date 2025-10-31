@@ -1,2024 +1,2024 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-<!-- Bookmark/Apple touch icon (stamp logo) -->
-<link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
-<title>Artist Prospecting</title>
-<link href="https://fonts.googleapis.com/css2?family=Avenir&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
-<style>
-    body {
-    font-family: 'Satoshi', sans-serif;
-    background-color: #F3EFE9;
-    margin: 0;
-    padding: 2rem;
-    color: #0D0D0D;
-    position: relative;
-    }
-    
-    .header {
-    position: relative;
-    margin-bottom: 4rem;
-    }
-    
-    .logo {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100px;
-    height: 100px;
-    background: #F3EFE9;
-    border: 2px solid #0D0D0D;
-    border-radius: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-end;
-    color: #0D0D0D;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 500;
-    line-height: 0.9;
-    text-transform: lowercase;
-    letter-spacing: 0.02em;
-    padding: 0.5rem;
-    padding-bottom: 0.8rem;
-    box-sizing: border-box;
-    text-decoration: none;
-    }
-    
-    h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    margin-right: 120px;
-    letter-spacing: -0.02em;
-    }
-    
-    h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    margin-top: 0;
-    margin-left: 0;
-    border-bottom: 2px solid #2552FF;
-    padding-bottom: 0.25rem;
-    padding-left: 0;
-    display: inline-block;
-    letter-spacing: -0.01em;
-    }
-    
-    .summary {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(214, 179, 112, 0.15);
-    border-radius: 0;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
-    
-    .summary-item {
-    text-align: center;
-    }
-    
-    .summary-number {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2rem;
-    font-weight: 500;
-    color: #D6B370;
-    display: block;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-    }
-    
-    .summary-label {
-    font-family: 'Satoshi', sans-serif;
-    font-size: 0.875rem;
-    color: #666;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    }
-    
-    .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-    }
-    
-.filter-select {
-font-family: 'Satoshi', sans-serif;
-font-size: 1rem;
-font-weight: 400;
-padding: 0.5rem 1rem;
-border: 2px solid #D6B370;
-border-radius: 20px;
-background-color: white;
-color: #0D0D0D;
-width: 100%;
-margin-top: 0.25rem;
-transition: all 0.3s ease;
-cursor: pointer;
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: #2552FF;
-    box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-.filter-checkbox {
-width: 1.1rem;
-height: 1.1rem;
-accent-color: #2552FF;
-margin-top: 0.4rem;
-transform: scale(1.1);
-}
-
-/* Search bar styling */
-.search-container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
-
-.search-input {
-    font-family: 'Satoshi', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border: 2px solid #D6B370;
-    border-radius: 20px;
-    background: white;
-    color: #0D0D0D;
-    width: 100%;
-    max-width: 400px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.1);
-    text-transform: capitalize;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: #2552FF;
-    box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-.search-input::placeholder {
-    color: #999;
-    font-style: italic;
-    text-transform: none;
-}
-
-.clear-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #D6B370;
-    background: transparent;
-    color: #0D0D0D;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: 'Satoshi', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-transform: capitalize;
-    white-space: nowrap;
-}
-
-.clear-btn:hover {
-    background: #D6B370;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
-}
-
-/* Status filter buttons */
-.status-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    justify-content: flex-start;
-}
-
-.status-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #D6B370;
-    background: transparent;
-    color: #0D0D0D;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: 'Satoshi', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-transform: capitalize;
-}
-
-.status-btn.active {
-    background: #D6B370;
-    color: #0D0D0D;
-}
-
-.status-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
-}
-
-/* Status badges on cards */
-.status-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    z-index: 1;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    user-select: none;
-}
-
-.status-badge:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Status selector dropdown */
-.status-selector {
-    position: absolute;
-    top: 3rem;
-    right: 1rem;
-    background: white;
-    border: 2px solid #D6B370;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-    min-width: 150px;
-    display: none;
-}
-
-.status-selector.active {
-    display: block;
-}
-
-.status-option {
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    font-family: 'Satoshi', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: capitalize;
-    transition: background 0.2s ease;
-    border-bottom: 1px solid rgba(214, 179, 112, 0.2);
-}
-
-.status-option:last-child {
-    border-bottom: none;
-}
-
-.status-option:hover {
-    background: rgba(37, 82, 255, 0.1);
-}
-
-.status-updating {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.status-prospect {
-    background: rgba(214, 179, 112, 0.2);
-    color: #a67c00;
-    border: 1px solid rgba(214, 179, 112, 0.3);
-}
-
-.status-planned-outreach {
-    background: rgba(168, 85, 247, 0.2);
-    color: #7c3aed;
-    border: 1px solid rgba(168, 85, 247, 0.3);
-}
-
-.status-outreach {
-    background: rgba(37, 82, 255, 0.2);
-    color: #1d4ed8;
-    border: 1px solid rgba(37, 82, 255, 0.3);
-}
-
-.status-responded {
-    background: rgba(34, 197, 94, 0.2);
-    color: #15803d;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.status-spotlighted {
-    background: rgba(249, 115, 22, 0.2);
-    color: #ea580c;
-    border: 1px solid rgba(249, 115, 22, 0.3);
-}
-
-.status-negotiating {
-    background: rgba(147, 51, 234, 0.2);
-    color: #7c3aed;
-    border: 1px solid rgba(147, 51, 234, 0.3);
-}
-
-.status-featured {
-    background: rgba(16, 185, 129, 0.2);
-    color: #047857;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.status-feature.planned {
-    background: rgba(245, 158, 11, 0.2);
-    color: #d97706;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-@media (max-width: 768px) {
-#filters {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-
-.status-filters {
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.status-btn {
-    width: 100%;
-    text-align: center;
-}
-
-.search-container {
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.clear-btn {
-    width: 100%;
-    max-width: 400px;
-}
-}
-
-    .card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    font-family: 'Satoshi', sans-serif;
-    position: relative;
-    }
-    
-    .artist-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 500;
-    font-size: 1.25rem;
-    letter-spacing: -0.02em;
-    }
-    
-    .insta-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    width: fit-content;
-    color: #2552FF;
-    font-family: 'Satoshi', sans-serif;
-    font-weight: 500;
-    }
-    
-    .insta-logo {
-    width: 20px;
-    height: 20px;
-    }
-    
-    .image {
-    width: 100%;
-    height: auto;
-    max-height: 320px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-    }
-
-    .image:hover {
-    opacity: 0.9;
-    }
-
-    /* Lightbox styles */
-    .lightbox {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease;
-    }
-
-    .lightbox.active {
-    display: flex;
-    }
-
-    @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-    }
-
-    .lightbox-content {
-    max-width: calc(100vw - 240px - 8rem);
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
-
-    @keyframes zoomIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-    }
-
-    .lightbox-container {
-    display: flex;
-    gap: 2rem;
-    max-width: 90%;
-    max-height: 90vh;
-    align-items: center;
-    justify-content: center;
-    animation: zoomIn 0.3s ease;
-    }
-
-    .lightbox-info {
-    position: fixed;
-    right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    padding: 1.25rem;
-    border-radius: 8px;
-    width: 240px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    font-family: 'Satoshi', sans-serif;
-    z-index: 10000;
-    }
-
-    .lightbox-info-item {
-    margin-bottom: 1rem;
-    }
-
-    .lightbox-info-item:last-child {
-    margin-bottom: 0;
-    }
-
-    .lightbox-info-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    margin-bottom: 0.35rem;
-    color: #0D0D0D;
-    display: block;
-    }
-
-    .lightbox-info-item span:not(.lightbox-info-label) {
-    font-size: 0.85rem;
-    font-weight: 300;
-    color: #D6B370;
-    line-height: 1.4;
-    }
-
-    .lightbox-close {
-    position: absolute;
-    top: 2rem;
-    right: calc(240px + 4rem + 1rem);
-    color: white;
-    font-size: 3rem;
-    font-weight: 300;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.5);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    transition: all 0.3s ease;
-    z-index: 10001;
-    }
-
-    .lightbox-close:hover {
-    background: rgba(214, 179, 112, 0.8);
-    transform: rotate(90deg);
-    }
-
-    .lightbox-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    color: white;
-    font-size: 2.5rem;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.5);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    user-select: none;
-    line-height: 1;
-    padding: 0;
-    z-index: 10002;
-    }
-
-    .lightbox-arrow:hover {
-    background: rgba(214, 179, 112, 0.9);
-    transform: translateY(-50%) scale(1.1);
-    }
-
-    .lightbox-arrow-left {
-    left: 2rem;
-    }
-
-    .lightbox-arrow-right {
-    right: 1.5rem;
-    }
-
-    .lightbox-counter {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-family: 'Satoshi', sans-serif;
-    }
-
-    @media (max-width: 768px) {
-    .lightbox-container {
-        flex-direction: column;
-        max-width: 95%;
-        gap: 1rem;
-    }
-
-    .lightbox-content {
-        max-width: 95vw;
-        max-height: 50vh;
-    }
-
-    .lightbox-info {
-        position: static;
-        transform: none;
-        min-width: auto;
-        width: 100%;
-        max-width: 95vw;
-        padding: 1rem;
-    }
-
-    .lightbox-info-item {
-        margin-bottom: 0.75rem;
-    }
-
-    .lightbox-info-label {
-        font-size: 0.9rem;
-    }
-
-    .lightbox-info-item span:not(.lightbox-info-label) {
-        font-size: 0.8rem;
-    }
-
-    .lightbox-close {
-        top: 1rem;
-        right: 1rem;
-        width: 40px;
-        height: 40px;
-        font-size: 2rem;
-    }
-
-    .lightbox-arrow {
-        width: 45px;
-        height: 45px;
-        font-size: 2rem;
-    }
-
-    .lightbox-arrow-left {
-        left: 0.5rem;
-    }
-
-    .lightbox-arrow-right {
-        right: 0.5rem;
-    }
-
-    .lightbox-counter {
-        bottom: 1rem;
-        font-size: 0.8rem;
-    }
-    }
-    
-    .label {
-    font-family: 'Satoshi', sans-serif;
-    font-weight: 600;
-    }
-    
-    .notes {
-    font-family: 'Satoshi', sans-serif;
-    font-size: 0.85rem;
-    font-style: italic;
-    color: #444;
-    margin-top: 0.5rem;
-    }
-    
-    .field-item {
-    font-family: 'Satoshi', sans-serif;
-    }
-    
-    .website-link {
-    font-family: 'Satoshi', sans-serif;
-    color: #2552FF;
-    text-decoration: none;
-    font-weight: 500;
-    }
-    
-    .website-link:hover {
-    text-decoration: underline;
-    }
-
-    .similar-artist-link {
-    color: #2552FF;
-    cursor: pointer;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    font-weight: 500;
-    }
-
-    .similar-artist-link:hover {
-    color: #D6B370;
-    text-decoration: underline;
-    }
-
-    .tag-link {
-    color: #2552FF;
-    cursor: pointer;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    font-weight: 500;
-    }
-
-    .tag-link:hover {
-    color: #D6B370;
-    text-decoration: underline;
-    }
-    
-    .footer {
-    text-align: left;
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(214, 179, 112, 0.2);
-    }
-    
-    .footer-brand {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #0D0D0D;
-    letter-spacing: -0.02em;
-    text-transform: lowercase;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    cursor: pointer;
-    }
-    
-    .footer-brand:hover {
-    transform: scale(1.05);
-    transform-origin: left center;
-    color: #D6B370;
-    letter-spacing: 0.02em;
-    }
-
-    /* Navigation section styles (updated to match Analytics.html) */
-    .nav-section {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <!-- Bookmark/Apple touch icon (stamp logo) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
+    <title>Artist Prospecting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Avenir&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
+    <style>
+        body {
+        font-family: 'Satoshi', sans-serif;
+        background-color: #F3EFE9;
+        margin: 0;
+        padding: 2rem;
+        color: #0D0D0D;
+        position: relative;
+        }
+        
+        .header {
+        position: relative;
+        margin-bottom: 4rem;
+        }
+        
+        .logo {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: #F3EFE9;
+        border: 2px solid #0D0D0D;
+        border-radius: 0;
         display: flex;
-        gap: 3rem;
-        align-items: baseline;
-        margin-right: 120px;
-    }
-
-    .nav-title {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        color: #0D0D0D;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 500;
+        line-height: 0.9;
+        text-transform: lowercase;
+        letter-spacing: 0.02em;
+        padding: 0.5rem;
+        padding-bottom: 0.8rem;
+        box-sizing: border-box;
+        text-decoration: none;
+        }
+        
+        h1 {
         font-family: 'Space Grotesk', sans-serif;
         font-size: 2rem;
         font-weight: 500;
-        margin: 0;
+        margin-bottom: 0.25rem;
+        margin-right: 120px;
         letter-spacing: -0.02em;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        }
+        
+        h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-top: 0;
+        margin-left: 0;
+        border-bottom: 2px solid #2552FF;
+        padding-bottom: 0.25rem;
+        padding-left: 0;
+        display: inline-block;
+        letter-spacing: -0.01em;
+        }
+        
+        .summary {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(214, 179, 112, 0.15);
+        border-radius: 0;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .summary-item {
+        text-align: center;
+        }
+        
+        .summary-number {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 500;
+        color: #D6B370;
+        display: block;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        }
+        
+        .summary-label {
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.875rem;
+        color: #666;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        }
+        
+        .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+        }
+        
+    .filter-select {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    padding: 0.5rem 1rem;
+    border: 2px solid #D6B370;
+    border-radius: 20px;
+    background-color: white;
+    color: #0D0D0D;
+    width: 100%;
+    margin-top: 0.25rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
     }
 
-    .nav-title.active {
+    .filter-select:focus {
+        outline: none;
+        border-color: #2552FF;
+        box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .filter-checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #2552FF;
+    margin-top: 0.4rem;
+    transform: scale(1.1);
+    }
+
+    /* Search bar styling */
+    .search-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border: 2px solid #D6B370;
+        border-radius: 20px;
+        background: white;
+        color: #0D0D0D;
+        width: 100%;
+        max-width: 400px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(214, 179, 112, 0.1);
+        text-transform: capitalize;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #2552FF;
+        box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .search-input::placeholder {
+        color: #999;
+        font-style: italic;
+        text-transform: none;
+    }
+
+    .clear-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #D6B370;
+        background: transparent;
+        color: #0D0D0D;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-transform: capitalize;
+        white-space: nowrap;
+    }
+
+    .clear-btn:hover {
+        background: #D6B370;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
+    }
+
+    /* Status filter buttons */
+    .status-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        justify-content: flex-start;
+    }
+
+    .status-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #D6B370;
+        background: transparent;
+        color: #0D0D0D;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-transform: capitalize;
+    }
+
+    .status-btn.active {
+        background: #D6B370;
         color: #0D0D0D;
     }
 
-    .nav-title:not(.active) {
-        color: #666;
+    .status-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
     }
 
-    .nav-title a {
-        color: inherit;
-        text-decoration: none;
+    /* Status badges on cards */
+    .status-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        z-index: 1;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        user-select: none;
     }
-    
-    @media (max-width: 768px) {
-    .logo {
-        position: relative;
-        margin: 0 auto 1rem auto;
-        width: 80px;
-        height: 80px;
-        font-size: 0.6rem;
+
+    .status-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-    h1 {
-        margin-right: 0;
-        text-align: center;
+
+    /* Status selector dropdown */
+    .status-selector {
+        position: absolute;
+        top: 3rem;
+        right: 1rem;
+        background: white;
+        border: 2px solid #D6B370;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 100;
+        min-width: 150px;
+        display: none;
     }
-    
-    h2 {
-        text-align: center;
+
+    .status-selector.active {
         display: block;
-        width: 100%;
     }
-    
-    .footer {
+
+    .status-option {
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+        transition: background 0.2s ease;
+        border-bottom: 1px solid rgba(214, 179, 112, 0.2);
+    }
+
+    .status-option:last-child {
+        border-bottom: none;
+    }
+
+    .status-option:hover {
+        background: rgba(37, 82, 255, 0.1);
+    }
+
+    .status-updating {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .status-prospect {
+        background: rgba(214, 179, 112, 0.2);
+        color: #a67c00;
+        border: 1px solid rgba(214, 179, 112, 0.3);
+    }
+
+    .status-planned-outreach {
+        background: rgba(168, 85, 247, 0.2);
+        color: #7c3aed;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .status-outreach {
+        background: rgba(37, 82, 255, 0.2);
+        color: #1d4ed8;
+        border: 1px solid rgba(37, 82, 255, 0.3);
+    }
+
+    .status-responded {
+        background: rgba(34, 197, 94, 0.2);
+        color: #15803d;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-spotlighted {
+        background: rgba(249, 115, 22, 0.2);
+        color: #ea580c;
+        border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .status-negotiating {
+        background: rgba(147, 51, 234, 0.2);
+        color: #7c3aed;
+        border: 1px solid rgba(147, 51, 234, 0.3);
+    }
+
+    .status-featured {
+        background: rgba(16, 185, 129, 0.2);
+        color: #047857;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-feature.planned {
+        background: rgba(245, 158, 11, 0.2);
+        color: #d97706;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    @media (max-width: 768px) {
+    #filters {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .status-filters {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .status-btn {
+        width: 100%;
         text-align: center;
     }
-    }
-.filter-reset {
-  background-color: #2552FF;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-family: 'Satoshi', sans-serif;
-  font-weight: 500;
-  width: 100%;
-  box-sizing: border-box;
-  text-align: center;
-  transition: all 0.3s ease;
-  text-transform: capitalize;
-  margin-top: 1.85rem;
-}
 
-.filter-reset:hover {
-  background-color: #1f47d4;
-}
-
-#filters {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 1rem;
-  margin-top: 1rem;
-}
-
-.no-results {
-  color: #666;
-  text-align: center;
-  padding: 2rem 0;
-  font-size: 1.2rem;
-  opacity: 0.7;
-}
-
-/* Mobile UX improvements */
-@media (max-width: 480px) {
-  .summary-item label,
-  .summary-label {
-    font-size: 0.9rem;
-  }
-
-  .filter-select {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.6rem;
-  }
-
-  .filter-checkbox {
-    transform: scale(1.2);
-    margin-top: 0.3rem;
-  }
-
-  #filters {
-    row-gap: 1rem;
-  }
-}
-@media (min-width: 768px) {
-    .card img {
-      transition: transform 0.3s ease;
+    .search-container {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .card:hover img {
-      transform: scale(1.1);
+    .clear-btn {
+        width: 100%;
+        max-width: 400px;
     }
-  }
-
-  /* Mobile filter modal and toggle button styles */
-  @media (max-width: 768px) {
-    #filters {
-      display: none;
-      position: fixed;
-      bottom: 60px;
-      right: 1rem;
-      background-color: #0D0D0D;
-      padding: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      z-index: 1000;
-      max-width: 90vw;
-      flex-direction: column;
-      row-gap: 1rem;
     }
-    .filter-toggle {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      background-color: #2552FF;
-      color: #fff;
-      border: none;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1001;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-  }
-  @media (min-width: 768px) {
-    .filter-toggle {
-      display: none;
-    }
-    #filters {
-      display: grid !important;
-      position: static !important;
-      background-color: inherit !important;
-      border: none !important;
-      padding: 0 !important;
-      box-shadow: none !important;
-    }
-  }
-/* Mobile-only refinements */
-@media (max-width: 600px) {
-  /* Reduce excessive padding on mobile */
-  body {
-    padding: 1rem;
-  }
 
-  /* Reduce header spacing */
-  .header {
-    margin-bottom: 2rem;
-  }
-
-  /* Navigation fixes */
-  .nav-section {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.25rem;
-    margin: 0;
-  }
-  .nav-title {
-    font-size: 1.2rem !important;
-  }
-  .logo {
-    position: relative !important;
-    margin: 0 auto 0.5rem auto;
-    width: 60px;
-    height: 60px;
-    font-size: 0.55rem;
-  }
-
-  /* Enhanced search bar & filters for mobile */
-  .search-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto 1rem auto;
-    gap: 0.5rem;
-  }
-  .search-input {
-    font-size: 0.8rem;
-    padding: 0.35rem 0.8rem;
-    width: 90%;
-    max-width: 90%;
-    box-sizing: border-box;
-  }
-  .clear-btn {
-    font-size: 0.8rem;
-    padding: 0.35rem 0.8rem;
-    width: 90%;
-    max-width: 90%;
-    margin-top: 0.5rem;
-    box-sizing: border-box;
-    display: block;
-  }
-  .status-filters {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    margin-bottom: 1rem;
-  }
-  .status-btn {
-    width: 90%;
-    font-size: 0.78rem;
-    padding: 0.35rem 0.7rem;
-    margin: 0 auto;
-    box-sizing: border-box;
-    min-height: 48px; /* Ensure minimum touch target size */
-  }
-  #filters {
-    max-width: 100%;
-    margin: 0 auto;
-  }
-
-  /* Adjust card grid for smaller screens */
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
-
-  /* Reduce card image height on mobile */
-  .image {
-    max-height: 240px;
-  }
-
-  /* Ensure status badges don't overlap on narrow cards */
-  .status-badge {
-    max-width: calc(100% - 2rem);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Analytics grid */
-  .analytics-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1rem;
-  }
-  .chart-card {
-    margin: 0 auto;
-    width: 100% !important;
-  }
-
-  /* Headings */
-  h1, h2 {
-    font-size: 1.4rem;
-    text-align: center;
-  }
-}
-</style>
-</head>
-<body>
-<div class="header">
-    <div class="logo">
-    <div>else</div>
-    <div>where</div>
-    <div>collective</div>
-    </div>
-  <div class="nav-section">
-  <div class="nav-title active"><a href="index.html">Artist Prospecting</a></div>
-  <div class="nav-title"><a href="analytics.html">Analytics</a></div>
-    </div>
-</div>
-
-<!-- Search Bar -->
-<div class="search-container">
-    <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name..." />
-    <button id="resetFilters" class="clear-btn">Clear Filters</button>
-</div>
-
-<!-- Status Filter Buttons -->
-<div class="status-filters">
-    <button class="status-btn active" data-status="all">All</button>
-    <button class="status-btn" data-status="prospect">Prospect</button>
-    <button class="status-btn" data-status="planned outreach">Planned Outreach</button>
-    <button class="status-btn" data-status="outreach">Outreach</button>
-    <button class="status-btn" data-status="responded">Responded</button>
-    <button class="status-btn" data-status="spotlighted">Spotlighted</button>
-    <button class="status-btn" data-status="negotiating">Negotiating</button>
-    <button class="status-btn" data-status="featured">Featured</button>
-    <button class="status-btn" data-status="feature planned">Feature Planned</button>
-</div>
-
-<!-- Summary Dashboard -->
-<div class="summary" id="summary">
-<div class="summary-item">
-<span class="summary-number" id="totalArtists">0</span>
-<span class="summary-label">Total Artists</span>
-</div>
-<div class="summary-item">
-<span class="summary-number" id="avgFollowers">0</span>
-<span class="summary-label">Avg Followers</span>
-</div>
-<div class="summary-item">
-<span class="summary-number" id="statusCounts">0</span>
-<span class="summary-label">Current Filter</span>
-</div>
-<div class="summary-item">
-<span class="summary-number" id="topGenre">-</span>
-<span class="summary-label">Top Genre</span>
-</div>
-</div>
-<div class="summary" id="filters" style="margin-top: 1rem; margin-bottom: 2rem;">
-<div class="summary-item">
-<label for="genreFilter" class="summary-label">Genre</label><br>
-<select id="genreFilter" class="filter-select">
-  <option value="All">All</option>
-</select>
-</div>
-<div class="summary-item">
-<label for="whereFoundFilter" class="summary-label">Where Found</label><br>
-<select id="whereFoundFilter" class="filter-select">
-  <option value="All">All</option>
-</select>
-</div>
-<div class="summary-item">
-<label for="followersFilter" class="summary-label">Followers</label><br>
-<select id="followersFilter" class="filter-select">
-  <option value="All">All</option>
-  <option value="under5k">Under 5k</option>
-  <option value="5kto10k">5k–10k</option>
-  <option value="10kplus">10k+</option>
-</select>
-</div>
-<div class="summary-item">
-<label for="sortByFilter" class="summary-label">Sort By</label><br>
-<select id="sortByFilter" class="filter-select">
-  <option value="rankingHighLow">Highest to Lowest Ranking</option>
-  <option value="rankingLowHigh">Lowest to Highest Ranking</option>
-  <option value="newest">Newest Added</option>
-  <option value="oldest">Oldest Added</option>
-  <option value="nameAZ">Name A-Z</option>
-  <option value="nameZA">Name Z-A</option>
-</select>
-</div>
-</div>
-
-
-<div class="grid" id="cards"></div>
-
-<div class="footer">
-    <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
-</div>
-
-<!-- Filter Toggle Button (only on mobile) -->
-<button class="filter-toggle" onclick="toggleFilters()">☰</button>
-
-<!-- Lightbox for image zoom -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-    <span class="lightbox-arrow lightbox-arrow-left" onclick="event.stopPropagation(); navigateLightbox(-1)">&#8249;</span>
-    <span class="lightbox-arrow lightbox-arrow-right" onclick="event.stopPropagation(); navigateLightbox(1)">&#8250;</span>
-    <div class="lightbox-container" onclick="event.stopPropagation()">
-        <img class="lightbox-content" id="lightboxImage" src="" alt="">
-        <div class="lightbox-info" id="lightboxInfo">
-            <div class="lightbox-info-item"><span class="lightbox-info-label">Artist:</span> <span id="lightboxArtist"></span></div>
-            <div class="lightbox-info-item"><span class="lightbox-info-label">Genre:</span> <span id="lightboxGenre"></span></div>
-            <div class="lightbox-info-item"><span class="lightbox-info-label">Status:</span> <span id="lightboxStatus"></span></div>
-            <div class="lightbox-info-item" id="lightboxSimilarArtistsContainer" style="display: none;"><span class="lightbox-info-label">Similar Artists:</span> <span id="lightboxSimilarArtists"></span></div>
-        </div>
-    </div>
-    <div class="lightbox-counter" id="lightboxCounter"></div>
-</div>
-
-<script>
-// *** IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE ***
-// After deploying the Google Apps Script, paste the URL below
-const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbzXKY_3izM2hcwqqEZ6TFpAhBs76I4OrqXChHzecTUgJAvGukwBAtNtwxZMMsiJGOw9/exec';
-
-// Available status options
-const STATUS_OPTIONS = [
-    'Prospect',
-    'Planned Outreach',
-    'Outreach',
-    'Responded',
-    'Spotlighted',
-    'Negotiating',
-    'Featured',
-    'Feature Planned'
-];
-
-// Lightbox gallery state
-let currentLightboxIndex = 0;
-let lightboxImages = [];
-let lightboxCardElements = [];
-let lightboxArtistData = [];
-
-// Lightbox functions
-function openLightbox(imageIndex) {
-    currentLightboxIndex = imageIndex;
-    updateLightboxImage();
-    const lightbox = document.getElementById('lightbox');
-    lightbox.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Prevent scrolling when lightbox is open
-}
-
-function updateLightboxImage() {
-    const lightboxImage = document.getElementById('lightboxImage');
-    const lightboxCounter = document.getElementById('lightboxCounter');
-
-    if (lightboxImages.length > 0) {
-        lightboxImage.src = lightboxImages[currentLightboxIndex];
-        lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${lightboxImages.length}`;
-
-        // Update artist info
-        const artistData = lightboxArtistData[currentLightboxIndex];
-        if (artistData) {
-            document.getElementById('lightboxArtist').textContent = artistData.artist || '-';
-            document.getElementById('lightboxGenre').textContent = artistData.genre || '-';
-            document.getElementById('lightboxStatus').textContent = artistData.status || '-';
-
-            // Handle Similar Artists (Col V) - only show if filled in
-            const similarArtistsContainer = document.getElementById('lightboxSimilarArtistsContainer');
-            if (artistData.similarArtists && artistData.similarArtists.trim()) {
-                document.getElementById('lightboxSimilarArtists').textContent = artistData.similarArtists;
-                similarArtistsContainer.style.display = 'block';
-            } else {
-                similarArtistsContainer.style.display = 'none';
-            }
+        .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        font-family: 'Satoshi', sans-serif;
+        position: relative;
         }
-    }
-}
-
-function navigateLightbox(direction) {
-    currentLightboxIndex += direction;
-
-    // Wrap around
-    if (currentLightboxIndex < 0) {
-        currentLightboxIndex = lightboxImages.length - 1;
-    } else if (currentLightboxIndex >= lightboxImages.length) {
-        currentLightboxIndex = 0;
-    }
-
-    updateLightboxImage();
-}
-
-function closeLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    lightbox.classList.remove('active');
-    document.body.style.overflow = ''; // Restore scrolling
-
-    // Scroll to the current card
-    if (lightboxCardElements[currentLightboxIndex]) {
-        lightboxCardElements[currentLightboxIndex].scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
-    }
-}
-
-// Keyboard navigation
-document.addEventListener('keydown', function(event) {
-    const lightbox = document.getElementById('lightbox');
-    if (lightbox.classList.contains('active')) {
-        if (event.key === 'Escape') {
-            closeLightbox();
-        } else if (event.key === 'ArrowLeft') {
-            navigateLightbox(-1);
-        } else if (event.key === 'ArrowRight') {
-            navigateLightbox(1);
+        
+        .artist-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 500;
+        font-size: 1.25rem;
+        letter-spacing: -0.02em;
         }
-    }
-});
-
-// Status update functions
-function createStatusSelector(statusBadge, currentStatus, artistName) {
-    // Remove any existing selectors
-    const existingSelector = statusBadge.parentElement.querySelector('.status-selector');
-    if (existingSelector) {
-        existingSelector.remove();
-        return;
-    }
-
-    // Create dropdown
-    const selector = document.createElement('div');
-    selector.className = 'status-selector active';
-
-    // Add all status options
-    STATUS_OPTIONS.forEach(status => {
-        const option = document.createElement('div');
-        option.className = 'status-option';
-        option.textContent = status;
-
-        // Highlight current status
-        if (status.toLowerCase() === currentStatus.toLowerCase()) {
-            option.style.background = 'rgba(214, 179, 112, 0.2)';
-            option.style.fontWeight = '700';
+        
+        .insta-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        width: fit-content;
+        color: #2552FF;
+        font-family: 'Satoshi', sans-serif;
+        font-weight: 500;
+        }
+        
+        .insta-logo {
+        width: 20px;
+        height: 20px;
+        }
+        
+        .image {
+        width: 100%;
+        height: auto;
+        max-height: 320px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
         }
 
-        option.addEventListener('click', (e) => {
-            e.stopPropagation();
-            updateArtistStatus(artistName, status, statusBadge, selector);
-        });
-
-        selector.appendChild(option);
-    });
-
-    statusBadge.parentElement.appendChild(selector);
-
-    // Close selector when clicking outside
-    setTimeout(() => {
-        document.addEventListener('click', function closeSelector(e) {
-            if (!selector.contains(e.target) && e.target !== statusBadge) {
-                selector.remove();
-                document.removeEventListener('click', closeSelector);
-            }
-        });
-    }, 10);
-}
-
-async function updateArtistStatus(artistName, newStatus, statusBadge, selector) {
-    // Check if Apps Script URL is configured
-    if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
-        alert('Please configure the Google Apps Script URL first!\n\nSee the setup instructions in GoogleAppsScript.gs');
-        selector.remove();
-        return;
-    }
-
-    // Add updating state
-    statusBadge.classList.add('status-updating');
-    statusBadge.textContent = 'Updating...';
-
-    try {
-        // Use URLSearchParams for Google Apps Script compatibility
-        const formData = new URLSearchParams();
-        formData.append('artistName', artistName);
-        formData.append('newStatus', newStatus);
-
-        // Alternative: Use fetch with proper content type
-        const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData.toString()
-        });
-
-        // Try to read the response
-        let result;
-        try {
-            const text = await response.text();
-            result = JSON.parse(text);
-            console.log('Server response:', result);
-        } catch (e) {
-            // If we can't read response, assume success
-            console.log('Could not parse response, assuming success');
-            result = { success: true };
+        .image:hover {
+        opacity: 0.9;
         }
 
-        if (result.success !== false) {
-            // Update badge
-            statusBadge.textContent = newStatus;
-            statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
-            statusBadge.classList.remove('status-updating');
-
-            // Remove selector
-            selector.remove();
-
-            // Show success message
-            showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
-        } else {
-            throw new Error(result.message || 'Update failed');
-        }
-
-    } catch (error) {
-        console.error('Error updating status:', error);
-        statusBadge.classList.remove('status-updating');
-        statusBadge.textContent = statusBadge.getAttribute('data-original-status');
-        selector.remove();
-        showStatusMessage('✗ Failed to update: ' + error.message, 'error');
-    }
-}
-
-function showStatusMessage(message, type) {
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.style.cssText = `
+        /* Lightbox styles */
+        .lightbox {
+        display: none;
         position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.95);
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+        }
+
+        .lightbox.active {
+        display: flex;
+        }
+
+        @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+        }
+
+        .lightbox-content {
+        max-width: calc(100vw - 240px - 8rem);
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes zoomIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+        }
+
+        .lightbox-container {
+        display: flex;
+        gap: 2rem;
+        max-width: 90%;
+        max-height: 90vh;
+        align-items: center;
+        justify-content: center;
+        animation: zoomIn 0.3s ease;
+        }
+
+        .lightbox-info {
+        position: fixed;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1.25rem;
+        border-radius: 8px;
+        width: 240px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        font-family: 'Satoshi', sans-serif;
+        z-index: 10000;
+        }
+
+        .lightbox-info-item {
+        margin-bottom: 1rem;
+        }
+
+        .lightbox-info-item:last-child {
+        margin-bottom: 0;
+        }
+
+        .lightbox-info-label {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-bottom: 0.35rem;
+        color: #0D0D0D;
+        display: block;
+        }
+
+        .lightbox-info-item span:not(.lightbox-info-label) {
+        font-size: 0.85rem;
+        font-weight: 300;
+        color: #D6B370;
+        line-height: 1.4;
+        }
+
+        .lightbox-close {
+        position: absolute;
         top: 2rem;
+        right: calc(240px + 4rem + 1rem);
+        color: white;
+        font-size: 3rem;
+        font-weight: 300;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.5);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        transition: all 0.3s ease;
+        z-index: 10001;
+        }
+
+        .lightbox-close:hover {
+        background: rgba(214, 179, 112, 0.8);
+        transform: rotate(90deg);
+        }
+
+        .lightbox-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 2.5rem;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.5);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        user-select: none;
+        line-height: 1;
+        padding: 0;
+        z-index: 10002;
+        }
+
+        .lightbox-arrow:hover {
+        background: rgba(214, 179, 112, 0.9);
+        transform: translateY(-50%) scale(1.1);
+        }
+
+        .lightbox-arrow-left {
+        left: 2rem;
+        }
+
+        .lightbox-arrow-right {
+        right: 1.5rem;
+        }
+
+        .lightbox-counter {
+        position: absolute;
+        bottom: 2rem;
         left: 50%;
         transform: translateX(-50%);
-        background: ${type === 'success' ? '#10b981' : '#ef4444'};
         color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-family: 'Satoshi', sans-serif;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
         font-size: 0.9rem;
+        font-family: 'Satoshi', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+        .lightbox-container {
+            flex-direction: column;
+            max-width: 95%;
+            gap: 1rem;
+        }
+
+        .lightbox-content {
+            max-width: 95vw;
+            max-height: 50vh;
+        }
+
+        .lightbox-info {
+            position: static;
+            transform: none;
+            min-width: auto;
+            width: 100%;
+            max-width: 95vw;
+            padding: 1rem;
+        }
+
+        .lightbox-info-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .lightbox-info-label {
+            font-size: 0.9rem;
+        }
+
+        .lightbox-info-item span:not(.lightbox-info-label) {
+            font-size: 0.8rem;
+        }
+
+        .lightbox-close {
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            font-size: 2rem;
+        }
+
+        .lightbox-arrow {
+            width: 45px;
+            height: 45px;
+            font-size: 2rem;
+        }
+
+        .lightbox-arrow-left {
+            left: 0.5rem;
+        }
+
+        .lightbox-arrow-right {
+            right: 0.5rem;
+        }
+
+        .lightbox-counter {
+            bottom: 1rem;
+            font-size: 0.8rem;
+        }
+        }
+        
+        .label {
+        font-family: 'Satoshi', sans-serif;
+        font-weight: 600;
+        }
+        
+        .notes {
+        font-family: 'Satoshi', sans-serif;
+        font-size: 0.85rem;
+        font-style: italic;
+        color: #444;
+        margin-top: 0.5rem;
+        }
+        
+        .field-item {
+        font-family: 'Satoshi', sans-serif;
+        }
+        
+        .website-link {
+        font-family: 'Satoshi', sans-serif;
+        color: #2552FF;
+        text-decoration: none;
         font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 10000;
-        animation: slideDown 0.3s ease;
+        }
+        
+        .website-link:hover {
+        text-decoration: underline;
+        }
+
+        .similar-artist-link {
+        color: #2552FF;
+        cursor: pointer;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        font-weight: 500;
+        }
+
+        .similar-artist-link:hover {
+        color: #D6B370;
+        text-decoration: underline;
+        }
+
+        .tag-link {
+        color: #2552FF;
+        cursor: pointer;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        font-weight: 500;
+        }
+
+        .tag-link:hover {
+        color: #D6B370;
+        text-decoration: underline;
+        }
+        
+        .footer {
+        text-align: left;
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(214, 179, 112, 0.2);
+        }
+        
+        .footer-brand {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #0D0D0D;
+        letter-spacing: -0.02em;
+        text-transform: lowercase;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+        }
+        
+        .footer-brand:hover {
+        transform: scale(1.05);
+        transform-origin: left center;
+        color: #D6B370;
+        letter-spacing: 0.02em;
+        }
+
+        /* Navigation section styles (updated to match Analytics.html) */
+        .nav-section {
+            display: flex;
+            gap: 3rem;
+            align-items: baseline;
+            margin-right: 120px;
+        }
+
+        .nav-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 500;
+            margin: 0;
+            letter-spacing: -0.02em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-title.active {
+            color: #0D0D0D;
+        }
+
+        .nav-title:not(.active) {
+            color: #666;
+        }
+
+        .nav-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+        .logo {
+            position: relative;
+            margin: 0 auto 1rem auto;
+            width: 80px;
+            height: 80px;
+            font-size: 0.6rem;
+        }
+        h1 {
+            margin-right: 0;
+            text-align: center;
+        }
+        
+        h2 {
+            text-align: center;
+            display: block;
+            width: 100%;
+        }
+        
+        .footer {
+            text-align: center;
+        }
+        }
+    .filter-reset {
+    background-color: #2552FF;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+    margin-top: 1.85rem;
+    }
+
+    .filter-reset:hover {
+    background-color: #1f47d4;
+    }
+
+    #filters {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    }
+
+    .no-results {
+    color: #666;
+    text-align: center;
+    padding: 2rem 0;
+    font-size: 1.2rem;
+    opacity: 0.7;
+    }
+
+    /* Mobile UX improvements */
+    @media (max-width: 480px) {
+    .summary-item label,
+    .summary-label {
+        font-size: 0.9rem;
+    }
+
+    .filter-select {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .filter-checkbox {
+        transform: scale(1.2);
+        margin-top: 0.3rem;
+    }
+
+    #filters {
+        row-gap: 1rem;
+    }
+    }
+    @media (min-width: 768px) {
+        .card img {
+        transition: transform 0.3s ease;
+        }
+
+        .card:hover img {
+        transform: scale(1.1);
+        }
+    }
+
+    /* Mobile filter modal and toggle button styles */
+    @media (max-width: 768px) {
+        #filters {
+        display: none;
+        position: fixed;
+        bottom: 60px;
+        right: 1rem;
+        background-color: #0D0D0D;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        z-index: 1000;
+        max-width: 90vw;
+        flex-direction: column;
+        row-gap: 1rem;
+        }
+        .filter-toggle {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        background-color: #2552FF;
+        color: #fff;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+    }
+    @media (min-width: 768px) {
+        .filter-toggle {
+        display: none;
+        }
+        #filters {
+        display: grid !important;
+        position: static !important;
+        background-color: inherit !important;
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        }
+    }
+    /* Mobile-only refinements */
+    @media (max-width: 600px) {
+    /* Reduce excessive padding on mobile */
+    body {
+        padding: 1rem;
+    }
+
+    /* Reduce header spacing */
+    .header {
+        margin-bottom: 2rem;
+    }
+
+    /* Navigation fixes */
+    .nav-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.25rem;
+        margin: 0;
+    }
+    .nav-title {
+        font-size: 1.2rem !important;
+    }
+    .logo {
+        position: relative !important;
+        margin: 0 auto 0.5rem auto;
+        width: 60px;
+        height: 60px;
+        font-size: 0.55rem;
+    }
+
+    /* Enhanced search bar & filters for mobile */
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto 1rem auto;
+        gap: 0.5rem;
+    }
+    .search-input {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.8rem;
+        width: 90%;
+        max-width: 90%;
+        box-sizing: border-box;
+    }
+    .clear-btn {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.8rem;
+        width: 90%;
+        max-width: 90%;
+        margin-top: 0.5rem;
+        box-sizing: border-box;
+        display: block;
+    }
+    .status-filters {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        margin-bottom: 1rem;
+    }
+    .status-btn {
+        width: 90%;
+        font-size: 0.78rem;
+        padding: 0.35rem 0.7rem;
+        margin: 0 auto;
+        box-sizing: border-box;
+        min-height: 48px; /* Ensure minimum touch target size */
+    }
+    #filters {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Adjust card grid for smaller screens */
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    /* Reduce card image height on mobile */
+    .image {
+        max-height: 240px;
+    }
+
+    /* Ensure status badges don't overlap on narrow cards */
+    .status-badge {
+        max-width: calc(100% - 2rem);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Analytics grid */
+    .analytics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+    .chart-card {
+        margin: 0 auto;
+        width: 100% !important;
+    }
+
+    /* Headings */
+    h1, h2 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    }
+    </style>
+    </head>
+    <body>
+    <div class="header">
+        <div class="logo">
+        <div>else</div>
+        <div>where</div>
+        <div>collective</div>
+        </div>
+    <div class="nav-section">
+    <div class="nav-title active"><a href="index.html">Artist Prospecting</a></div>
+    <div class="nav-title"><a href="analytics.html">Analytics</a></div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name..." />
+        <button id="resetFilters" class="clear-btn">Clear Filters</button>
+    </div>
+
+    <!-- Status Filter Buttons -->
+    <div class="status-filters">
+        <button class="status-btn active" data-status="all">All</button>
+        <button class="status-btn" data-status="prospect">Prospect</button>
+        <button class="status-btn" data-status="planned outreach">Planned Outreach</button>
+        <button class="status-btn" data-status="outreach">Outreach</button>
+        <button class="status-btn" data-status="responded">Responded</button>
+        <button class="status-btn" data-status="spotlighted">Spotlighted</button>
+        <button class="status-btn" data-status="negotiating">Negotiating</button>
+        <button class="status-btn" data-status="featured">Featured</button>
+        <button class="status-btn" data-status="feature planned">Feature Planned</button>
+    </div>
+
+    <!-- Summary Dashboard -->
+    <div class="summary" id="summary">
+    <div class="summary-item">
+    <span class="summary-number" id="totalArtists">0</span>
+    <span class="summary-label">Total Artists</span>
+    </div>
+    <div class="summary-item">
+    <span class="summary-number" id="avgFollowers">0</span>
+    <span class="summary-label">Avg Followers</span>
+    </div>
+    <div class="summary-item">
+    <span class="summary-number" id="statusCounts">0</span>
+    <span class="summary-label">Current Filter</span>
+    </div>
+    <div class="summary-item">
+    <span class="summary-number" id="topGenre">-</span>
+    <span class="summary-label">Top Genre</span>
+    </div>
+    </div>
+    <div class="summary" id="filters" style="margin-top: 1rem; margin-bottom: 2rem;">
+    <div class="summary-item">
+    <label for="genreFilter" class="summary-label">Genre</label><br>
+    <select id="genreFilter" class="filter-select">
+    <option value="All">All</option>
+    </select>
+    </div>
+    <div class="summary-item">
+    <label for="whereFoundFilter" class="summary-label">Where Found</label><br>
+    <select id="whereFoundFilter" class="filter-select">
+    <option value="All">All</option>
+    </select>
+    </div>
+    <div class="summary-item">
+    <label for="followersFilter" class="summary-label">Followers</label><br>
+    <select id="followersFilter" class="filter-select">
+    <option value="All">All</option>
+    <option value="under5k">Under 5k</option>
+    <option value="5kto10k">5k–10k</option>
+    <option value="10kplus">10k+</option>
+    </select>
+    </div>
+    <div class="summary-item">
+    <label for="sortByFilter" class="summary-label">Sort By</label><br>
+    <select id="sortByFilter" class="filter-select">
+    <option value="rankingHighLow">Highest to Lowest Ranking</option>
+    <option value="rankingLowHigh">Lowest to Highest Ranking</option>
+    <option value="newest">Newest Added</option>
+    <option value="oldest">Oldest Added</option>
+    <option value="nameAZ">Name A-Z</option>
+    <option value="nameZA">Name Z-A</option>
+    </select>
+    </div>
+    </div>
+
+
+    <div class="grid" id="cards"></div>
+
+    <div class="footer">
+        <div class="footer-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">elsewhere collective</div>
+    </div>
+
+    <!-- Filter Toggle Button (only on mobile) -->
+    <button class="filter-toggle" onclick="toggleFilters()">☰</button>
+
+    <!-- Lightbox for image zoom -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <span class="lightbox-arrow lightbox-arrow-left" onclick="event.stopPropagation(); navigateLightbox(-1)">&#8249;</span>
+        <span class="lightbox-arrow lightbox-arrow-right" onclick="event.stopPropagation(); navigateLightbox(1)">&#8250;</span>
+        <div class="lightbox-container" onclick="event.stopPropagation()">
+            <img class="lightbox-content" id="lightboxImage" src="" alt="">
+            <div class="lightbox-info" id="lightboxInfo">
+                <div class="lightbox-info-item"><span class="lightbox-info-label">Artist:</span> <span id="lightboxArtist"></span></div>
+                <div class="lightbox-info-item"><span class="lightbox-info-label">Genre:</span> <span id="lightboxGenre"></span></div>
+                <div class="lightbox-info-item"><span class="lightbox-info-label">Status:</span> <span id="lightboxStatus"></span></div>
+                <div class="lightbox-info-item" id="lightboxSimilarArtistsContainer" style="display: none;"><span class="lightbox-info-label">Similar Artists:</span> <span id="lightboxSimilarArtists"></span></div>
+            </div>
+        </div>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
+
+    <script>
+    // *** IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE ***
+    // After deploying the Google Apps Script, paste the URL below
+    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbzXKY_3izM2hcwqqEZ6TFpAhBs76I4OrqXChHzecTUgJAvGukwBAtNtwxZMMsiJGOw9/exec';
+
+    // Available status options
+    const STATUS_OPTIONS = 
+        'Prospect',
+        'Planned Outreach',
+        'Outreach',
+        'Responded',
+        'Spotlighted',
+        'Negotiating',
+        'Featured',
+        'Feature Planned'
+    ];
+
+    // Lightbox gallery state
+    let currentLightboxIndex = 0;
+    let lightboxImages = [];
+    let lightboxCardElements = [];
+    let lightboxArtistData = [];
+
+    // Lightbox functions
+    function openLightbox(imageIndex) {
+        currentLightboxIndex = imageIndex;
+        updateLightboxImage();
+        const lightbox = document.getElementById('lightbox');
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when lightbox is open
+    }
+
+    function updateLightboxImage() {
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxCounter = document.getElementById('lightboxCounter');
+
+        if (lightboxImages.length > 0) {
+            lightboxImage.src = lightboxImages[currentLightboxIndex];
+            lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${lightboxImages.length}`;
+
+            // Update artist info
+            const artistData = lightboxArtistData[currentLightboxIndex];
+            if (artistData) {
+                document.getElementById('lightboxArtist').textContent = artistData.artist || '-';
+                document.getElementById('lightboxGenre').textContent = artistData.genre || '-';
+                document.getElementById('lightboxStatus').textContent = artistData.status || '-';
+
+                // Handle Similar Artists (Col V) - only show if filled in
+                const similarArtistsContainer = document.getElementById('lightboxSimilarArtistsContainer');
+                if (artistData.similarArtists && artistData.similarArtists.trim()) {
+                    document.getElementById('lightboxSimilarArtists').textContent = artistData.similarArtists;
+                    similarArtistsContainer.style.display = 'block';
+                } else {
+                    similarArtistsContainer.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    function navigateLightbox(direction) {
+        currentLightboxIndex += direction;
+
+        // Wrap around
+        if (currentLightboxIndex < 0) {
+            currentLightboxIndex = lightboxImages.length - 1;
+        } else if (currentLightboxIndex >= lightboxImages.length) {
+            currentLightboxIndex = 0;
+        }
+
+        updateLightboxImage();
+    }
+
+    function closeLightbox() {
+        const lightbox = document.getElementById('lightbox');
+        lightbox.classList.remove('active');
+        document.body.style.overflow = ''; // Restore scrolling
+
+        // Scroll to the current card
+        if (lightboxCardElements[currentLightboxIndex]) {
+            lightboxCardElements[currentLightboxIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(event) {
+        const lightbox = document.getElementById('lightbox');
+        if (lightbox.classList.contains('active')) {
+            if (event.key === 'Escape') {
+                closeLightbox();
+            } else if (event.key === 'ArrowLeft') {
+                navigateLightbox(-1);
+            } else if (event.key === 'ArrowRight') {
+                navigateLightbox(1);
+            }
+        }
+    });
+
+    // Status update functions
+    function createStatusSelector(statusBadge, currentStatus, artistName) {
+        // Remove any existing selectors
+        const existingSelector = statusBadge.parentElement.querySelector('.status-selector');
+        if (existingSelector) {
+            existingSelector.remove();
+            return;
+        }
+
+        // Create dropdown
+        const selector = document.createElement('div');
+        selector.className = 'status-selector active';
+
+        // Add all status options
+        STATUS_OPTIONS.forEach(status => {
+            const option = document.createElement('div');
+            option.className = 'status-option';
+            option.textContent = status;
+
+            // Highlight current status
+            if (status.toLowerCase() === currentStatus.toLowerCase()) {
+                option.style.background = 'rgba(214, 179, 112, 0.2)';
+                option.style.fontWeight = '700';
+            }
+
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateArtistStatus(artistName, status, statusBadge, selector);
+            });
+
+            selector.appendChild(option);
+        });
+
+        statusBadge.parentElement.appendChild(selector);
+
+        // Close selector when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', function closeSelector(e) {
+                if (!selector.contains(e.target) && e.target !== statusBadge) {
+                    selector.remove();
+                    document.removeEventListener('click', closeSelector);
+                }
+            });
+        }, 10);
+    }
+
+    async function updateArtistStatus(artistName, newStatus, statusBadge, selector) {
+        // Check if Apps Script URL is configured
+        if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+            alert('Please configure the Google Apps Script URL first!\n\nSee the setup instructions in GoogleAppsScript.gs');
+            selector.remove();
+            return;
+        }
+
+        // Add updating state
+        statusBadge.classList.add('status-updating');
+        statusBadge.textContent = 'Updating...';
+
+        try {
+            // Use URLSearchParams for Google Apps Script compatibility
+            const formData = new URLSearchParams();
+            formData.append('artistName', artistName);
+            formData.append('newStatus', newStatus);
+
+            // Alternative: Use fetch with proper content type
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            });
+
+            // Try to read the response
+            let result;
+            try {
+                const text = await response.text();
+                result = JSON.parse(text);
+                console.log('Server response:', result);
+            } catch (e) {
+                // If we can't read response, assume success
+                console.log('Could not parse response, assuming success');
+                result = { success: true };
+            }
+
+            if (result.success !== false) {
+                // Update badge
+                statusBadge.textContent = newStatus;
+                statusBadge.className = `status-badge ${getStatusClass(newStatus)}`;
+                statusBadge.classList.remove('status-updating');
+
+                // Remove selector
+                selector.remove();
+
+                // Show success message
+                showStatusMessage('✓ Status updated to: ' + newStatus, 'success');
+            } else {
+                throw new Error(result.message || 'Update failed');
+            }
+
+        } catch (error) {
+            console.error('Error updating status:', error);
+            statusBadge.classList.remove('status-updating');
+            statusBadge.textContent = statusBadge.getAttribute('data-original-status');
+            selector.remove();
+            showStatusMessage('✗ Failed to update: ' + error.message, 'error');
+        }
+    }
+
+    function showStatusMessage(message, type) {
+        // Create toast notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Satoshi', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            animation: slideDown 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideUp 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Add animations for toast
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+        }
     `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
+    document.head.appendChild(style);
 
-    setTimeout(() => {
-        toast.style.animation = 'slideUp 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
+    let currentStatusFilter = ['all'];
+    let currentSearchTerm = '';
+    let currentTagFilter = null;
 
-// Add animations for toast
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideDown {
-        from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
-        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    function toggleFilters() {
+    const filters = document.getElementById("filters");
+    filters.style.display = filters.style.display === "none" || filters.style.display === "" ? "flex" : "none";
     }
-    @keyframes slideUp {
-        from { transform: translateX(-50%) translateY(0); opacity: 1; }
-        to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
 
-let currentStatusFilter = ['all'];
-let currentSearchTerm = '';
-let currentTagFilter = null;
-
-function toggleFilters() {
-  const filters = document.getElementById("filters");
-  filters.style.display = filters.style.display === "none" || filters.style.display === "" ? "flex" : "none";
-}
-
-function parseCSV(csv) {
-    const lines = csv.split('\n');
-    const result = [];
-    const headers = [];
-    let current = '', inQuotes = false;
-    for (let i = 0; i < lines[0].length; i++) {
-    const char = lines[0][i];
-    if (char === '"') inQuotes = !inQuotes;
-    else if (char === ',' && !inQuotes) {
-        headers.push(current.trim().replace(/^"|"$/g, ''));
-        current = '';
-    } else current += char;
-    }
-    headers.push(current.trim().replace(/^"|"$/g, ''));
-
-    for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    const values = [], row = {};
-    current = ''; inQuotes = false;
-    for (let j = 0; j < lines[i].length; j++) {
-        const char = lines[i][j];
+    function parseCSV(csv) {
+        const lines = csv.split('\n');
+        const result = [];
+        const headers = [];
+        let current = '', inQuotes = false;
+        for (let i = 0; i < lines[0].length; i++) {
+        const char = lines[0][i];
         if (char === '"') inQuotes = !inQuotes;
         else if (char === ',' && !inQuotes) {
-        values.push(current.trim().replace(/^"|"$/g, ''));
-        current = '';
+            headers.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
         } else current += char;
+        }
+        headers.push(current.trim().replace(/^"|"$/g, ''));
+
+        for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const values = [], row = {};
+        current = ''; inQuotes = false;
+        for (let j = 0; j < lines[i].length; j++) {
+            const char = lines[i][j];
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) {
+            values.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
+            } else current += char;
+        }
+        values.push(current.trim().replace(/^"|"$/g, ''));
+        headers.forEach((header, idx) => row[header] = values[idx] || '');
+        if (row[headers[0]]) result.push(row);
+        }
+        return result;
     }
-    values.push(current.trim().replace(/^"|"$/g, ''));
-    headers.forEach((header, idx) => row[header] = values[idx] || '');
-    if (row[headers[0]]) result.push(row);
+
+    function getStatusClass(status) {
+        if (!status) return 'status-prospect';
+        const normalized = status.toLowerCase().replace(/\s+/g, '');
+        if (normalized === 'featureplanned') return 'status-feature planned';
+        if (normalized === 'plannedoutreach') return 'status-planned-outreach';
+        return `status-${normalized}`;
     }
-    return result;
-}
 
-function getStatusClass(status) {
-    if (!status) return 'status-prospect';
-    const normalized = status.toLowerCase().replace(/\s+/g, '');
-    if (normalized === 'featureplanned') return 'status-feature planned';
-    if (normalized === 'plannedoutreach') return 'status-planned-outreach';
-    return `status-${normalized}`;
-}
+    fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357")
+        .then(res => res.text())
+        .then(csvData => {
+        const data = parseCSV(csvData);
+        const genreSelect = document.getElementById("genreFilter");
+        const whereFoundSelect = document.getElementById("whereFoundFilter");
+        const followersSelect = document.getElementById("followersFilter");
+        const sortBySelect = document.getElementById("sortByFilter");
 
-fetch("https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357")
-    .then(res => res.text())
-    .then(csvData => {
-    const data = parseCSV(csvData);
-    const genreSelect = document.getElementById("genreFilter");
-    const whereFoundSelect = document.getElementById("whereFoundFilter");
-    const followersSelect = document.getElementById("followersFilter");
-    const sortBySelect = document.getElementById("sortByFilter");
+        // Store all data for re-filtering
+        let fullData = data;
 
-    // Store all data for re-filtering
-    let fullData = data;
+        // Debug: Log the data structure
+        console.log("First row of data:", data[0]);
+        console.log("All column headers:", Object.keys(data[0] || {}));
 
-    // Debug: Log the data structure
-    console.log("First row of data:", data[0]);
-    console.log("All column headers:", Object.keys(data[0] || {}));
+        // Populate genres
+        const genres = [...new Set(data.map(row => row["Genre"]).filter(Boolean))];
+        console.log("Found genres:", genres);
+        genres.sort().forEach(genre => {
+            const option = document.createElement("option");
+            option.value = genre;
+            option.textContent = genre;
+            genreSelect.appendChild(option);
+        });
 
-    // Populate genres
-    const genres = [...new Set(data.map(row => row["Genre"]).filter(Boolean))];
-    console.log("Found genres:", genres);
-    genres.sort().forEach(genre => {
-        const option = document.createElement("option");
-        option.value = genre;
-        option.textContent = genre;
-        genreSelect.appendChild(option);
-    });
+        // Populate where found options
+        const whereFoundOptions = [...new Set(data.map(row => row["Where Found"]).filter(Boolean))];
+        console.log("Found where found options:", whereFoundOptions);
+        whereFoundOptions.sort().forEach(whereFound => {
+            const option = document.createElement("option");
+            option.value = whereFound;
+            option.textContent = whereFound;
+            whereFoundSelect.appendChild(option);
+        });
 
-    // Populate where found options
-    const whereFoundOptions = [...new Set(data.map(row => row["Where Found"]).filter(Boolean))];
-    console.log("Found where found options:", whereFoundOptions);
-    whereFoundOptions.sort().forEach(whereFound => {
-        const option = document.createElement("option");
-        option.value = whereFound;
-        option.textContent = whereFound;
-        whereFoundSelect.appendChild(option);
-    });
-
-    // Status filter buttons - now supports multi-select with metaKey/ctrlKey
-    document.querySelectorAll('.status-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            const status = btn.dataset.status;
-            let changed = false;
-            if (event.metaKey || event.ctrlKey) {
-                // Multi-select: toggle this status in the array
-                if (status === 'all') {
-                    currentStatusFilter = ['all'];
-                } else {
-                    // Remove 'all' if present
-                    currentStatusFilter = currentStatusFilter.filter(s => s !== 'all');
-                    const idx = currentStatusFilter.indexOf(status);
-                    if (idx > -1) {
-                        currentStatusFilter.splice(idx, 1);
+        // Status filter buttons - now supports multi-select with metaKey/ctrlKey
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const status = btn.dataset.status;
+                let changed = false;
+                if (event.metaKey || event.ctrlKey) {
+                    // Multi-select: toggle this status in the array
+                    if (status === 'all') {
+                        currentStatusFilter = ['all'];
                     } else {
-                        currentStatusFilter.push(status);
-                    }
-                    // If none selected, revert to 'all'
-                    if (currentStatusFilter.length === 0) currentStatusFilter = ['all'];
-                }
-            } else {
-                // Single select: only this status
-                currentStatusFilter = [status];
-            }
-            // Update button classes
-            document.querySelectorAll('.status-btn').forEach(b => {
-                const s = b.dataset.status;
-                if (currentStatusFilter.includes(s)) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-            refreshUI();
-        });
-    });
-
-    function filterData() {
-        const genre = genreSelect.value;
-        const whereFound = whereFoundSelect.value;
-        const followersRange = followersSelect.value;
-
-        return fullData.filter(row => {
-            // Status filter
-            const status = (row["Current Status"] || "").toLowerCase().trim();
-            let statusMatch = false;
-            if (currentStatusFilter.includes('all')) {
-                statusMatch = true;
-            } else {
-                // Match if any selected status matches
-                statusMatch = currentStatusFilter.some(s => status === s.toLowerCase());
-            }
-            // Search filter
-            const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
-            const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
-
-            const genreMatch = genre === "All" || row["Genre"] === genre;
-            const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
-
-            // Tag filter
-            let tagMatch = true;
-            if (currentTagFilter) {
-                const artistTags = (row["Tags"] || "").toString().trim();
-                if (artistTags) {
-                    const tagsList = artistTags.split(',').map(tag => tag.trim());
-                    tagMatch = tagsList.includes(currentTagFilter);
-                } else {
-                    tagMatch = false;
-                }
-            }
-
-            // Followers filter
-            let followers = 0;
-            const raw = row["Instagram Followers - Do not delete"] || '';
-            const str = raw.toLowerCase().replace(/,/g, '');
-            if (str.includes('k')) followers = parseFloat(str.replace('k', '')) * 1000;
-            else followers = parseInt(str) || 0;
-            let followersMatch = true;
-            if (followersRange === "under5k") followersMatch = followers < 5000;
-            else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
-            else if (followersRange === "10kplus") followersMatch = followers > 10000;
-
-            return statusMatch && searchMatch && genreMatch && whereFoundMatch && tagMatch && followersMatch;
-        });
-    }
-
-    function parseDate(dateString) {
-        if (!dateString) return new Date("1900-01-01");
-        
-        // Handle DD.MM.YY format (like 01.08.25)
-        if (dateString.includes(".") && dateString.length === 8) {
-            const parts = dateString.split(".");
-            if (parts.length === 3) {
-                const day = parseInt(parts[0]);
-                const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
-                let year = parseInt(parts[2]);
-                
-                // Convert 2-digit year to 4-digit (assuming 20xx for now)
-                if (year < 100) {
-                    year = 2000 + year;
-                }
-                
-                return new Date(year, month, day);
-            }
-        }
-        
-        // Handle DD/MM/YYYY format (European)
-        if (dateString.includes("/")) {
-            const parts = dateString.split("/");
-            if (parts.length === 3) {
-                const day = parseInt(parts[0]);
-                const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
-                const year = parseInt(parts[2]);
-                return new Date(year, month, day);
-            }
-        }
-        
-        // Handle DD-MM-YYYY format
-        if (dateString.includes("-") && dateString.length === 10) {
-            const parts = dateString.split("-");
-            if (parts.length === 3 && parts[0].length === 2) {
-                const day = parseInt(parts[0]);
-                const month = parseInt(parts[1]) - 1;
-                const year = parseInt(parts[2]);
-                return new Date(year, month, day);
-            }
-        }
-        
-        // Try standard JavaScript parsing (handles YYYY-MM-DD, etc.)
-        const standardDate = new Date(dateString);
-        if (!isNaN(standardDate.getTime())) {
-            return standardDate;
-        }
-        
-        // Fallback if nothing works
-        console.warn("Could not parse date:", dateString);
-        return new Date("1900-01-01");
-    }
-
-    function sortData(data) {
-        const sortBy = sortBySelect.value;
-        return [...data].sort((a, b) => {
-            if (sortBy === "rankingHighLow") {
-                // Highest to Lowest: 1 → 5 (best to worst)
-                const rankA = parseInt(a["Ranking"]) || 0;
-                const rankB = parseInt(b["Ranking"]) || 0;
-                return rankA - rankB; // Lower numbers (better rankings) first
-            } else if (sortBy === "rankingLowHigh") {
-                // Lowest to Highest: 5 → 1 (worst to best)
-                const rankA = parseInt(a["Ranking"]) || 0;
-                const rankB = parseInt(b["Ranking"]) || 0;
-                return rankB - rankA; // Higher numbers (worse rankings) first
-            } else if (sortBy === "newest") {
-                const dateA = parseDate(a["When Added"]);
-                const dateB = parseDate(b["When Added"]);
-                return dateB - dateA; // Newest first
-            } else if (sortBy === "oldest") {
-                const dateA = parseDate(a["When Added"]);
-                const dateB = parseDate(b["When Added"]);
-                return dateA - dateB; // Oldest first
-            } else if (sortBy === "nameAZ") {
-                const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
-                const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
-                return nameA.localeCompare(nameB);
-            } else if (sortBy === "nameZA") {
-                const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
-                const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
-                return nameB.localeCompare(nameA);
-            }
-            return 0;
-        });
-    }
-
-    function renderCards(dataset) {
-        const container = document.getElementById("cards");
-        if (dataset.length === 0) {
-          container.innerHTML = "<p class='no-results'>No artists match these filters.</p>";
-          lightboxImages = [];
-          lightboxCardElements = [];
-          return;
-        }
-        container.innerHTML = "";
-
-        // Reset gallery arrays
-        lightboxImages = [];
-        lightboxCardElements = [];
-        lightboxArtistData = [];
-
-        dataset.forEach((row, index) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        // Add unique ID to card based on artist name
-        const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-');
-        card.id = `artist-${artistNameForId}`;
-
-        // Add status badge (now clickable)
-        const status = row["Current Status"] || "Prospect";
-        const artistName = row["Artist"] || row["Instagram Name"] || "Untitled";
-        const statusBadge = document.createElement("div");
-        statusBadge.className = `status-badge ${getStatusClass(status)}`;
-        statusBadge.textContent = status;
-        statusBadge.setAttribute('data-original-status', status);
-        statusBadge.setAttribute('title', 'Click to change status');
-
-        // Make status badge clickable
-        statusBadge.addEventListener('click', (e) => {
-            e.stopPropagation();
-            createStatusSelector(statusBadge, status, artistName);
-        });
-
-        card.appendChild(statusBadge);
-
-        const name = document.createElement("div");
-        name.className = "artist-name";
-        name.textContent = row["Artist"] || row["Instagram Name"] || "Untitled";
-        card.appendChild(name);
-
-        const insta = document.createElement("a");
-        insta.className = "insta-link";
-        insta.href = row["Insta Handle"] || "#";
-        insta.target = "_blank";
-        const img = document.createElement("img");
-        img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
-        img.alt = "Instagram";
-        img.className = "insta-logo";
-        img.loading = "lazy";
-        insta.appendChild(img);
-        insta.append("Insta");
-        card.appendChild(insta);
-
-        if (row["Image"]) {
-            // Add to gallery arrays
-            lightboxImages.push(row["Image"]);
-            lightboxCardElements.push(card);
-            lightboxArtistData.push({
-                artist: row["Artist"] || row["Instagram Name"] || "Unknown",
-                genre: row["Genre"] || "-",
-                status: row["Current Status"] || "-",
-                similarArtists: row["Similar Artists"] || ""
-            });
-
-            const image = document.createElement("img");
-            image.className = "image";
-            // Add timestamp to force reload and bypass cache
-            const imageUrl = row["Image"];
-            const cacheBuster = imageUrl.includes('?') ? '&' : '?';
-            image.src = imageUrl + cacheBuster + 't=' + new Date().getTime();
-            image.alt = row["Instagram Name"];
-            image.loading = "eager"; // Changed from lazy to eager for immediate loading
-            // Force reload if image fails to load
-            image.onerror = function() {
-                console.log("Retrying image load for:", imageUrl);
-                this.src = imageUrl + cacheBuster + 't=' + new Date().getTime() + '&retry=1';
-            };
-            image.onclick = function() { openLightbox(index); };
-            card.appendChild(image);
-        } else {
-            // If no image, add placeholder to keep indices aligned
-            lightboxImages.push(null);
-            lightboxCardElements.push(card);
-            lightboxArtistData.push({
-                artist: row["Artist"] || row["Instagram Name"] || "Unknown",
-                genre: row["Genre"] || "-",
-                status: row["Current Status"] || "-",
-                similarArtists: row["Similar Artists"] || ""
-            });
-        }
-
-        const fields = [
-            { label: "Genre", key: "Genre" },
-            { label: "Followers", key: "Instagram Followers - Do not delete" },
-            { label: "Where Found", key: "Where Found" },
-            { label: "Current Status", key: "Current Status" },
-        ];
-
-        fields.forEach(({ label, key }) => {
-            if (row[key]) {
-            const el = document.createElement("div");
-            el.className = "field-item";
-            el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
-            card.appendChild(el);
-            }
-        });
-
-        // Show "When Featured" date for Featured or Spotlighted status
-        const cardStatus = (row["Current Status"] || "").toLowerCase().trim();
-        if ((cardStatus === "featured" || cardStatus === "spotlighted") && row["Spotlighted"]) {
-            const whenFeatured = document.createElement("div");
-            whenFeatured.className = "field-item";
-            whenFeatured.innerHTML = `<span class="label">When Featured:</span> ${row["Spotlighted"]}`;
-            card.appendChild(whenFeatured);
-        }
-
-        const websiteFields = [
-            { label: "Easy Commerce", key: "Website with easy commerce" },
-            { label: "Gallery Rep", key: "Gallery Representation" }
-        ];
-
-        websiteFields.forEach(({ label, key }) => {
-            if (row[key] && row[key].toString().trim()) {
-                const cellValue = row[key].toString().trim();
-                const el = document.createElement("div");
-                el.className = "field-item";
-                el.innerHTML = `<span class="label">${label}:</span> ${cellValue}`;
-                card.appendChild(el);
-            }
-        });
-
-        // Handle website link from "Links" column
-        if (row["Links"] && row["Links"].toString().trim()) {
-            const websiteUrl = row["Links"].toString().trim();
-            if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
-                const el = document.createElement("div");
-                el.className = "field-item";
-                el.innerHTML = `<span class="label">Website:</span> <a href="${websiteUrl}" target="_blank" class="website-link">Visit Site</a>`;
-                card.appendChild(el);
-            }
-        }
-
-        // Add Instagram follow status fields - these will be after Gallery Rep
-        const followFields = [
-            { label: "Follow on IG", key: "Follow on IG" },
-            { label: "Follows me on IG", key: "Follows Me on IG?" }
-        ];
-
-        followFields.forEach(({ label, key }) => {
-            // If we found a value and it's "Yes" (case insensitive), display it
-            if (row[key] && row[key].toString().toLowerCase().trim() === "yes") {
-                const el = document.createElement("div");
-                el.className = "field-item";
-                el.innerHTML = `<span class="label">${label}:</span> Y`;
-                card.appendChild(el);
-            }
-        });
-
-        // Add Similar Artists if present
-        if (row["Similar Artists"] && row["Similar Artists"].toString().trim()) {
-            const el = document.createElement("div");
-            el.className = "field-item";
-            const similarArtistsText = row["Similar Artists"].toString().trim();
-
-            // Split by comma and make each artist name clickable
-            const artistNames = similarArtistsText.split(',').map(name => name.trim());
-            const clickableNames = artistNames.map(name => {
-                const nameForId = name.toLowerCase().replace(/\s+/g, '-');
-                return `<span class="similar-artist-link" data-artist-id="artist-${nameForId}">${name}</span>`;
-            }).join(', ');
-
-            el.innerHTML = `<span class="label">Similar Artists:</span> ${clickableNames}`;
-            card.appendChild(el);
-        }
-
-        // Add Tags if present (Column W)
-        if (row["Tags"] && row["Tags"].toString().trim()) {
-            const el = document.createElement("div");
-            el.className = "field-item";
-            const tagsText = row["Tags"].toString().trim();
-
-            // Split by comma and make each tag clickable
-            const tagsList = tagsText.split(',').map(tag => tag.trim());
-            const clickableTags = tagsList.map(tag => {
-                return `<span class="tag-link" data-tag="${tag}">${tag}</span>`;
-            }).join(', ');
-
-            el.innerHTML = `<span class="label">Tags:</span> ${clickableTags}`;
-            card.appendChild(el);
-        }
-
-        if (row["Notes"]) {
-            const notes = document.createElement("div");
-            notes.className = "notes";
-            notes.textContent = row["Notes"];
-            card.appendChild(notes);
-        }
-
-        container.appendChild(card);
-        });
-
-        // Add click handlers for similar artist links
-        document.querySelectorAll('.similar-artist-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('data-artist-id');
-                let targetCard = document.getElementById(targetId);
-
-                // If the card is not currently visible (due to filters), clear filters first
-                if (!targetCard) {
-                    // Clear search
-                    currentSearchTerm = '';
-                    document.getElementById('searchInput').value = '';
-
-                    // Reset to "All" status
-                    currentStatusFilter = ['all'];
-                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelector('.status-btn[data-status="all"]').classList.add('active');
-
-                    // Reset other filters
-                    document.getElementById('genreFilter').value = 'All';
-                    document.getElementById('whereFoundFilter').value = 'All';
-                    document.getElementById('followersFilter').value = 'All';
-
-                    // Clear tag filter
-                    currentTagFilter = null;
-
-                    // Refresh the UI to show all artists
-                    refreshUI();
-
-                    // Wait for DOM to update, then try again
-                    setTimeout(() => {
-                        targetCard = document.getElementById(targetId);
-                        if (targetCard) {
-                            targetCard.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-                            // Add highlight effect
-                            targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
-                            setTimeout(() => {
-                                targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
-                            }, 2000);
+                        // Remove 'all' if present
+                        currentStatusFilter = currentStatusFilter.filter(s => s !== 'all');
+                        const idx = currentStatusFilter.indexOf(status);
+                        if (idx > -1) {
+                            currentStatusFilter.splice(idx, 1);
+                        } else {
+                            currentStatusFilter.push(status);
                         }
-                    }, 100);
+                        // If none selected, revert to 'all'
+                        if (currentStatusFilter.length === 0) currentStatusFilter = ['all'];
+                    }
                 } else {
-                    // Card is already visible, just scroll to it
-                    targetCard.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    // Add highlight effect
-                    targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
-                    setTimeout(() => {
-                        targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
-                    }, 2000);
+                    // Single select: only this status
+                    currentStatusFilter = [status];
                 }
-            });
-        });
-
-        // Add click handlers for tag links
-        document.querySelectorAll('.tag-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const tag = this.getAttribute('data-tag');
-
-                // Set the tag filter
-                currentTagFilter = tag;
-
-                // Scroll to top of page to see filtered results
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+                // Update button classes
+                document.querySelectorAll('.status-btn').forEach(b => {
+                    const s = b.dataset.status;
+                    if (currentStatusFilter.includes(s)) b.classList.add('active');
+                    else b.classList.remove('active');
                 });
-
-                // Refresh UI to apply tag filter
                 refreshUI();
             });
         });
-    }
 
-    function updateStats(filtered) {
-        const followersData = filtered
-        .map(row => {
-            const followers = row["Instagram Followers - Do not delete"];
-            if (!followers) return 0;
-            const str = followers.toString().toLowerCase().replace(/,/g, '');
-            return str.includes('k')
-            ? parseFloat(str.replace('k', '')) * 1000
-            : parseInt(str) || 0;
-        }).filter(n => n > 0);
-        const avgFollowers = followersData.length > 0
-        ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
-        : 0;
-        
-        const genres = filtered.map(r => r["Genre"]).filter(Boolean)
-        .reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
-        const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+        function filterData() {
+            const genre = genreSelect.value;
+            const whereFound = whereFoundSelect.value;
+            const followersRange = followersSelect.value;
 
-        document.getElementById("totalArtists").textContent = filtered.length;
-        document.getElementById("avgFollowers").textContent = avgFollowers > 1000 ? (avgFollowers / 1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
-        document.getElementById("statusCounts").textContent = filtered.length;
-        document.getElementById("topGenre").textContent = topGenre;
-    }
-
-    function refreshUI() {
-        const filtered = filterData();
-        const sorted = sortData(filtered);
-        renderCards(sorted);
-        updateStats(filtered);
-    }
-
-    // Search input listener
-    const searchInput = document.getElementById("searchInput");
-    searchInput.addEventListener("input", (e) => {
-        currentSearchTerm = e.target.value;
-        refreshUI();
-    });
-
-    genreSelect.addEventListener("change", refreshUI);
-    whereFoundSelect.addEventListener("change", refreshUI);
-    followersSelect.addEventListener("change", refreshUI);
-    sortBySelect.addEventListener("change", refreshUI);
-
-    refreshUI(); // Initial render
-
-    // Handle hash navigation (from analytics page links)
-    function handleHashNavigation() {
-        const hash = window.location.hash;
-        if (hash && hash.startsWith('#artist-')) {
-            setTimeout(() => {
-                const targetCard = document.getElementById(hash.substring(1));
-                if (targetCard) {
-                    targetCard.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    // Add highlight effect
-                    targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
-                    setTimeout(() => {
-                        targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
-                    }, 2000);
+            return fullData.filter(row => {
+                // Status filter
+                const status = (row["Current Status"] || "").toLowerCase().trim();
+                let statusMatch = false;
+                if (currentStatusFilter.includes('all')) {
+                    statusMatch = true;
+                } else {
+                    // Match if any selected status matches
+                    statusMatch = currentStatusFilter.some(s => status === s.toLowerCase());
                 }
-            }, 500); // Wait for cards to render
+                // Search filter
+                const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
+                const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
+
+                const genreMatch = genre === "All" || row["Genre"] === genre;
+                const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
+
+                // Tag filter
+                let tagMatch = true;
+                if (currentTagFilter) {
+                    const artistTags = (row["Tags"] || "").toString().trim();
+                    if (artistTags) {
+                        const tagsList = artistTags.split(',').map(tag => tag.trim());
+                        tagMatch = tagsList.includes(currentTagFilter);
+                    } else {
+                        tagMatch = false;
+                    }
+                }
+
+                // Followers filter
+                let followers = 0;
+                const raw = row["Instagram Followers - Do not delete"] || '';
+                const str = raw.toLowerCase().replace(/,/g, '');
+                if (str.includes('k')) followers = parseFloat(str.replace('k', '')) * 1000;
+                else followers = parseInt(str) || 0;
+                let followersMatch = true;
+                if (followersRange === "under5k") followersMatch = followers < 5000;
+                else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
+                else if (followersRange === "10kplus") followersMatch = followers > 10000;
+
+                return statusMatch && searchMatch && genreMatch && whereFoundMatch && tagMatch && followersMatch;
+            });
         }
-    }
 
-    // Call on load and on hash change
-    handleHashNavigation();
-    window.addEventListener('hashchange', handleHashNavigation);
+        function parseDate(dateString) {
+            if (!dateString) return new Date("1900-01-01");
+            
+            // Handle DD.MM.YY format (like 01.08.25)
+            if (dateString.includes(".") && dateString.length === 8) {
+                const parts = dateString.split(".");
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+                    let year = parseInt(parts[2]);
+                    
+                    // Convert 2-digit year to 4-digit (assuming 20xx for now)
+                    if (year < 100) {
+                        year = 2000 + year;
+                    }
+                    
+                    return new Date(year, month, day);
+                }
+            }
+            
+            // Handle DD/MM/YYYY format (European)
+            if (dateString.includes("/")) {
+                const parts = dateString.split("/");
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1; // JavaScript months are 0-indexed
+                    const year = parseInt(parts[2]);
+                    return new Date(year, month, day);
+                }
+            }
+            
+            // Handle DD-MM-YYYY format
+            if (dateString.includes("-") && dateString.length === 10) {
+                const parts = dateString.split("-");
+                if (parts.length === 3 && parts[0].length === 2) {
+                    const day = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1;
+                    const year = parseInt(parts[2]);
+                    return new Date(year, month, day);
+                }
+            }
+            
+            // Try standard JavaScript parsing (handles YYYY-MM-DD, etc.)
+            const standardDate = new Date(dateString);
+            if (!isNaN(standardDate.getTime())) {
+                return standardDate;
+            }
+            
+            // Fallback if nothing works
+            console.warn("Could not parse date:", dateString);
+            return new Date("1900-01-01");
+        }
 
-    // Reset Filters button
-    document.getElementById("resetFilters").addEventListener("click", () => {
-      genreSelect.value = "All";
-      whereFoundSelect.value = "All";
-      followersSelect.value = "All";
-      sortBySelect.value = "rankingHighLow";
-      searchInput.value = "";
-      currentSearchTerm = "";
-      currentStatusFilter = ['all'];
-      currentTagFilter = null;
-      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector('.status-btn[data-status="all"]').classList.add('active');
-      refreshUI();
-      // On mobile, hide filters after reset
-      if (window.innerWidth <= 768) {
+        function sortData(data) {
+            const sortBy = sortBySelect.value;
+            return [...data].sort((a, b) => {
+                if (sortBy === "rankingHighLow") {
+                    // Highest to Lowest: 1 → 5 (best to worst)
+                    const rankA = parseInt(a["Ranking"]) || 0;
+                    const rankB = parseInt(b["Ranking"]) || 0;
+                    return rankA - rankB; // Lower numbers (better rankings) first
+                } else if (sortBy === "rankingLowHigh") {
+                    // Lowest to Highest: 5 → 1 (worst to best)
+                    const rankA = parseInt(a["Ranking"]) || 0;
+                    const rankB = parseInt(b["Ranking"]) || 0;
+                    return rankB - rankA; // Higher numbers (worse rankings) first
+                } else if (sortBy === "newest") {
+                    const dateA = parseDate(a["When Added"]);
+                    const dateB = parseDate(b["When Added"]);
+                    return dateB - dateA; // Newest first
+                } else if (sortBy === "oldest") {
+                    const dateA = parseDate(a["When Added"]);
+                    const dateB = parseDate(b["When Added"]);
+                    return dateA - dateB; // Oldest first
+                } else if (sortBy === "nameAZ") {
+                    const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
+                    const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
+                    return nameA.localeCompare(nameB);
+                } else if (sortBy === "nameZA") {
+                    const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
+                    const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
+                    return nameB.localeCompare(nameA);
+                }
+                return 0;
+            });
+        }
+
+        function renderCards(dataset) {
+            const container = document.getElementById("cards");
+            if (dataset.length === 0) {
+            container.innerHTML = "<p class='no-results'>No artists match these filters.</p>";
+            lightboxImages = [];
+            lightboxCardElements = [];
+            return;
+            }
+            container.innerHTML = "";
+
+            // Reset gallery arrays
+            lightboxImages = [];
+            lightboxCardElements = [];
+            lightboxArtistData = [];
+
+            dataset.forEach((row, index) => {
+            const card = document.createElement("div");
+            card.className = "card";
+            // Add unique ID to card based on artist name
+            const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-');
+            card.id = `artist-${artistNameForId}`;
+
+            // Add status badge (now clickable)
+            const status = row["Current Status"] || "Prospect";
+            const artistName = row["Artist"] || row["Instagram Name"] || "Untitled";
+            const statusBadge = document.createElement("div");
+            statusBadge.className = `status-badge ${getStatusClass(status)}`;
+            statusBadge.textContent = status;
+            statusBadge.setAttribute('data-original-status', status);
+            statusBadge.setAttribute('title', 'Click to change status');
+
+            // Make status badge clickable
+            statusBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                createStatusSelector(statusBadge, status, artistName);
+            });
+
+            card.appendChild(statusBadge);
+
+            const name = document.createElement("div");
+            name.className = "artist-name";
+            name.textContent = row["Artist"] || row["Instagram Name"] || "Untitled";
+            card.appendChild(name);
+
+            const insta = document.createElement("a");
+            insta.className = "insta-link";
+            insta.href = row["Insta Handle"] || "#";
+            insta.target = "_blank";
+            const img = document.createElement("img");
+            img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
+            img.alt = "Instagram";
+            img.className = "insta-logo";
+            img.loading = "lazy";
+            insta.appendChild(img);
+            insta.append("Insta");
+            card.appendChild(insta);
+
+            if (row["Image"]) {
+                // Add to gallery arrays
+                lightboxImages.push(row["Image"]);
+                lightboxCardElements.push(card);
+                lightboxArtistData.push({
+                    artist: row["Artist"] || row["Instagram Name"] || "Unknown",
+                    genre: row["Genre"] || "-",
+                    status: row["Current Status"] || "-",
+                    similarArtists: row["Similar Artists"] || ""
+                });
+
+                const image = document.createElement("img");
+                image.className = "image";
+                // Add timestamp to force reload and bypass cache
+                const imageUrl = row["Image"];
+                const cacheBuster = imageUrl.includes('?') ? '&' : '?';
+                image.src = imageUrl + cacheBuster + 't=' + new Date().getTime();
+                image.alt = row["Instagram Name"];
+                image.loading = "eager"; // Changed from lazy to eager for immediate loading
+                // Force reload if image fails to load
+                image.onerror = function() {
+                    console.log("Retrying image load for:", imageUrl);
+                    this.src = imageUrl + cacheBuster + 't=' + new Date().getTime() + '&retry=1';
+                };
+                image.onclick = function() { openLightbox(index); };
+                card.appendChild(image);
+            } else {
+                // If no image, add placeholder to keep indices aligned
+                lightboxImages.push(null);
+                lightboxCardElements.push(card);
+                lightboxArtistData.push({
+                    artist: row["Artist"] || row["Instagram Name"] || "Unknown",
+                    genre: row["Genre"] || "-",
+                    status: row["Current Status"] || "-",
+                    similarArtists: row["Similar Artists"] || ""
+                });
+            }
+
+            const fields = [
+                { label: "Genre", key: "Genre" },
+                { label: "Followers", key: "Instagram Followers - Do not delete" },
+                { label: "Where Found", key: "Where Found" },
+                { label: "Current Status", key: "Current Status" },
+            ];
+
+            fields.forEach(({ label, key }) => {
+                if (row[key]) {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                el.innerHTML = `<span class="label">${label}:</span> ${row[key]}`;
+                card.appendChild(el);
+                }
+            });
+
+            // Show "When Featured" date for Featured or Spotlighted status
+            const cardStatus = (row["Current Status"] || "").toLowerCase().trim();
+            if ((cardStatus === "featured" || cardStatus === "spotlighted") && row["Spotlighted"]) {
+                const whenFeatured = document.createElement("div");
+                whenFeatured.className = "field-item";
+                whenFeatured.innerHTML = `<span class="label">When Featured:</span> ${row["Spotlighted"]}`;
+                card.appendChild(whenFeatured);
+            }
+
+            const websiteFields = [
+                { label: "Easy Commerce", key: "Website with easy commerce" },
+                { label: "Gallery Rep", key: "Gallery Representation" }
+            ];
+
+            websiteFields.forEach(({ label, key }) => {
+                if (row[key] && row[key].toString().trim()) {
+                    const cellValue = row[key].toString().trim();
+                    const el = document.createElement("div");
+                    el.className = "field-item";
+                    el.innerHTML = `<span class="label">${label}:</span> ${cellValue}`;
+                    card.appendChild(el);
+                }
+            });
+
+            // Handle website link from "Links" column
+            if (row["Links"] && row["Links"].toString().trim()) {
+                const websiteUrl = row["Links"].toString().trim();
+                if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
+                    const el = document.createElement("div");
+                    el.className = "field-item";
+                    el.innerHTML = `<span class="label">Website:</span> <a href="${websiteUrl}" target="_blank" class="website-link">Visit Site</a>`;
+                    card.appendChild(el);
+                }
+            }
+
+            // Add Instagram follow status fields - these will be after Gallery Rep
+            const followFields = [
+                { label: "Follow on IG", key: "Follow on IG" },
+                { label: "Follows me on IG", key: "Follows Me on IG?" }
+            ];
+
+            followFields.forEach(({ label, key }) => {
+                // If we found a value and it's "Yes" (case insensitive), display it
+                if (row[key] && row[key].toString().toLowerCase().trim() === "yes") {
+                    const el = document.createElement("div");
+                    el.className = "field-item";
+                    el.innerHTML = `<span class="label">${label}:</span> Y`;
+                    card.appendChild(el);
+                }
+            });
+
+            // Add Similar Artists if present
+            if (row["Similar Artists"] && row["Similar Artists"].toString().trim()) {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                const similarArtistsText = row["Similar Artists"].toString().trim();
+
+                // Split by comma and make each artist name clickable
+                const artistNames = similarArtistsText.split(',').map(name => name.trim());
+                const clickableNames = artistNames.map(name => {
+                    const nameForId = name.toLowerCase().replace(/\s+/g, '-');
+                    return `<span class="similar-artist-link" data-artist-id="artist-${nameForId}">${name}</span>`;
+                }).join(', ');
+
+                el.innerHTML = `<span class="label">Similar Artists:</span> ${clickableNames}`;
+                card.appendChild(el);
+            }
+
+            // Add Tags if present (Column W)
+            if (row["Tags"] && row["Tags"].toString().trim()) {
+                const el = document.createElement("div");
+                el.className = "field-item";
+                const tagsText = row["Tags"].toString().trim();
+
+                // Split by comma and make each tag clickable
+                const tagsList = tagsText.split(',').map(tag => tag.trim());
+                const clickableTags = tagsList.map(tag => {
+                    return `<span class="tag-link" data-tag="${tag}">${tag}</span>`;
+                }).join(', ');
+
+                el.innerHTML = `<span class="label">Tags:</span> ${clickableTags}`;
+                card.appendChild(el);
+            }
+
+            if (row["Notes"]) {
+                const notes = document.createElement("div");
+                notes.className = "notes";
+                notes.textContent = row["Notes"];
+                card.appendChild(notes);
+            }
+
+            container.appendChild(card);
+            });
+
+            // Add click handlers for similar artist links
+            document.querySelectorAll('.similar-artist-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-artist-id');
+                    let targetCard = document.getElementById(targetId);
+
+                    // If the card is not currently visible (due to filters), clear filters first
+                    if (!targetCard) {
+                        // Clear search
+                        currentSearchTerm = '';
+                        document.getElementById('searchInput').value = '';
+
+                        // Reset to "All" status
+                        currentStatusFilter = ['all'];
+                        document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+
+                        // Reset other filters
+                        document.getElementById('genreFilter').value = 'All';
+                        document.getElementById('whereFoundFilter').value = 'All';
+                        document.getElementById('followersFilter').value = 'All';
+
+                        // Clear tag filter
+                        currentTagFilter = null;
+
+                        // Refresh the UI to show all artists
+                        refreshUI();
+
+                        // Wait for DOM to update, then try again
+                        setTimeout(() => {
+                            targetCard = document.getElementById(targetId);
+                            if (targetCard) {
+                                targetCard.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+                                // Add highlight effect
+                                targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                                setTimeout(() => {
+                                    targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                                }, 2000);
+                            }
+                        }, 100);
+                    } else {
+                        // Card is already visible, just scroll to it
+                        targetCard.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        // Add highlight effect
+                        targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                        setTimeout(() => {
+                            targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                        }, 2000);
+                    }
+                });
+            });
+
+            // Add click handlers for tag links
+            document.querySelectorAll('.tag-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tag = this.getAttribute('data-tag');
+
+                    // Set the tag filter
+                    currentTagFilter = tag;
+
+                    // Scroll to top of page to see filtered results
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+
+                    // Refresh UI to apply tag filter
+                    refreshUI();
+                });
+            });
+        }
+
+        function updateStats(filtered) {
+            const followersData = filtered
+            .map(row => {
+                const followers = row["Instagram Followers - Do not delete"];
+                if (!followers) return 0;
+                const str = followers.toString().toLowerCase().replace(/,/g, '');
+                return str.includes('k')
+                ? parseFloat(str.replace('k', '')) * 1000
+                : parseInt(str) || 0;
+            }).filter(n => n > 0);
+            const avgFollowers = followersData.length > 0
+            ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
+            : 0;
+            
+            const genres = filtered.map(r => r["Genre"]).filter(Boolean)
+            .reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
+            const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+
+            document.getElementById("totalArtists").textContent = filtered.length;
+            document.getElementById("avgFollowers").textContent = avgFollowers > 1000 ? (avgFollowers / 1000).toFixed(1) + 'k' : avgFollowers.toLocaleString();
+            document.getElementById("statusCounts").textContent = filtered.length;
+            document.getElementById("topGenre").textContent = topGenre;
+        }
+
+        function refreshUI() {
+            const filtered = filterData();
+            const sorted = sortData(filtered);
+            renderCards(sorted);
+            updateStats(filtered);
+        }
+
+        // Search input listener
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", (e) => {
+            currentSearchTerm = e.target.value;
+            refreshUI();
+        });
+
+        genreSelect.addEventListener("change", refreshUI);
+        whereFoundSelect.addEventListener("change", refreshUI);
+        followersSelect.addEventListener("change", refreshUI);
+        sortBySelect.addEventListener("change", refreshUI);
+
+        refreshUI(); // Initial render
+
+        // Handle hash navigation (from analytics page links)
+        function handleHashNavigation() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#artist-')) {
+                setTimeout(() => {
+                    const targetCard = document.getElementById(hash.substring(1));
+                    if (targetCard) {
+                        targetCard.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        // Add highlight effect
+                        targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                        setTimeout(() => {
+                            targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                        }, 2000);
+                    }
+                }, 500); // Wait for cards to render
+            }
+        }
+
+        // Call on load and on hash change
+        handleHashNavigation();
+        window.addEventListener('hashchange', handleHashNavigation);
+
+        // Reset Filters button
+        document.getElementById("resetFilters").addEventListener("click", () => {
+        genreSelect.value = "All";
+        whereFoundSelect.value = "All";
+        followersSelect.value = "All";
+        sortBySelect.value = "rankingHighLow";
+        searchInput.value = "";
+        currentSearchTerm = "";
+        currentStatusFilter = ['all'];
+        currentTagFilter = null;
+        document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+        refreshUI();
+        // On mobile, hide filters after reset
+        if (window.innerWidth <= 768) {
+            document.getElementById("filters").style.display = "none";
+        }
+        });
+        
+        // Hide filters on resize to mobile
+        window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
+            document.getElementById("filters").style.display = "none";
+        } else {
+            document.getElementById("filters").style.display = "grid";
+        }
+        });
+        
+        // Initial state for filters on load (mobile hidden)
+        if (window.innerWidth <= 768) {
         document.getElementById("filters").style.display = "none";
-      }
-    });
-    
-    // Hide filters on resize to mobile
-    window.addEventListener('resize', function() {
-      if (window.innerWidth <= 768) {
-        document.getElementById("filters").style.display = "none";
-      } else {
-        document.getElementById("filters").style.display = "grid";
-      }
-    });
-    
-    // Initial state for filters on load (mobile hidden)
-    if (window.innerWidth <= 768) {
-      document.getElementById("filters").style.display = "none";
-    }
-    })
-    .catch(err => {
-    console.error("Error loading data:", err);
-    console.error("Error details:", err.message);
-    console.error("Stack trace:", err.stack);
-    document.getElementById("summary").innerHTML = "<div style='text-align: center; color: red; padding: 2rem;'>Error loading artist data. Check console for details.</div>";
-    });
-</script>
-</body>
-</html>
+        }
+        })
+        .catch(err => {
+        console.error("Error loading data:", err);
+        console.error("Error details:", err.message);
+        console.error("Stack trace:", err.stack);
+        document.getElementById("summary").innerHTML = "<div style='text-align: center; color: red; padding: 2rem;'>Error loading artist data. Check console for details.</div>";
+        });
+    </script>
+    </body>
+    </html>
