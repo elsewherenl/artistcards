@@ -705,6 +705,19 @@
         text-decoration: underline;
         }
 
+        .similar-artists-label-link {
+        color: #D6B370;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+        }
+
+        .similar-artists-label-link:hover {
+        color: #2552FF;
+        border-bottom: 2px solid #2552FF;
+        }
+
         .tag-link {
         color: #2552FF;
         cursor: pointer;
@@ -1299,9 +1312,9 @@
         }
     });
 
-    // Function to clear all filters (used by keyboard shortcut)
+    // Function to clear filters progressively (used by keyboard shortcut)
     function clearAllFilters() {
-        console.log('Clearing all filters via Escape key...');
+        console.log('Clearing filters progressively via Escape key...');
 
         const searchInput = document.getElementById("searchInput");
         const genreSelect = document.getElementById("genreFilter");
@@ -1309,32 +1322,92 @@
         const followersSelect = document.getElementById("followersFilter");
         const sortBySelect = document.getElementById("sortByFilter");
 
-        // Reset all filters to default
-        if (genreSelect) genreSelect.value = "All";
-        if (whereFoundSelect) whereFoundSelect.value = "All";
-        if (followersSelect) followersSelect.value = "All";
-        if (sortBySelect) sortBySelect.value = "rankingHighLow";
-        if (searchInput) searchInput.value = "";
+        // Priority order: Clear one filter at a time
+        // 1. Visual filter (similar artists display:none)
+        let hasVisualFilter = false;
+        document.querySelectorAll('.card').forEach(card => {
+            if (card.style.display === 'none') {
+                hasVisualFilter = true;
+            }
+        });
 
-        currentSearchTerm = "";
-        currentStatusFilter = ['all'];
-        currentTagFilter = null;
+        if (hasVisualFilter) {
+            console.log('Clearing visual filter (similar artists)');
+            document.querySelectorAll('.card').forEach(card => {
+                card.style.display = 'flex';
+            });
+            refreshUI();
+            return;
+        }
 
-        // Update status buttons
-        document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-        const allButton = document.querySelector('.status-btn[data-status="all"]');
-        if (allButton) allButton.classList.add('active');
+        // 2. Search term
+        if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+            console.log('Clearing search term');
+            currentSearchTerm = "";
+            if (searchInput) searchInput.value = "";
+            refreshUI();
+            return;
+        }
 
-        // Refresh UI to show all artists
-        refreshUI();
+        // 3. Tag filter
+        if (currentTagFilter !== null) {
+            console.log('Clearing tag filter');
+            currentTagFilter = null;
+            refreshUI();
+            return;
+        }
 
-        // On mobile, hide filters after reset
+        // 4. Status filter (if not "all")
+        if (!currentStatusFilter.includes('all')) {
+            console.log('Clearing status filter');
+            currentStatusFilter = ['all'];
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            const allButton = document.querySelector('.status-btn[data-status="all"]');
+            if (allButton) allButton.classList.add('active');
+            refreshUI();
+            return;
+        }
+
+        // 5. Genre filter
+        if (genreSelect && genreSelect.value !== "All") {
+            console.log('Clearing genre filter');
+            genreSelect.value = "All";
+            refreshUI();
+            return;
+        }
+
+        // 6. Where Found filter
+        if (whereFoundSelect && whereFoundSelect.value !== "All") {
+            console.log('Clearing where found filter');
+            whereFoundSelect.value = "All";
+            refreshUI();
+            return;
+        }
+
+        // 7. Followers filter
+        if (followersSelect && followersSelect.value !== "All") {
+            console.log('Clearing followers filter');
+            followersSelect.value = "All";
+            refreshUI();
+            return;
+        }
+
+        // 8. Sort order (reset to default)
+        if (sortBySelect && sortBySelect.value !== "rankingHighLow") {
+            console.log('Resetting sort order');
+            sortBySelect.value = "rankingHighLow";
+            refreshUI();
+            return;
+        }
+
+        // All filters already cleared
+        console.log('All filters already cleared');
+
+        // On mobile, hide filters after all cleared
         if (window.innerWidth <= 768) {
             const filtersEl = document.getElementById("filters");
             if (filtersEl) filtersEl.style.display = "none";
         }
-
-        console.log('All filters cleared - showing all artists');
     }
 
     // Status update functions
@@ -1922,7 +1995,9 @@
                     return `<span class="similar-artist-link" data-artist-id="artist-${nameForId}">${name}</span>`;
                 }).join(', ');
 
-                el.innerHTML = `<span class="label">Similar Artists:</span> ${clickableNames}`;
+                // Make the label clickable to show all similar artists
+                const artistIdsArray = artistNames.map(name => name.toLowerCase().replace(/\s+/g, '-'));
+                el.innerHTML = `<span class="label similar-artists-label-link" data-artist-ids='${JSON.stringify(artistIdsArray)}'>Similar Artists:</span> ${clickableNames}`;
                 card.appendChild(el);
             }
 
@@ -2008,6 +2083,66 @@
                             targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
                         }, 2000);
                     }
+                });
+            });
+
+            // Add click handlers for "Similar Artists:" label (show all similar artists together)
+            document.querySelectorAll('.similar-artists-label-link').forEach(labelLink => {
+                labelLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Parse the artist IDs from data attribute
+                    const artistIdsJson = this.getAttribute('data-artist-ids');
+                    const artistIds = JSON.parse(artistIdsJson);
+
+                    // Get the current artist's card to find their name
+                    const currentCard = this.closest('.card');
+                    const currentArtistId = currentCard.id.replace('artist-', '');
+
+                    // Create an array of all artist IDs we want to show (current + similar)
+                    const allIdsToShow = [currentArtistId, ...artistIds];
+
+                    // Clear all other filters
+                    currentSearchTerm = '';
+                    document.getElementById('searchInput').value = '';
+                    currentStatusFilter = ['all'];
+                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+                    document.getElementById('genreFilter').value = 'All';
+                    document.getElementById('whereFoundFilter').value = 'All';
+                    document.getElementById('followersFilter').value = 'All';
+                    currentTagFilter = null;
+
+                    // Refresh UI first to show all artists
+                    refreshUI();
+
+                    // Wait for DOM update, then hide non-matching cards and highlight the group
+                    setTimeout(() => {
+                        // Hide all cards that are NOT in our group
+                        document.querySelectorAll('.card').forEach(card => {
+                            const cardId = card.id.replace('artist-', '');
+                            if (!allIdsToShow.includes(cardId)) {
+                                card.style.display = 'none';
+                            } else {
+                                card.style.display = 'flex';
+                                // Highlight with gold color
+                                card.style.boxShadow = '0 0 20px rgba(214, 179, 112, 0.6)';
+                                setTimeout(() => {
+                                    card.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                                }, 3000);
+                            }
+                        });
+
+                        // Scroll to the current artist's card (the one we clicked from)
+                        const currentCardElement = document.getElementById(`artist-${currentArtistId}`);
+                        if (currentCardElement) {
+                            currentCardElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }, 100);
                 });
             });
 
