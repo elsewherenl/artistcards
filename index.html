@@ -99,7 +99,7 @@
         line-height: 1;
         margin-bottom: 0.25rem;
         }
-        
+
         .summary-label {
         font-family: 'Satoshi', sans-serif;
         font-size: 0.875rem;
@@ -242,7 +242,7 @@
         position: absolute;
         top: 1rem;
         right: 1rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.35rem 0.85rem;
         border-radius: 12px;
         font-size: 0.7rem;
         font-weight: 600;
@@ -252,6 +252,11 @@
         cursor: pointer;
         transition: all 0.3s ease;
         user-select: none;
+        max-width: calc(100% - 2rem);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
     }
 
     .status-badge:hover {
@@ -385,6 +390,21 @@
         gap: 0.75rem;
         font-family: 'Satoshi', sans-serif;
         position: relative;
+        transition: box-shadow 0.3s ease;
+        }
+
+        .card.highlight-glow {
+        box-shadow: 0 0 20px rgba(37, 82, 255, 0.6), 0 0 40px rgba(37, 82, 255, 0.3);
+        animation: pulseGlow 2s ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(37, 82, 255, 0.6), 0 0 40px rgba(37, 82, 255, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 30px rgba(37, 82, 255, 0.8), 0 0 60px rgba(37, 82, 255, 0.4);
+        }
         }
         
         .artist-name {
@@ -890,6 +910,47 @@
         box-shadow: none !important;
         }
     }
+    /* Back to Top button */
+    .back-to-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #2552FF;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        font-size: 1.5rem;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(37, 82, 255, 0.3);
+        transition: all 0.3s ease;
+        z-index: 999;
+    }
+
+    .back-to-top.visible {
+        display: flex;
+    }
+
+    .back-to-top:hover {
+        background: #1f47d4;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 82, 255, 0.4);
+    }
+
+    @media (max-width: 768px) {
+        .back-to-top {
+            bottom: 5rem;
+            right: 1rem;
+            width: 45px;
+            height: 45px;
+            font-size: 1.3rem;
+        }
+    }
+
     /* Mobile-only refinements */
     @media (max-width: 600px) {
     /* Reduce excessive padding on mobile */
@@ -977,13 +1038,7 @@
         max-height: 240px;
     }
 
-    /* Ensure status badges don't overlap on narrow cards */
-    .status-badge {
-        max-width: calc(100% - 2rem);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    /* Status badge already has responsive styling in main CSS */
 
     /* Analytics grid */
     .analytics-grid {
@@ -1047,7 +1102,7 @@
     </div>
     <div class="summary-item">
     <span class="summary-number" id="statusCounts">0</span>
-    <span class="summary-label">Current Filter</span>
+    <span class="summary-label" id="statusCountsLabel">Viewing</span>
     </div>
     <div class="summary-item">
     <span class="summary-number" id="topGenre">-</span>
@@ -1098,6 +1153,9 @@
 
     <!-- Filter Toggle Button (only on mobile) -->
     <button class="filter-toggle" onclick="toggleFilters()">☰</button>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to top">↑</button>
 
     <!-- Lightbox for image zoom -->
     <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -1193,12 +1251,21 @@
         lightbox.classList.remove('active');
         document.body.style.overflow = ''; // Restore scrolling
 
-        // Scroll to the current card
+        // Scroll to the current card with glow effect
         if (lightboxCardElements[currentLightboxIndex]) {
-            lightboxCardElements[currentLightboxIndex].scrollIntoView({
+            const card = lightboxCardElements[currentLightboxIndex];
+            card.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center'
             });
+
+            // Add glow effect
+            card.classList.add('highlight-glow');
+
+            // Remove glow after animation completes
+            setTimeout(() => {
+                card.classList.remove('highlight-glow');
+            }, 2000);
         }
     }
 
@@ -1213,8 +1280,60 @@
             } else if (event.key === 'ArrowRight') {
                 navigateLightbox(1);
             }
+        } else {
+            // Global keyboard shortcuts (when lightbox is not active)
+            // Cmd/Ctrl + K to focus search
+            if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+                event.preventDefault();
+                const searchInput = document.getElementById('searchInput');
+                searchInput.focus();
+                searchInput.select();
+            }
+            // Escape to clear all filters
+            else if (event.key === 'Escape') {
+                event.preventDefault();
+                clearAllFilters();
+            }
         }
     });
+
+    // Function to clear all filters (used by keyboard shortcut)
+    function clearAllFilters() {
+        console.log('Clearing all filters via Escape key...');
+
+        const searchInput = document.getElementById("searchInput");
+        const genreSelect = document.getElementById("genreFilter");
+        const whereFoundSelect = document.getElementById("whereFoundFilter");
+        const followersSelect = document.getElementById("followersFilter");
+        const sortBySelect = document.getElementById("sortByFilter");
+
+        // Reset all filters to default
+        if (genreSelect) genreSelect.value = "All";
+        if (whereFoundSelect) whereFoundSelect.value = "All";
+        if (followersSelect) followersSelect.value = "All";
+        if (sortBySelect) sortBySelect.value = "rankingHighLow";
+        if (searchInput) searchInput.value = "";
+
+        currentSearchTerm = "";
+        currentStatusFilter = ['all'];
+        currentTagFilter = null;
+
+        // Update status buttons
+        document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+        const allButton = document.querySelector('.status-btn[data-status="all"]');
+        if (allButton) allButton.classList.add('active');
+
+        // Refresh UI to show all artists
+        refreshUI();
+
+        // On mobile, hide filters after reset
+        if (window.innerWidth <= 768) {
+            const filtersEl = document.getElementById("filters");
+            if (filtersEl) filtersEl.style.display = "none";
+        }
+
+        console.log('All filters cleared - showing all artists');
+    }
 
     // Status update functions
     function createStatusSelector(statusBadge, currentStatus, artistName) {
@@ -1955,6 +2074,16 @@
         sortBySelect.addEventListener("change", refreshUI);
 
         refreshUI(); // Initial render
+
+        // Back to Top button visibility
+        const backToTopBtn = document.getElementById('backToTop');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
 
         // Handle hash navigation (from analytics page links)
         function handleHashNavigation() {
