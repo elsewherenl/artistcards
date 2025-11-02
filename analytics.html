@@ -948,6 +948,14 @@ body.dark-mode .post-performance-container::-webkit-scrollbar-track {
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Set global Chart.js font defaults for larger text
+Chart.defaults.font.size = 16;
+Chart.defaults.plugins.legend.labels.font.size = 16;
+Chart.defaults.plugins.legend.labels.padding = 15;
+Chart.defaults.plugins.tooltip.titleFont.size = 18;
+Chart.defaults.plugins.tooltip.bodyFont.size = 16;
+</script>
 </head>
 <body>
     <div class="header">
@@ -1288,15 +1296,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                     position: 'left',
                     title: {
                         display: !isMobile,
-                        text: 'Reach / Views',
-                        font: {
-                            size: isMobile ? 10 : 12
-                        }
-                    },
-                    ticks: {
-                        font: {
-                            size: isMobile ? 9 : 11
-                        }
+                        text: 'Reach / Views'
                     }
                 },
                 y1: {
@@ -1305,15 +1305,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                     position: 'right',
                     title: {
                         display: !isMobile,
-                        text: 'Engagement Rate (%)',
-                        font: {
-                            size: isMobile ? 10 : 12
-                        }
-                    },
-                    ticks: {
-                        font: {
-                            size: isMobile ? 9 : 11
-                        }
+                        text: 'Engagement Rate (%)'
                     },
                     grid: {
                         drawOnChartArea: false
@@ -1322,31 +1314,15 @@ function renderPostPerformance(data, sortBy = 'date') {
                 x: {
                     ticks: {
                         maxRotation: 45,
-                        minRotation: 45,
-                        font: {
-                            size: isMobile ? 9 : 11
-                        }
+                        minRotation: 45
                     }
                 }
             },
             plugins: {
                 legend: {
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: isMobile ? 10 : 12
-                        },
-                        padding: isMobile ? 8 : 10,
-                        boxWidth: isMobile ? 20 : 40
-                    }
+                    position: 'top'
                 },
                 tooltip: {
-                    bodyFont: {
-                        size: isMobile ? 10 : 12
-                    },
-                    titleFont: {
-                        size: isMobile ? 11 : 13
-                    },
                     callbacks: {
                         afterLabel: function(context) {
                             const dataIndex = context.dataIndex;
