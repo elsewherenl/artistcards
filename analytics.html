@@ -782,6 +782,170 @@ a.activity-item:hover {
     margin: 0.5rem 0 !important;
   }
 }
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+    background: transparent;
+    border: 2px solid #D6B370;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    flex-shrink: 0;
+    margin-left: 2rem;
+}
+
+.dark-mode-toggle:hover {
+    background: #D6B370;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .dark-mode-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+        margin-left: 1rem;
+    }
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .logo {
+    background: #1a1a1a;
+    border-color: #D6B370;
+    color: #D6B370;
+}
+
+body.dark-mode .nav-title.active {
+    color: #e0e0e0;
+}
+
+body.dark-mode .nav-title:not(.active) {
+    color: #999;
+}
+
+body.dark-mode .summary {
+    background: rgba(40, 40, 40, 0.8);
+    border-color: rgba(214, 179, 112, 0.25);
+}
+
+body.dark-mode .summary-label {
+    color: #b0b0b0;
+}
+
+body.dark-mode .chart-container {
+    background: rgba(40, 40, 40, 0.8);
+    border-color: rgba(214, 179, 112, 0.25);
+}
+
+body.dark-mode .chart-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .chart-subtitle {
+    color: #b0b0b0;
+}
+
+body.dark-mode .post-summary-stats {
+    color: #b0b0b0;
+}
+
+body.dark-mode .bar-label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .bar-value {
+    color: #e0e0e0;
+}
+
+body.dark-mode .funnel-label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .funnel-number {
+    color: #e0e0e0;
+}
+
+body.dark-mode .funnel-percentage {
+    color: #b0b0b0;
+}
+
+body.dark-mode .funnel-stage {
+    background: linear-gradient(to right, rgba(214, 179, 112, 0.15), rgba(214, 179, 112, 0.08));
+    border-left-color: rgba(214, 179, 112, 0.5);
+    border-right-color: rgba(214, 179, 112, 0.5);
+}
+
+body.dark-mode .funnel-stage:first-child {
+    border-top-color: rgba(214, 179, 112, 0.5);
+}
+
+body.dark-mode .funnel-stage:last-child {
+    border-bottom-color: rgba(214, 179, 112, 0.5);
+}
+
+body.dark-mode .activity-item {
+    border-bottom-color: rgba(214, 179, 112, 0.15);
+}
+
+body.dark-mode .activity-name {
+    color: #e0e0e0;
+}
+
+body.dark-mode .activity-source {
+    color: #b0b0b0;
+    background: rgba(214, 179, 112, 0.15);
+}
+
+body.dark-mode .activity-date {
+    color: #b0b0b0;
+}
+
+body.dark-mode .sort-btn {
+    background: rgba(214, 179, 112, 0.15);
+    border-color: rgba(214, 179, 112, 0.3);
+    color: #e0e0e0;
+}
+
+body.dark-mode .sort-btn:hover {
+    background: rgba(214, 179, 112, 0.25);
+    border-color: rgba(214, 179, 112, 0.5);
+}
+
+body.dark-mode .sort-btn.active {
+    background: #D6B370;
+    border-color: #D6B370;
+    color: #0D0D0D;
+}
+
+body.dark-mode .scroll-hint {
+    background: rgba(214, 179, 112, 0.9);
+    color: #0D0D0D;
+}
+
+body.dark-mode .scroll-hint-below {
+    background: rgba(214, 179, 112, 0.9);
+    color: #0D0D0D;
+}
+
+body.dark-mode .activity-avatar {
+    border-color: rgba(214, 179, 112, 0.4);
+}
+
+body.dark-mode .post-performance-container::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.15);
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -795,6 +959,7 @@ a.activity-item:hover {
         <div class="nav-section">
             <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
             <div class="nav-title active">Analytics</div>
+            <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">☀️</button>
         </div>
     </div>
 
@@ -1816,6 +1981,42 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
             followerCanvas.getContext('2d').fillText('Error loading follower data', 50, 50);
         }
     });
+
+// Dark mode functionality
+function initDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    // Check for saved preference in localStorage
+    const savedDarkMode = localStorage.getItem('darkMode');
+
+    // If user has a saved preference, use it; otherwise check system preference
+    if (savedDarkMode === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.textContent = '🌙';
+    } else if (savedDarkMode === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // Auto-detect system preference if no saved preference
+        body.classList.add('dark-mode');
+        darkModeToggle.textContent = '🌙';
+        localStorage.setItem('darkMode', 'enabled');
+    }
+
+    // Toggle dark mode on button click
+    darkModeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            darkModeToggle.textContent = '🌙';
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            darkModeToggle.textContent = '☀️';
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+}
+
+// Initialize dark mode on page load
+initDarkMode();
 </script>
 </body>
 </html>
