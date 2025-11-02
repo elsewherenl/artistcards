@@ -1993,11 +1993,11 @@ function initDarkMode() {
     // If user has a saved preference, use it; otherwise check system preference
     if (savedDarkMode === 'enabled') {
         body.classList.add('dark-mode');
-        darkModeToggle.textContent = '🌙';
+        darkModeToggle.textContent = '☀️';
     } else if (savedDarkMode === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         // Auto-detect system preference if no saved preference
         body.classList.add('dark-mode');
-        darkModeToggle.textContent = '🌙';
+        darkModeToggle.textContent = '☀️';
         localStorage.setItem('darkMode', 'enabled');
     }
 
@@ -2006,10 +2006,10 @@ function initDarkMode() {
         body.classList.toggle('dark-mode');
 
         if (body.classList.contains('dark-mode')) {
-            darkModeToggle.textContent = '🌙';
+            darkModeToggle.textContent = '☀️';
             localStorage.setItem('darkMode', 'enabled');
         } else {
-            darkModeToggle.textContent = '☀️';
+            darkModeToggle.textContent = '🌙';
             localStorage.setItem('darkMode', 'disabled');
         }
     });
