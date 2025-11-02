@@ -1510,6 +1510,7 @@ function renderFunnel(data) {
         outreach: null,
         responded: null,
         negotiating: null,
+        featurePlanned: null,
         showcased: null
     };
     const stageCounts = {
@@ -1518,6 +1519,7 @@ function renderFunnel(data) {
         outreach: 0,
         responded: 0,
         negotiating: 0,
+        featurePlanned: 0,
         showcased: 0
     };
     data.forEach(row => {
@@ -1541,8 +1543,10 @@ function renderFunnel(data) {
         } else if (status.includes("negotiat")) {
             stageCounts.negotiating++;
             if (!canonicalLabels.negotiating) canonicalLabels.negotiating = rawStatus;
+        } else if (status.includes("feature") && status.includes("planned")) {
+            stageCounts.featurePlanned++;
+            if (!canonicalLabels.featurePlanned) canonicalLabels.featurePlanned = rawStatus;
         } else if (
-            status.includes("feature planned") ||
             status.includes("spotlight") ||
             status.includes("featured") ||
             status.includes("showcas")
@@ -1557,6 +1561,7 @@ function renderFunnel(data) {
         outreach: "Outreach",
         responded: "Responded",
         negotiating: "Negotiating",
+        featurePlanned: "Feature Planned",
         showcased: "Showcased"
     };
     const funnelStages = [
@@ -1565,13 +1570,14 @@ function renderFunnel(data) {
         { key: "outreach", label: canonicalLabels.outreach || fallbackLabels.outreach, count: stageCounts.outreach },
         { key: "responded", label: canonicalLabels.responded || fallbackLabels.responded, count: stageCounts.responded },
         { key: "negotiating", label: canonicalLabels.negotiating || fallbackLabels.negotiating, count: stageCounts.negotiating },
+        { key: "featurePlanned", label: canonicalLabels.featurePlanned || fallbackLabels.featurePlanned, count: stageCounts.featurePlanned },
         { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
     ];
     const total = data.length;
     document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle').innerText = `Total: ${total}`;
 
-    // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 25%)
-    const funnelWidths = [100, 85, 70, 55, 40, 25];
+    // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 30%, 20%)
+    const funnelWidths = [100, 85, 70, 55, 40, 30, 20];
 
     let funnelHtml = "";
     for (let i = 0; i < funnelStages.length; i++) {
