@@ -700,7 +700,9 @@ a.activity-item:hover {
   }
 
   .post-performance-container {
-    height: 300px !important;
+    height: auto !important;
+    min-height: 320px !important;
+    max-height: 400px !important;
     margin-bottom: 0.5rem !important;
     padding-bottom: 10px !important;
   }
@@ -712,11 +714,13 @@ a.activity-item:hover {
 
   /* Reduce chart canvas size on mobile */
   #postPerformanceChart {
-    max-height: 280px !important;
+    max-height: 300px !important;
+    height: 300px !important;
   }
 
   .post-chart-wrapper {
-    height: 100% !important;
+    height: auto !important;
+    min-height: 300px !important;
   }
 
   /* Recent additions - centered */
@@ -1054,20 +1058,25 @@ function renderPostPerformance(data, sortBy = 'date') {
     const isMobile = window.innerWidth <= 600;
     const minBarWidth = isMobile ? 80 : 120;
     const chartWidth = Math.max(isMobile ? 800 : 1200, sortedData.length * minBarWidth);
-    const chartHeight = isMobile ? 280 : 400;
+    const chartHeight = isMobile ? 300 : 400;
 
     const canvas = document.getElementById('postPerformanceChart');
-    canvas.width = chartWidth;
-    canvas.height = chartHeight;
+
+    // Account for device pixel ratio for crisp rendering on retina displays
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = chartWidth * dpr;
+    canvas.height = chartHeight * dpr;
     canvas.style.width = chartWidth + 'px';
     canvas.style.height = chartHeight + 'px';
+
+    // Scale the context to match DPR
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
 
     const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
     if (postSubtitle) {
         postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total — scroll to see all`;
     }
-
-    const ctx = canvas.getContext('2d');
 
     // Destroy existing chart if it exists
     if (postPerformanceChart) {
