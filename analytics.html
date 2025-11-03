@@ -1409,22 +1409,28 @@ function renderPostPerformance(data, sortBy = 'date') {
     const summaryStatsHTML = `Avg Reach: ${avgReach.toLocaleString()} | Avg Views: ${avgViews.toLocaleString()} | Avg Likes: ${avgLikes.toLocaleString()} | Avg Engagement Rate: ${avgEngagement}%`;
     document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
 
-    // Set responsive dimensions based on viewport
+    // Mobile detection
     const isMobile = window.innerWidth <= 600;
-    const minBarWidth = isMobile ? 80 : 120;
-    const chartWidth = Math.max(isMobile ? 800 : 1200, sortedData.length * minBarWidth);
-    const chartHeight = isMobile ? 300 : 400;
+
+    // Dark mode detection
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#e0e0e0' : '#0D0D0D';
+    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)';
+
+    // Calculate chart dimensions - much wider bars for readability
+    const barWidth = isMobile ? 100 : 140;
+    const chartWidth = Math.max(sortedData.length * barWidth, isMobile ? 600 : 1000);
+    const chartHeight = isMobile ? 350 : 450;
 
     const canvas = document.getElementById('postPerformanceChart');
 
-    // Account for device pixel ratio for crisp rendering on retina displays
+    // Set canvas size (accounting for device pixel ratio)
     const dpr = window.devicePixelRatio || 1;
     canvas.width = chartWidth * dpr;
     canvas.height = chartHeight * dpr;
     canvas.style.width = chartWidth + 'px';
     canvas.style.height = chartHeight + 'px';
 
-    // Scale the context to match DPR
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
@@ -1438,41 +1444,66 @@ function renderPostPerformance(data, sortBy = 'date') {
         postPerformanceChart.destroy();
     }
 
+    // Shorten labels for better readability
+    const labels = sortedData.map(post => {
+        if (isMobile && post.title.length > 20) {
+            return post.title.substring(0, 17) + '...';
+        } else if (!isMobile && post.title.length > 30) {
+            return post.title.substring(0, 27) + '...';
+        }
+        return post.title;
+    });
+
     postPerformanceChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: sortedData.map(post => post.title),
+            labels: labels,
             datasets: [
                 {
                     label: 'Reach',
                     data: sortedData.map(post => post.reach),
                     backgroundColor: '#2552FF',
-                    yAxisID: 'y'
+                    yAxisID: 'y',
+                    barPercentage: 0.85,
+                    categoryPercentage: 0.9
                 },
                 {
                     label: 'Views',
                     data: sortedData.map(post => post.views),
-                    backgroundColor: 'rgba(37, 82, 255, 0.6)',
-                    yAxisID: 'y'
+                    backgroundColor: 'rgba(37, 82, 255, 0.5)',
+                    yAxisID: 'y',
+                    barPercentage: 0.85,
+                    categoryPercentage: 0.9
                 },
                 {
-                    label: 'Engagement Rate (%)',
+                    label: 'Engagement %',
                     data: sortedData.map(post => post.engagementRate),
                     type: 'line',
                     borderColor: '#D6B370',
                     backgroundColor: '#D6B370',
-                    borderWidth: isMobile ? 2 : 3,
+                    borderWidth: isMobile ? 2.5 : 3,
                     fill: false,
-                    tension: 0.2,
+                    tension: 0.1,
                     yAxisID: 'y1',
-                    pointRadius: isMobile ? 3 : 4,
-                    pointHoverRadius: isMobile ? 5 : 6
+                    pointRadius: isMobile ? 4 : 5,
+                    pointHoverRadius: isMobile ? 6 : 8,
+                    pointBackgroundColor: '#D6B370',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 }
             ]
         },
         options: {
             responsive: false,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: isMobile ? 5 : 10,
+                    right: isMobile ? 5 : 10,
+                    top: isMobile ? 50 : 60,
+                    bottom: isMobile ? 10 : 15
+                }
+            },
             scales: {
                 y: {
                     type: 'linear',
@@ -1482,13 +1513,27 @@ function renderPostPerformance(data, sortBy = 'date') {
                         display: !isMobile,
                         text: 'Reach / Views',
                         font: {
-                            size: isMobile ? 9 : 12
-                        }
+                            size: isMobile ? 14 : 16,
+                            weight: '500',
+                            family: "'Space Grotesk', sans-serif"
+                        },
+                        color: textColor
                     },
                     ticks: {
                         font: {
-                            size: isMobile ? 8 : 11
+                            size: isMobile ? 10 : 14,
+                            family: "'Satoshi', sans-serif"
+                        },
+                        color: textColor,
+                        callback: function(value) {
+                            if (value >= 1000) {
+                                return (value / 1000).toFixed(1) + 'k';
+                            }
+                            return value;
                         }
+                    },
+                    grid: {
+                        color: gridColor
                     }
                 },
                 y1: {
@@ -1497,14 +1542,22 @@ function renderPostPerformance(data, sortBy = 'date') {
                     position: 'right',
                     title: {
                         display: !isMobile,
-                        text: 'Engagement Rate (%)',
+                        text: 'Engagement %',
                         font: {
-                            size: isMobile ? 9 : 12
-                        }
+                            size: isMobile ? 14 : 16,
+                            weight: '500',
+                            family: "'Space Grotesk', sans-serif"
+                        },
+                        color: '#D6B370'
                     },
                     ticks: {
                         font: {
-                            size: isMobile ? 8 : 11
+                            size: isMobile ? 10 : 14,
+                            family: "'Satoshi', sans-serif"
+                        },
+                        color: '#D6B370',
+                        callback: function(value) {
+                            return value.toFixed(1) + '%';
                         }
                     },
                     grid: {
@@ -1514,41 +1567,73 @@ function renderPostPerformance(data, sortBy = 'date') {
                 x: {
                     ticks: {
                         font: {
-                            size: isMobile ? 8 : 10
+                            size: isMobile ? 9 : 13,
+                            family: "'Satoshi', sans-serif"
                         },
+                        color: textColor,
                         maxRotation: 45,
-                        minRotation: 45
+                        minRotation: 45,
+                        autoSkip: false
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             },
             plugins: {
                 legend: {
                     position: 'top',
+                    align: 'center',
                     labels: {
                         font: {
-                            size: isMobile ? 9 : 12
+                            size: isMobile ? 11 : 16,
+                            family: "'Satoshi', sans-serif",
+                            weight: '500'
                         },
-                        padding: isMobile ? 6 : 10,
-                        boxWidth: isMobile ? 30 : 40
+                        color: textColor,
+                        padding: isMobile ? 10 : 15,
+                        boxWidth: isMobile ? 35 : 40,
+                        boxHeight: isMobile ? 12 : 14,
+                        usePointStyle: false
                     }
                 },
                 tooltip: {
+                    enabled: true,
+                    backgroundColor: isDarkMode ? 'rgba(40, 40, 40, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                    titleColor: textColor,
+                    bodyColor: textColor,
+                    borderColor: '#D6B370',
+                    borderWidth: 2,
+                    padding: isMobile ? 10 : 14,
                     titleFont: {
-                        size: isMobile ? 11 : 14
+                        size: isMobile ? 13 : 18,
+                        family: "'Space Grotesk', sans-serif",
+                        weight: '600'
                     },
                     bodyFont: {
-                        size: isMobile ? 10 : 12
+                        size: isMobile ? 12 : 15,
+                        family: "'Satoshi', sans-serif"
                     },
-                    padding: isMobile ? 8 : 12,
+                    displayColors: true,
+                    boxWidth: 12,
+                    boxHeight: 12,
                     callbacks: {
-                        afterLabel: function(context) {
-                            const dataIndex = context.dataIndex;
+                        title: function(context) {
+                            const dataIndex = context[0].dataIndex;
                             const post = sortedData[dataIndex];
-                            const tooltip = [`Date: ${post.date}`, `Artist: ${post.artist}`];
+                            return post.title;
+                        },
+                        afterBody: function(context) {
+                            const dataIndex = context[0].dataIndex;
+                            const post = sortedData[dataIndex];
+                            const extra = [];
+                            extra.push(`Date: ${post.date}`);
+                            extra.push(`Artist: ${post.artist}`);
+                            extra.push(`Likes: ${post.likes.toLocaleString()}`);
                             if (post.notes) {
-                                tooltip.push(`Notes: ${post.notes}`);
+                                extra.push(`Notes: ${post.notes}`);
                             }
-                            return tooltip;
+                            return extra;
                         }
                     }
                 }
@@ -2483,6 +2568,13 @@ function initDarkMode() {
         } else {
             darkModeToggle.textContent = '🌙';
             localStorage.setItem('darkMode', 'disabled');
+        }
+
+        // Re-render post performance chart to update colors
+        if (postPerformanceChart && postPerformanceRawData.length > 0) {
+            const activeSort = document.querySelector('.sort-btn.active');
+            const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
+            renderPostPerformance([], sortType);
         }
     });
 }
