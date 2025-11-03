@@ -2035,12 +2035,14 @@
                     // Match if any selected status matches
                     statusMatch = currentStatusFilter.some(s => status === s.toLowerCase());
                 }
-                // Search filter - search in artist name and tags
-                const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
+                // Search filter - search in artist name, Instagram handle, and tags
+                const artistFullName = (row["Artist"] || "").toLowerCase();
+                const instagramHandle = (row["Instagram Name"] || "").toLowerCase();
                 const artistTags = (row["Tags"] || "").toLowerCase();
                 const searchTerm = currentSearchTerm.toLowerCase();
                 const searchMatch = !currentSearchTerm ||
-                                  artistName.includes(searchTerm) ||
+                                  artistFullName.includes(searchTerm) ||
+                                  instagramHandle.includes(searchTerm) ||
                                   artistTags.includes(searchTerm);
 
                 const genreMatch = genre === "All" || row["Genre"] === genre;
