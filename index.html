@@ -31,6 +31,8 @@
         right: 0;
         width: 100px;
         height: 100px;
+        min-width: 100px;
+        min-height: 100px;
         background: #F3EFE9;
         border: 2px solid #0D0D0D;
         border-radius: 0;
@@ -49,6 +51,12 @@
         padding-bottom: 0.8rem;
         box-sizing: border-box;
         text-decoration: none;
+        flex-shrink: 0;
+        }
+
+        .logo > div {
+        width: 100%;
+        text-align: left;
         }
         
         h1 {
@@ -366,13 +374,16 @@
     }
 
     .status-filters {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: 0.5rem;
     }
 
     .status-btn {
-        width: 100%;
+        width: auto;
         text-align: center;
+        flex: 1 1 auto;
+        min-width: fit-content;
     }
 
     .search-container {
@@ -445,7 +456,13 @@
         object-fit: cover;
         border-radius: 0.5rem;
         cursor: pointer;
-        transition: opacity 0.3s ease;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .image-container {
+        width: 100%;
+        overflow: hidden;
+        border-radius: 0.5rem;
         }
 
         .image.lazy-image {
@@ -631,13 +648,17 @@
         }
 
         .lightbox-content {
-            max-width: 95vw;
-            max-height: 50vh;
+            max-width: 95vw !important;
+            max-height: 60vh !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            margin-top: 60px !important;
+            margin-bottom: 60px !important;
         }
 
         .lightbox-info {
-            position: static;
-            transform: none;
+            position: static !important;
+            transform: none !important;
             min-width: auto;
             width: 100%;
             max-width: 95vw;
@@ -657,8 +678,8 @@
         }
 
         .lightbox-close {
-            top: 1rem;
-            right: 1rem;
+            top: 1rem !important;
+            right: 1rem !important;
             width: 40px;
             height: 40px;
             font-size: 2rem;
@@ -671,11 +692,11 @@
         }
 
         .lightbox-arrow-left {
-            left: 0.5rem;
+            left: 0.5rem !important;
         }
 
         .lightbox-arrow-right {
-            right: 0.5rem;
+            right: 0.5rem !important;
         }
 
         .lightbox-counter {
@@ -813,6 +834,8 @@
             margin: 0 auto 1rem auto;
             width: 80px;
             height: 80px;
+            min-width: 80px;
+            min-height: 80px;
             font-size: 0.6rem;
         }
         h1 {
@@ -888,11 +911,7 @@
     }
     }
     @media (min-width: 768px) {
-        .card img {
-        transition: transform 0.3s ease;
-        }
-
-        .card:hover img {
+        .image-container:hover .image {
         transform: scale(1.1);
         }
     }
@@ -1207,7 +1226,11 @@
         margin: 0 auto 0.5rem auto;
         width: 60px;
         height: 60px;
+        min-width: 60px;
+        min-height: 60px;
         font-size: 0.55rem;
+        padding: 0.3rem;
+        padding-bottom: 0.48rem;
     }
 
     /* Enhanced search bar & filters for mobile */
@@ -1237,19 +1260,61 @@
         box-sizing: border-box;
         display: block;
     }
-    .status-filters {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.25rem;
-        margin-bottom: 1rem;
+    .dark-mode-toggle {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.5rem !important;
+        margin: 0.5rem auto !important;
     }
+    /* Horizontal scrollable status filters - Instagram stories style */
+    .status-filters {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        gap: 0.5rem !important;
+        margin-bottom: 1rem !important;
+        padding: 0.5rem 0 !important;
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: smooth !important;
+        align-items: flex-start !important;
+        position: relative !important;
+        /* Hide scrollbar but keep functionality */
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important; /* IE/Edge */
+    }
+
+    /* Hide scrollbar for Chrome/Safari */
+    .status-filters::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    /* Fade-out gradient on right edge to show more content */
+    .status-filters::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 40px;
+        height: 100%;
+        background: linear-gradient(to right, transparent, #F3EFE9);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    body.dark-mode .status-filters::after {
+        background: linear-gradient(to right, transparent, #1a1a1a);
+    }
+
     .status-btn {
-        width: 90%;
-        font-size: 0.75rem;
-        padding: 0.4rem 0.7rem;
-        margin: 0 auto;
-        box-sizing: border-box;
-        min-height: 36px;
+        width: auto !important;
+        min-width: fit-content !important;
+        font-size: 0.75rem !important;
+        padding: 0.5rem 1rem !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
     }
     #filters {
         max-width: 100%;
@@ -1266,7 +1331,14 @@
         max-height: 240px;
     }
 
-    /* Status badge already has responsive styling in main CSS */
+    /* Status badge - improved mobile handling */
+    .status-badge {
+        font-size: 0.6rem !important;
+        padding: 0.3rem 0.6rem !important;
+        max-width: calc(100% - 1.5rem) !important;
+        top: 0.75rem !important;
+        right: 0.75rem !important;
+    }
 
     /* Analytics grid */
     .analytics-grid {
@@ -1301,7 +1373,7 @@
 
     <!-- Search Bar -->
     <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name..." />
+        <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name or tags..." />
         <button id="resetFilters" class="clear-btn">Clear Filters</button>
         <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">☀️</button>
     </div>
@@ -1963,9 +2035,13 @@
                     // Match if any selected status matches
                     statusMatch = currentStatusFilter.some(s => status === s.toLowerCase());
                 }
-                // Search filter
+                // Search filter - search in artist name and tags
                 const artistName = (row["Instagram Name"] || row["Artist"] || "").toLowerCase();
-                const searchMatch = !currentSearchTerm || artistName.includes(currentSearchTerm.toLowerCase());
+                const artistTags = (row["Tags"] || "").toLowerCase();
+                const searchTerm = currentSearchTerm.toLowerCase();
+                const searchMatch = !currentSearchTerm ||
+                                  artistName.includes(searchTerm) ||
+                                  artistTags.includes(searchTerm);
 
                 const genreMatch = genre === "All" || row["Genre"] === genre;
                 const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
@@ -2152,6 +2228,10 @@
                     similarArtists: row["Similar Artists"] || ""
                 });
 
+                // Create image container to prevent overflow on hover
+                const imageContainer = document.createElement("div");
+                imageContainer.className = "image-container";
+
                 const image = document.createElement("img");
                 image.className = "image lazy-image";
                 const imageUrl = row["Image"];
@@ -2164,7 +2244,9 @@
                     this.style.display = 'none';
                 };
                 image.onclick = function() { openLightbox(index); };
-                card.appendChild(image);
+
+                imageContainer.appendChild(image);
+                card.appendChild(imageContainer);
             } else {
                 // If no image, add placeholder to keep indices aligned
                 lightboxImages.push(null);
