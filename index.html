@@ -2303,9 +2303,16 @@
             if (row["Links"] && row["Links"].toString().trim()) {
                 const websiteUrl = row["Links"].toString().trim();
                 if (websiteUrl.startsWith('http://') || websiteUrl.startsWith('https://')) {
+                    // Extract clean domain name
+                    let displayDomain = websiteUrl
+                        .replace(/^https?:\/\//i, '') // Remove protocol
+                        .replace(/^www\./i, '') // Remove www.
+                        .split('/')[0] // Get only the domain (everything before first slash)
+                        .split('?')[0]; // Remove query strings if any
+
                     const el = document.createElement("div");
                     el.className = "field-item";
-                    el.innerHTML = `<span class="label">Website:</span> <a href="${websiteUrl}" target="_blank" class="website-link">Visit Site</a>`;
+                    el.innerHTML = `<span class="label">Website:</span> <a href="${websiteUrl}" target="_blank" class="website-link">${displayDomain}</a>`;
                     card.appendChild(el);
                 }
             }
