@@ -368,6 +368,60 @@ a.activity-item:hover {
     grid-column: 1 / -1;
 }
 
+.response-analytics-full {
+    grid-column: 1 / -1;
+}
+
+.response-analytics-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.response-funnel-section,
+.response-insights-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.response-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 1rem 0;
+    color: #0D0D0D;
+    text-align: center;
+}
+
+.insight-item {
+    background: rgba(214, 179, 112, 0.1);
+    border-left: 3px solid #D6B370;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+}
+
+.insight-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.insight-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #D6B370;
+    margin-bottom: 0.25rem;
+}
+
+.insight-detail {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
 .post-performance-container {
     position: relative;
     width: 100%;
@@ -794,6 +848,29 @@ a.activity-item:hover {
     text-align: center !important;
     margin: 0.5rem 0 !important;
   }
+
+  /* Response Analytics - mobile stacking */
+  .response-analytics-container {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .response-section-title {
+    font-size: 1rem !important;
+  }
+
+  .insight-item {
+    padding: 0.6rem 0.8rem !important;
+  }
+
+  .insight-value {
+    font-size: 1.3rem !important;
+  }
+
+  .insight-label,
+  .insight-detail {
+    font-size: 0.75rem !important;
+  }
 }
 
 /* Dark mode toggle button */
@@ -959,6 +1036,19 @@ body.dark-mode .activity-avatar {
 body.dark-mode .post-performance-container::-webkit-scrollbar-track {
     background: rgba(214, 179, 112, 0.15);
 }
+
+body.dark-mode .response-section-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .insight-item {
+    background: rgba(214, 179, 112, 0.15);
+}
+
+body.dark-mode .insight-label,
+body.dark-mode .insight-detail {
+    color: #b0b0b0;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1063,6 +1153,21 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
             <div id="followerGrowthContainer">
                 <canvas id="followerGrowthChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container response-analytics-full">
+            <div class="chart-title">Response Analytics</div>
+            <div class="chart-subtitle" id="responseAnalyticsSubtitle">Outreach effectiveness and conversion insights</div>
+            <div class="response-analytics-container">
+                <div class="response-funnel-section">
+                    <h3 class="response-section-title">Response Funnel</h3>
+                    <div class="funnel" id="responseFunnel">Loading...</div>
+                </div>
+                <div class="response-insights-section">
+                    <h3 class="response-section-title">Key Insights</h3>
+                    <div id="responseInsights">Loading...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -1925,6 +2030,225 @@ function renderFollowerGrowth(data) {
     });
 }
 
+function renderResponseAnalytics(data) {
+    // Filter artists who have been contacted
+    const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
+
+    // Count those who responded with interest
+    const respondedInterested = contacted.filter(row => {
+        const status = (row["Response Status"] || "").trim();
+        return status === "Responded - Interested";
+    });
+
+    // Count those who made it to featured/spotlighted
+    const featured = respondedInterested.filter(row => {
+        const currentStatus = (row["Current Status"] || "").toLowerCase().trim();
+        return currentStatus.includes("spotlight") ||
+               currentStatus.includes("featured") ||
+               currentStatus.includes("showcas");
+    });
+
+    // Calculate response times for those who responded
+    const responseTimes = respondedInterested
+        .filter(row => row["Date Responded"] && row["Date Responded"].trim())
+        .map(row => {
+            const contacted = parseDate(row["Date Contacted"]);
+            const responded = parseDate(row["Date Responded"]);
+            if (contacted && responded && !isNaN(contacted) && !isNaN(responded)) {
+                return Math.floor((responded - contacted) / (1000 * 60 * 60 * 24));
+            }
+            return null;
+        })
+        .filter(days => days !== null && days >= 0);
+
+    const avgResponseTime = responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((sum, days) => sum + days, 0) / responseTimes.length)
+        : 0;
+
+    // Calculate time from response to feature for featured artists
+    const responseToFeatureTimes = featured
+        .filter(row => row["Date Responded"] && row["Date Responded"].trim() && row["When Added"])
+        .map(row => {
+            const responded = parseDate(row["Date Responded"]);
+            const featured = parseDate(row["When Added"]);
+            if (responded && featured && !isNaN(responded) && !isNaN(featured)) {
+                return Math.floor((featured - responded) / (1000 * 60 * 60 * 24));
+            }
+            return null;
+        })
+        .filter(days => days !== null && days >= 0);
+
+    const avgResponseToFeature = responseToFeatureTimes.length > 0
+        ? Math.round(responseToFeatureTimes.reduce((sum, days) => sum + days, 0) / responseToFeatureTimes.length)
+        : 0;
+
+    // Response rate by source
+    const sourceStats = {};
+    contacted.forEach(row => {
+        const source = row["Where Found"] || "Unknown";
+        if (!sourceStats[source]) {
+            sourceStats[source] = { contacted: 0, responded: 0 };
+        }
+        sourceStats[source].contacted++;
+
+        const respStatus = (row["Response Status"] || "").trim();
+        if (respStatus === "Responded - Interested") {
+            sourceStats[source].responded++;
+        }
+    });
+
+    const sourceRates = Object.entries(sourceStats)
+        .map(([source, stats]) => ({
+            source,
+            rate: stats.contacted > 0 ? (stats.responded / stats.contacted * 100) : 0,
+            contacted: stats.contacted
+        }))
+        .filter(s => s.contacted >= 3) // Only show sources with 3+ contacts
+        .sort((a, b) => b.rate - a.rate);
+
+    // Response rate by genre
+    const genreStats = {};
+    contacted.forEach(row => {
+        const genre = row["Genre"] || "Unknown";
+        if (!genreStats[genre]) {
+            genreStats[genre] = { contacted: 0, responded: 0 };
+        }
+        genreStats[genre].contacted++;
+
+        const respStatus = (row["Response Status"] || "").trim();
+        if (respStatus === "Responded - Interested") {
+            genreStats[genre].responded++;
+        }
+    });
+
+    const genreRates = Object.entries(genreStats)
+        .map(([genre, stats]) => ({
+            genre,
+            rate: stats.contacted > 0 ? (stats.responded / stats.contacted * 100) : 0,
+            contacted: stats.contacted
+        }))
+        .filter(g => g.contacted >= 3) // Only show genres with 3+ contacts
+        .sort((a, b) => b.rate - a.rate);
+
+    // Render funnel
+    const funnelContainer = document.getElementById('responseFunnel');
+    const totalContacted = contacted.length;
+    const totalResponded = respondedInterested.length;
+    const totalFeatured = featured.length;
+
+    const responseRate = totalContacted > 0 ? Math.round((totalResponded / totalContacted) * 100) : 0;
+    const conversionRate = totalResponded > 0 ? Math.round((totalFeatured / totalResponded) * 100) : 0;
+
+    if (totalContacted === 0) {
+        funnelContainer.innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">No outreach data yet. Start adding Date Contacted to artists!</div>';
+        document.getElementById('responseInsights').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Insights will appear once you have outreach data.</div>';
+        return;
+    }
+
+    const funnelHtml = `
+        <div class="funnel-stage" style="width: 100%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Contacted:</span>
+                <span class="funnel-number">${totalContacted}</span>
+                <span class="funnel-percentage">(100%)</span>
+            </div>
+        </div>
+        <div class="funnel-stage" style="width: 70%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Responded:</span>
+                <span class="funnel-number">${totalResponded}</span>
+                <span class="funnel-percentage">(${responseRate}%)</span>
+            </div>
+        </div>
+        <div class="funnel-stage" style="width: 40%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Featured:</span>
+                <span class="funnel-number">${totalFeatured}</span>
+                <span class="funnel-percentage">(${conversionRate}% of responded)</span>
+            </div>
+        </div>
+    `;
+    funnelContainer.innerHTML = funnelHtml;
+
+    // Render insights
+    const insightsContainer = document.getElementById('responseInsights');
+    let insightsHtml = '';
+
+    // Overall response rate
+    insightsHtml += `
+        <div class="insight-item">
+            <div class="insight-label">Overall Response Rate</div>
+            <div class="insight-value">${responseRate}%</div>
+            <div class="insight-detail">${totalResponded} of ${totalContacted} artists responded</div>
+        </div>
+    `;
+
+    // Average response time
+    if (avgResponseTime > 0) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Average Response Time</div>
+                <div class="insight-value">${avgResponseTime} days</div>
+                <div class="insight-detail">Based on ${responseTimes.length} response${responseTimes.length !== 1 ? 's' : ''}</div>
+            </div>
+        `;
+    }
+
+    // Best performing source
+    if (sourceRates.length > 0) {
+        const topSource = sourceRates[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Best Performing Source</div>
+                <div class="insight-value">${topSource.source}</div>
+                <div class="insight-detail">${Math.round(topSource.rate)}% response rate (${topSource.contacted} contacted)</div>
+            </div>
+        `;
+    }
+
+    // Best performing genre
+    if (genreRates.length > 0) {
+        const topGenre = genreRates[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Most Responsive Genre</div>
+                <div class="insight-value">${topGenre.genre}</div>
+                <div class="insight-detail">${Math.round(topGenre.rate)}% response rate (${topGenre.contacted} contacted)</div>
+            </div>
+        `;
+    }
+
+    // Conversion to featured
+    if (totalResponded > 0) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Interested → Featured Rate</div>
+                <div class="insight-value">${conversionRate}%</div>
+                <div class="insight-detail">${totalFeatured} of ${totalResponded} interested artists featured</div>
+            </div>
+        `;
+    }
+
+    // Time from response to feature
+    if (avgResponseToFeature > 0) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Response → Feature Time</div>
+                <div class="insight-value">${avgResponseToFeature} days</div>
+                <div class="insight-detail">Average time from interest to going live (${responseToFeatureTimes.length} featured)</div>
+            </div>
+        `;
+    }
+
+    insightsContainer.innerHTML = insightsHtml;
+
+    // Update subtitle with total contacted
+    const subtitle = document.getElementById('responseAnalyticsSubtitle');
+    if (subtitle) {
+        subtitle.textContent = `${totalContacted} artists contacted — ${responseRate}% response rate — ${avgResponseTime} days avg response time`;
+    }
+}
+
 // Store data globally for summary updates
 let artistData = [];
 let postPerformanceData = [];
@@ -1940,6 +2264,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderPipelineTimeline(artistData);
         renderFunnel(artistData);
         renderRecent(artistData);
+        renderResponseAnalytics(artistData);
 
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
     })
