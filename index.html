@@ -463,6 +463,44 @@
         width: 100%;
         overflow: hidden;
         border-radius: 0.5rem;
+        position: relative;
+        }
+
+        .image-indicators {
+        position: absolute;
+        bottom: 0.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.4rem;
+        z-index: 10;
+        padding: 0.4rem 0.6rem;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
+        transition: opacity 0.3s ease;
+        }
+
+        .image-container:hover .image-indicators {
+        opacity: 1;
+        }
+
+        .indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        }
+
+        .indicator-dot:hover {
+        background: rgba(255, 255, 255, 0.8);
+        transform: scale(1.2);
+        }
+
+        .indicator-dot.active {
+        background: #D6B370;
         }
 
         .image.lazy-image {
@@ -628,7 +666,7 @@
 
         .lightbox-counter {
         position: fixed;
-        bottom: 1rem;
+        top: 2rem;
         left: 50%;
         transform: translateX(-50%);
         color: white;
@@ -638,6 +676,7 @@
         font-size: 0.9rem;
         font-family: 'Satoshi', sans-serif;
         z-index: 10001;
+        backdrop-filter: blur(4px);
         }
 
         @media (max-width: 768px) {
@@ -700,8 +739,9 @@
         }
 
         .lightbox-counter {
-            bottom: 1rem;
+            top: 1rem;
             font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
         }
         }
         
@@ -1136,6 +1176,22 @@
         color: #D6B370;
     }
 
+    body.dark-mode .image-indicators {
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    body.dark-mode .indicator-dot {
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    body.dark-mode .indicator-dot:hover {
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    body.dark-mode .indicator-dot.active {
+        background: #D6B370;
+    }
+
     body.dark-mode .website-link {
         color: #6b9fff;
     }
@@ -1461,8 +1517,8 @@
     <!-- Lightbox for image zoom -->
     <div class="lightbox" id="lightbox" onclick="closeLightbox()">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-        <span class="lightbox-arrow lightbox-arrow-left" onclick="event.stopPropagation(); navigateLightbox(-1)">&#8249;</span>
-        <span class="lightbox-arrow lightbox-arrow-right" onclick="event.stopPropagation(); navigateLightbox(1)">&#8250;</span>
+        <span class="lightbox-arrow lightbox-arrow-left" onclick="event.stopPropagation(); if(event.shiftKey) { navigateToArtist(-1); } else { navigateArtistImages(-1); }">&#8249;</span>
+        <span class="lightbox-arrow lightbox-arrow-right" onclick="event.stopPropagation(); if(event.shiftKey) { navigateToArtist(1); } else { navigateArtistImages(1); }">&#8250;</span>
         <div class="lightbox-container" onclick="event.stopPropagation()">
             <img class="lightbox-content" id="lightboxImage" src="" alt="">
             <div class="lightbox-info" id="lightboxInfo">
@@ -1541,13 +1597,15 @@
 
     // Lightbox gallery state
     let currentLightboxIndex = 0;
-    let lightboxImages = [];
+    let currentImageIndex = 0; // Index of image within current artist's gallery
+    let lightboxImages = []; // Now array of arrays: [[img1, img2], [img3], ...]
     let lightboxCardElements = [];
     let lightboxArtistData = [];
 
     // Lightbox functions
-    function openLightbox(imageIndex) {
-        currentLightboxIndex = imageIndex;
+    function openLightbox(artistIndex, imageIndex = 0) {
+        currentLightboxIndex = artistIndex;
+        currentImageIndex = imageIndex;
         updateLightboxImage();
         const lightbox = document.getElementById('lightbox');
         lightbox.classList.add('active');
@@ -1558,9 +1616,24 @@
         const lightboxImage = document.getElementById('lightboxImage');
         const lightboxCounter = document.getElementById('lightboxCounter');
 
-        if (lightboxImages.length > 0) {
-            lightboxImage.src = lightboxImages[currentLightboxIndex];
-            lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${lightboxImages.length}`;
+        if (lightboxImages.length > 0 && lightboxImages[currentLightboxIndex]) {
+            const artistImages = lightboxImages[currentLightboxIndex];
+
+            // Ensure currentImageIndex is valid
+            if (currentImageIndex >= artistImages.length) {
+                currentImageIndex = 0;
+            } else if (currentImageIndex < 0) {
+                currentImageIndex = artistImages.length - 1;
+            }
+
+            lightboxImage.src = artistImages[currentImageIndex];
+
+            // Update counter to show both artist position and image position
+            if (artistImages.length > 1) {
+                lightboxCounter.textContent = `Image ${currentImageIndex + 1}/${artistImages.length} • Artist ${currentLightboxIndex + 1}/${lightboxImages.length}`;
+            } else {
+                lightboxCounter.textContent = `Artist ${currentLightboxIndex + 1}/${lightboxImages.length}`;
+            }
 
             // Update artist info
             const artistData = lightboxArtistData[currentLightboxIndex];
@@ -1581,8 +1654,42 @@
         }
     }
 
-    function navigateLightbox(direction) {
+    function navigateArtistImages(direction) {
+        // Left/Right arrows navigate within artist's images
+        const artistImages = lightboxImages[currentLightboxIndex];
+
+        // If only one image, navigate to next/prev artist instead
+        if (!artistImages || artistImages.length <= 1) {
+            navigateToArtist(direction);
+            return;
+        }
+
+        const newImageIndex = currentImageIndex + direction;
+
+        // If we've reached the boundary, move to next/prev artist
+        if (newImageIndex < 0) {
+            // At first image, going left - move to previous artist
+            navigateToArtist(-1);
+            // Set to last image of previous artist
+            const prevArtistImages = lightboxImages[currentLightboxIndex];
+            currentImageIndex = prevArtistImages ? prevArtistImages.length - 1 : 0;
+            updateLightboxImage();
+            return;
+        } else if (newImageIndex >= artistImages.length) {
+            // At last image, going right - move to next artist
+            navigateToArtist(1);
+            return;
+        }
+
+        // Otherwise, navigate within current artist's images
+        currentImageIndex = newImageIndex;
+        updateLightboxImage();
+    }
+
+    function navigateToArtist(direction) {
+        // Shift+Left/Right arrows navigate between artists
         currentLightboxIndex += direction;
+        currentImageIndex = 0; // Reset to first image of new artist
 
         // Wrap around
         if (currentLightboxIndex < 0) {
@@ -1598,6 +1705,7 @@
         const lightbox = document.getElementById('lightbox');
         lightbox.classList.remove('active');
         document.body.style.overflow = ''; // Restore scrolling
+        currentImageIndex = 0; // Reset to first image
 
         // Scroll to the current card with glow effect
         if (lightboxCardElements[currentLightboxIndex]) {
@@ -1624,9 +1732,19 @@
             if (event.key === 'Escape') {
                 closeLightbox();
             } else if (event.key === 'ArrowLeft') {
-                navigateLightbox(-1);
+                event.preventDefault();
+                if (event.shiftKey) {
+                    navigateToArtist(-1); // Shift+Left = previous artist
+                } else {
+                    navigateArtistImages(-1); // Left = previous image
+                }
             } else if (event.key === 'ArrowRight') {
-                navigateLightbox(1);
+                event.preventDefault();
+                if (event.shiftKey) {
+                    navigateToArtist(1); // Shift+Right = next artist
+                } else {
+                    navigateArtistImages(1); // Right = next image
+                }
             }
         } else {
             // Global keyboard shortcuts (when lightbox is not active)
@@ -2219,24 +2337,34 @@
             insta.append("Insta");
             card.appendChild(insta);
 
-            if (row["Image"]) {
-                // Add to gallery arrays
-                lightboxImages.push(row["Image"]);
-                lightboxCardElements.push(card);
-                lightboxArtistData.push({
-                    artist: row["Artist"] || row["Instagram Name"] || "Unknown",
-                    genre: row["Genre"] || "-",
-                    status: row["Current Status"] || "-",
-                    similarArtists: row["Similar Artists"] || ""
-                });
+            // Collect all images for this artist
+            const artistImages = [];
+            const imageColumns = ["Image", "Image 2", "Image 3", "Image 4", "Image 5"];
+            imageColumns.forEach(col => {
+                if (row[col] && row[col].trim()) {
+                    artistImages.push(row[col].trim());
+                }
+            });
 
+            // Add to gallery arrays (even if no images, to keep indices aligned)
+            lightboxImages.push(artistImages.length > 0 ? artistImages : [null]);
+            lightboxCardElements.push(card);
+            lightboxArtistData.push({
+                artist: row["Artist"] || row["Instagram Name"] || "Unknown",
+                genre: row["Genre"] || "-",
+                status: row["Current Status"] || "-",
+                similarArtists: row["Similar Artists"] || ""
+            });
+
+            if (artistImages.length > 0) {
                 // Create image container to prevent overflow on hover
                 const imageContainer = document.createElement("div");
                 imageContainer.className = "image-container";
+                let currentCardImageIndex = 0; // Track current image for this card
 
                 const image = document.createElement("img");
                 image.className = "image lazy-image";
-                const imageUrl = row["Image"];
+                const imageUrl = artistImages[0]; // Show first image
                 image.dataset.src = imageUrl; // Store URL in data attribute for lazy loading
                 image.alt = row["Instagram Name"];
                 image.loading = "lazy"; // Browser native lazy loading as fallback
@@ -2245,20 +2373,48 @@
                     console.log("Failed to load image:", imageUrl);
                     this.style.display = 'none';
                 };
-                image.onclick = function() { openLightbox(index); };
+
+                // Function to update card image display
+                const updateCardImage = (newIndex) => {
+                    currentCardImageIndex = newIndex;
+                    image.src = artistImages[currentCardImageIndex];
+                    image.dataset.src = artistImages[currentCardImageIndex];
+
+                    // Update indicator dots
+                    const dots = imageContainer.querySelectorAll('.indicator-dot');
+                    dots.forEach((dot, i) => {
+                        if (i === currentCardImageIndex) {
+                            dot.classList.add('active');
+                        } else {
+                            dot.classList.remove('active');
+                        }
+                    });
+                };
+
+                // Click image to open lightbox
+                image.onclick = function(e) {
+                    openLightbox(index, currentCardImageIndex);
+                };
 
                 imageContainer.appendChild(image);
+
+                // Add image indicators if multiple images
+                if (artistImages.length > 1) {
+                    const indicators = document.createElement("div");
+                    indicators.className = "image-indicators";
+                    for (let i = 0; i < artistImages.length; i++) {
+                        const dot = document.createElement("span");
+                        dot.className = "indicator-dot" + (i === 0 ? " active" : "");
+                        dot.onclick = function(e) {
+                            e.stopPropagation();
+                            updateCardImage(i);
+                        };
+                        indicators.appendChild(dot);
+                    }
+                    imageContainer.appendChild(indicators);
+                }
+
                 card.appendChild(imageContainer);
-            } else {
-                // If no image, add placeholder to keep indices aligned
-                lightboxImages.push(null);
-                lightboxCardElements.push(card);
-                lightboxArtistData.push({
-                    artist: row["Artist"] || row["Instagram Name"] || "Unknown",
-                    genre: row["Genre"] || "-",
-                    status: row["Current Status"] || "-",
-                    similarArtists: row["Similar Artists"] || ""
-                });
             }
 
             const fields = [
