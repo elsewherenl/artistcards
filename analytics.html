@@ -428,35 +428,56 @@ a.activity-item:hover {
 .post-performance-container {
     position: relative;
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 15px;
+    height: 350px;
     margin-bottom: 1rem;
-    height: 450px;
-}
-
-.post-performance-container::-webkit-scrollbar {
-    height: 12px;
-}
-
-.post-performance-container::-webkit-scrollbar-track {
-    background: rgba(214, 179, 112, 0.1);
-    border-radius: 6px;
-}
-
-.post-performance-container::-webkit-scrollbar-thumb {
-    background: #D6B370;
-    border-radius: 6px;
-}
-
-.post-performance-container::-webkit-scrollbar-thumb:hover {
-    background: #B8965A;
 }
 
 .post-chart-wrapper {
-    min-width: fit-content;
-    width: max-content;
+    width: 100%;
     height: 100%;
+    position: relative;
+}
+
+.post-chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Desktop: Add horizontal scroll */
+@media (min-width: 601px) {
+    .post-performance-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 15px;
+        height: 450px;
+    }
+
+    .post-performance-container::-webkit-scrollbar {
+        height: 12px;
+    }
+
+    .post-performance-container::-webkit-scrollbar-track {
+        background: rgba(214, 179, 112, 0.1);
+        border-radius: 6px;
+    }
+
+    .post-performance-container::-webkit-scrollbar-thumb {
+        background: #D6B370;
+        border-radius: 6px;
+    }
+
+    .post-performance-container::-webkit-scrollbar-thumb:hover {
+        background: #B8965A;
+    }
+
+    .post-chart-wrapper {
+        min-width: fit-content;
+        width: max-content;
+    }
+
+    .post-chart-wrapper canvas {
+        cursor: pointer;
+    }
 }
 
 .scroll-hint {
@@ -494,6 +515,115 @@ a.activity-item:hover {
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+.post-detail-card {
+    background: rgba(214, 179, 112, 0.15);
+    border-left: 4px solid #D6B370;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: none;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post-detail-card.active {
+    display: block;
+}
+
+.post-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.post-detail-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #0D0D0D;
+    margin: 0 0 0.5rem 0;
+}
+
+.post-detail-meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.post-detail-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.post-detail-stat {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 0.75rem;
+    border-radius: 6px;
+}
+
+.post-detail-stat-label {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.post-detail-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2552FF;
+}
+
+.post-detail-stat-value.engagement {
+    color: #D6B370;
+}
+
+.post-detail-notes {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #0D0D0D;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.post-detail-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.post-detail-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #0D0D0D;
 }
 
 .sort-btn {
@@ -789,8 +919,11 @@ a.activity-item:hover {
   }
 
   .scroll-hint-below {
-    font-size: 0.7rem !important;
-    padding: 0.35rem 0.6rem !important;
+    display: none !important;
+  }
+
+  .post-detail-card {
+    display: none !important;
   }
 
   /* Reduce chart canvas size on mobile */
@@ -1075,6 +1208,41 @@ body.dark-mode .insight-label,
 body.dark-mode .insight-detail {
     color: #b0b0b0;
 }
+
+body.dark-mode .post-detail-card {
+    background: rgba(214, 179, 112, 0.2);
+    border-left-color: #D6B370;
+}
+
+body.dark-mode .post-detail-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .post-detail-meta {
+    color: #b0b0b0;
+}
+
+body.dark-mode .post-detail-stat {
+    background: rgba(40, 40, 40, 0.6);
+}
+
+body.dark-mode .post-detail-stat-label {
+    color: #b0b0b0;
+}
+
+body.dark-mode .post-detail-notes {
+    background: rgba(40, 40, 40, 0.6);
+    color: #e0e0e0;
+}
+
+body.dark-mode .post-detail-close {
+    color: #b0b0b0;
+}
+
+body.dark-mode .post-detail-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1166,6 +1334,7 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
                 </div>
             </div>
             <div class="scroll-hint-below">← Scroll horizontally to see all posts →</div>
+            <div id="postDetailCard" class="post-detail-card"></div>
         </div>
         
         <div class="chart-container recent-full-width">
@@ -1350,6 +1519,50 @@ function renderPipelineTimeline(data) {
 let postPerformanceRawData = [];
 let postPerformanceChart = null;
 
+function showPostDetail(post) {
+    const card = document.getElementById('postDetailCard');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+
+    const html = `
+        <div class="post-detail-header">
+            <div>
+                <h3 class="post-detail-title">${post.title}</h3>
+                <div class="post-detail-meta">
+                    <strong>Artist:</strong> ${post.artist} | <strong>Date:</strong> ${post.date}
+                </div>
+            </div>
+            <button class="post-detail-close" onclick="document.getElementById('postDetailCard').classList.remove('active')">✕</button>
+        </div>
+        <div class="post-detail-stats">
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Reach</div>
+                <div class="post-detail-stat-value">${post.reach.toLocaleString()}</div>
+            </div>
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Views</div>
+                <div class="post-detail-stat-value">${post.views.toLocaleString()}</div>
+            </div>
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Likes</div>
+                <div class="post-detail-stat-value">${post.likes.toLocaleString()}</div>
+            </div>
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Engagement Rate</div>
+                <div class="post-detail-stat-value engagement">${post.engagementRate.toFixed(2)}%</div>
+            </div>
+        </div>
+        ${post.notes ? `<div class="post-detail-notes"><strong>Notes:</strong> ${post.notes}</div>` : ''}
+    `;
+
+    card.innerHTML = html;
+    card.classList.add('active');
+
+    // Scroll to the card smoothly
+    setTimeout(() => {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
 function renderPostPerformance(data, sortBy = 'date') {
     // Check if this is raw CSV data or already processed
     const isRawData = data.length > 0 && data[0].hasOwnProperty("Post Date");
@@ -1409,7 +1622,7 @@ function renderPostPerformance(data, sortBy = 'date') {
     const summaryStatsHTML = `Avg Reach: ${avgReach.toLocaleString()} | Avg Views: ${avgViews.toLocaleString()} | Avg Likes: ${avgLikes.toLocaleString()} | Avg Engagement Rate: ${avgEngagement}%`;
     document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
 
-    // Mobile detection
+    // Mobile-first detection
     const isMobile = window.innerWidth <= 600;
 
     // Dark mode detection
@@ -1417,26 +1630,19 @@ function renderPostPerformance(data, sortBy = 'date') {
     const textColor = isDarkMode ? '#e0e0e0' : '#0D0D0D';
     const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)';
 
-    // Calculate chart dimensions - much wider bars for readability
-    const barWidth = isMobile ? 100 : 140;
-    const chartWidth = Math.max(sortedData.length * barWidth, isMobile ? 600 : 1000);
-    const chartHeight = isMobile ? 350 : 450;
-
-    const canvas = document.getElementById('postPerformanceChart');
-
-    // Set canvas size (accounting for device pixel ratio)
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = chartWidth * dpr;
-    canvas.height = chartHeight * dpr;
-    canvas.style.width = chartWidth + 'px';
-    canvas.style.height = chartHeight + 'px';
-
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    // Mobile: show last 8 posts only for better readability
+    // Desktop: show all with horizontal scroll
+    const displayData = isMobile ? sortedData.slice(-8) : sortedData;
 
     const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
     if (postSubtitle) {
-        postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total — scroll to see all`;
+        if (isMobile && sortedData.length > 8) {
+            postSubtitle.textContent = `Showing most recent 8 of ${sortedData.length} posts`;
+        } else if (isMobile) {
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total`;
+        } else {
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total — click any bar for details`;
+        }
     }
 
     // Destroy existing chart if it exists
@@ -1445,14 +1651,32 @@ function renderPostPerformance(data, sortBy = 'date') {
     }
 
     // Shorten labels for better readability
-    const labels = sortedData.map(post => {
-        if (isMobile && post.title.length > 20) {
-            return post.title.substring(0, 17) + '...';
-        } else if (!isMobile && post.title.length > 30) {
-            return post.title.substring(0, 27) + '...';
+    const labels = displayData.map(post => {
+        const maxLength = isMobile ? 15 : 30;
+        if (post.title.length > maxLength) {
+            return post.title.substring(0, maxLength - 3) + '...';
         }
         return post.title;
     });
+
+    const canvas = document.getElementById('postPerformanceChart');
+    const wrapper = canvas.parentElement;
+
+    // Mobile-first: responsive canvas
+    if (isMobile) {
+        // Mobile: fit to container
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        wrapper.style.width = '100%';
+    } else {
+        // Desktop: wide scrollable canvas
+        const barWidth = 140;
+        const totalWidth = Math.max(displayData.length * barWidth, 1000);
+        canvas.style.width = totalWidth + 'px';
+        wrapper.style.width = totalWidth + 'px';
+    }
+
+    const ctx = canvas.getContext('2d');
 
     postPerformanceChart = new Chart(ctx, {
         type: 'bar',
@@ -1461,7 +1685,7 @@ function renderPostPerformance(data, sortBy = 'date') {
             datasets: [
                 {
                     label: 'Reach',
-                    data: sortedData.map(post => post.reach),
+                    data: displayData.map(post => post.reach),
                     backgroundColor: '#2552FF',
                     yAxisID: 'y',
                     barPercentage: 0.85,
@@ -1469,7 +1693,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                 },
                 {
                     label: 'Views',
-                    data: sortedData.map(post => post.views),
+                    data: displayData.map(post => post.views),
                     backgroundColor: 'rgba(37, 82, 255, 0.5)',
                     yAxisID: 'y',
                     barPercentage: 0.85,
@@ -1477,7 +1701,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                 },
                 {
                     label: 'Engagement %',
-                    data: sortedData.map(post => post.engagementRate),
+                    data: displayData.map(post => post.engagementRate),
                     type: 'line',
                     borderColor: '#D6B370',
                     backgroundColor: '#D6B370',
@@ -1494,14 +1718,21 @@ function renderPostPerformance(data, sortBy = 'date') {
             ]
         },
         options: {
-            responsive: false,
+            responsive: true,
             maintainAspectRatio: false,
+            onClick: !isMobile ? function(event, activeElements) {
+                if (activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const post = displayData[index];
+                    showPostDetail(post);
+                }
+            } : null,
             layout: {
                 padding: {
                     left: isMobile ? 5 : 10,
                     right: isMobile ? 5 : 10,
-                    top: isMobile ? 50 : 60,
-                    bottom: isMobile ? 10 : 15
+                    top: isMobile ? 45 : 60,
+                    bottom: isMobile ? 5 : 10
                 }
             },
             scales: {
@@ -1591,9 +1822,9 @@ function renderPostPerformance(data, sortBy = 'date') {
                             weight: '500'
                         },
                         color: textColor,
-                        padding: isMobile ? 10 : 15,
-                        boxWidth: isMobile ? 35 : 40,
-                        boxHeight: isMobile ? 12 : 14,
+                        padding: isMobile ? 8 : 15,
+                        boxWidth: isMobile ? 30 : 40,
+                        boxHeight: isMobile ? 10 : 14,
                         usePointStyle: false
                     }
                 },
@@ -1620,12 +1851,12 @@ function renderPostPerformance(data, sortBy = 'date') {
                     callbacks: {
                         title: function(context) {
                             const dataIndex = context[0].dataIndex;
-                            const post = sortedData[dataIndex];
+                            const post = displayData[dataIndex];
                             return post.title;
                         },
                         afterBody: function(context) {
                             const dataIndex = context[0].dataIndex;
-                            const post = sortedData[dataIndex];
+                            const post = displayData[dataIndex];
                             const extra = [];
                             extra.push(`Date: ${post.date}`);
                             extra.push(`Artist: ${post.artist}`);
