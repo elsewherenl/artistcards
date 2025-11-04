@@ -2153,10 +2153,10 @@
                     // Match if any selected status matches
                     statusMatch = currentStatusFilter.some(s => status === s.toLowerCase());
                 }
-                // Search filter - search in artist name, Instagram handle, and tags
+                // Search filter - search in artist name, Instagram handle, and themes
                 const artistFullName = (row["Artist"] || "").toLowerCase();
                 const instagramHandle = (row["Instagram Name"] || "").toLowerCase();
-                const artistTags = (row["Tags"] || "").toLowerCase();
+                const artistTags = (row["Themes"] || "").toLowerCase();
                 const searchTerm = currentSearchTerm.toLowerCase();
                 const searchMatch = !currentSearchTerm ||
                                   artistFullName.includes(searchTerm) ||
@@ -2166,10 +2166,10 @@
                 const genreMatch = genre === "All" || row["Genre"] === genre;
                 const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
 
-                // Tag filter
+                // Theme filter
                 let tagMatch = true;
                 if (currentTagFilter) {
-                    const artistTags = (row["Tags"] || "").toString().trim();
+                    const artistTags = (row["Themes"] || "").toString().trim();
                     if (artistTags) {
                         const tagsList = artistTags.split(',').map(tag => tag.trim());
                         tagMatch = tagsList.includes(currentTagFilter);
@@ -2510,11 +2510,11 @@
                 card.appendChild(el);
             }
 
-            // Add Themes if present (Column W - "Tags" in data)
-            if (row["Tags"] && row["Tags"].toString().trim()) {
+            // Add Themes if present (Column W - "Themes" in data)
+            if (row["Themes"] && row["Themes"].toString().trim()) {
                 const el = document.createElement("div");
                 el.className = "field-item";
-                const themesText = row["Tags"].toString().trim();
+                const themesText = row["Themes"].toString().trim();
 
                 // Split by comma and make each theme clickable
                 const themesList = themesText.split(',').map(theme => theme.trim());
