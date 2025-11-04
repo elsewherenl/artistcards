@@ -1429,7 +1429,7 @@
 
     <!-- Search Bar -->
     <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name or tags..." />
+        <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name or themes..." />
         <button id="resetFilters" class="clear-btn">Clear Filters</button>
         <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">☀️</button>
     </div>
@@ -2510,19 +2510,19 @@
                 card.appendChild(el);
             }
 
-            // Add Tags if present (Column W)
+            // Add Themes if present (Column W - "Tags" in data)
             if (row["Tags"] && row["Tags"].toString().trim()) {
                 const el = document.createElement("div");
                 el.className = "field-item";
-                const tagsText = row["Tags"].toString().trim();
+                const themesText = row["Tags"].toString().trim();
 
-                // Split by comma and make each tag clickable
-                const tagsList = tagsText.split(',').map(tag => tag.trim());
-                const clickableTags = tagsList.map(tag => {
-                    return `<span class="tag-link" data-tag="${tag}">${tag}</span>`;
+                // Split by comma and make each theme clickable
+                const themesList = themesText.split(',').map(theme => theme.trim());
+                const clickableThemes = themesList.map(theme => {
+                    return `<span class="tag-link" data-tag="${theme}">${theme}</span>`;
                 }).join(', ');
 
-                el.innerHTML = `<span class="label">Tags:</span> ${clickableTags}`;
+                el.innerHTML = `<span class="label">Themes:</span> ${clickableThemes}`;
                 card.appendChild(el);
             }
 
