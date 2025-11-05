@@ -1431,7 +1431,7 @@
     <div class="search-container">
         <input type="text" id="searchInput" class="search-input" placeholder="Search artists by name or themes..." />
         <button id="resetFilters" class="clear-btn">Clear Filters</button>
-        <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">☀️</button>
+        <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
     </div>
 
     <!-- Status Filter Buttons -->
@@ -1579,6 +1579,9 @@
             body.classList.add('dark-mode');
             darkModeToggle.textContent = '☀️';
             localStorage.setItem('darkMode', 'enabled');
+        } else {
+            // Light mode - show moon icon
+            darkModeToggle.textContent = '🌙';
         }
 
         // Toggle dark mode on button click
