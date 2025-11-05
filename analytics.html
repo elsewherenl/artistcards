@@ -1264,7 +1264,7 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
         <div class="nav-section">
             <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
             <div class="nav-title active">Analytics</div>
-            <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">☀️</button>
+            <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
         </div>
     </div>
 
@@ -2787,6 +2787,9 @@ function initDarkMode() {
         body.classList.add('dark-mode');
         darkModeToggle.textContent = '☀️';
         localStorage.setItem('darkMode', 'enabled');
+    } else {
+        // Light mode - show moon icon
+        darkModeToggle.textContent = '🌙';
     }
 
     // Toggle dark mode on button click
