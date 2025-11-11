@@ -83,8 +83,8 @@ body {
     padding: 1.5rem;
     margin-bottom: 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -94,7 +94,7 @@ body {
 
 .summary-number {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 500;
     color: #D6B370;
     display: block;
@@ -104,10 +104,11 @@ body {
 
 .summary-label {
     font-family: 'Satoshi', sans-serif;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: #666;
     font-weight: 500;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
 }
 
 .analytics-grid {
@@ -720,10 +721,6 @@ a.activity-item:hover {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  .summary-item:nth-child(5) {
-    grid-column: 1 / -1 !important;
-  }
-
   .summary-number {
     font-size: 1.3rem !important;
   }
@@ -1285,6 +1282,10 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
         <div class="summary-item">
             <span class="summary-number" id="summaryFollowerGrowth">-</span>
             <span class="summary-label" id="summaryFollowerGrowthLabel">Follower Growth</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="summaryAvgSpotlights">-</span>
+            <span class="summary-label">Avg Spotlights/Week</span>
         </div>
         <div class="summary-item">
             <span class="summary-number" id="summaryAvgEngagement">-</span>
@@ -2287,6 +2288,31 @@ function updateSummary(data, followerData = null, postData = null) {
             const growthText = growth > 0 ? `+${growth.toLocaleString()}` : growth.toLocaleString();
             document.getElementById('summaryFollowerGrowth').textContent = growthText;
             document.getElementById('summaryFollowerGrowthLabel').textContent = `Follower Growth (in ${timePeriod})`;
+        }
+    }
+
+    // Avg Spotlights per Week (from post data)
+    if (postData && postData.length > 0) {
+        const postsWithDates = postData.filter(row => row["Post Date"]);
+
+        if (postsWithDates.length > 0) {
+            // Parse all dates and find the earliest
+            const dates = postsWithDates
+                .map(row => parseDate(row["Post Date"]))
+                .filter(d => d && !isNaN(d));
+
+            if (dates.length > 0) {
+                dates.sort((a, b) => a - b);
+                const firstPostDate = dates[0];
+                const now = new Date();
+                const daysSinceFirst = Math.floor((now - firstPostDate) / (1000 * 60 * 60 * 24));
+                const weeksSinceFirst = daysSinceFirst / 7;
+
+                if (weeksSinceFirst > 0) {
+                    const avgSpotlightsPerWeek = (postsWithDates.length / weeksSinceFirst).toFixed(1);
+                    document.getElementById('summaryAvgSpotlights').textContent = avgSpotlightsPerWeek;
+                }
+            }
         }
     }
 
