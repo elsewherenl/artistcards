@@ -338,6 +338,18 @@
         border: 1px solid rgba(37, 82, 255, 0.3);
     }
 
+    .status-awaiting.response {
+        background: rgba(251, 191, 36, 0.2);
+        color: #d97706;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .status-no.response {
+        background: rgba(239, 68, 68, 0.2);
+        color: #dc2626;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
     .status-responded {
         background: rgba(34, 197, 94, 0.2);
         color: #15803d;
@@ -1440,7 +1452,8 @@
         <button class="status-btn" data-status="prospect">Prospect</button>
         <button class="status-btn" data-status="planned outreach">Planned Outreach</button>
         <button class="status-btn" data-status="outreach">Outreach</button>
-        <button class="status-btn" data-status="responded">Responded</button>
+        <button class="status-btn" data-status="awaiting response">Awaiting Response</button>
+        <button class="status-btn" data-status="no response">No Response</button>
         <button class="status-btn" data-status="spotlighted">Spotlighted</button>
         <button class="status-btn" data-status="negotiating">Negotiating</button>
         <button class="status-btn" data-status="featured">Featured</button>
@@ -1497,6 +1510,8 @@
     <option value="oldest">Oldest Added</option>
     <option value="nameAZ">Name A-Z</option>
     <option value="nameZA">Name Z-A</option>
+    <option value="featuredNewest">Date Featured: Newest to Oldest</option>
+    <option value="featuredOldest">Date Featured: Oldest to Newest</option>
     </select>
     </div>
     </div>
@@ -1818,6 +1833,7 @@
             document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
             const allButton = document.querySelector('.status-btn[data-status="all"]');
             if (allButton) allButton.classList.add('active');
+            updateFeaturedSortOptions();
             refreshUI();
             return;
         }
@@ -2023,6 +2039,33 @@
     let currentSearchTerm = '';
     let currentTagFilter = null;
 
+    // Function to show/hide featured date sort options based on status filter
+    function updateFeaturedSortOptions() {
+        const featuredNewestOption = document.querySelector('#sortByFilter option[value="featuredNewest"]');
+        const featuredOldestOption = document.querySelector('#sortByFilter option[value="featuredOldest"]');
+
+        // Show featured date options only when filtering by "spotlighted" or "featured"
+        const showFeaturedOptions = currentStatusFilter.includes('spotlighted') ||
+                                     currentStatusFilter.includes('featured') ||
+                                     currentStatusFilter.includes('feature planned');
+
+        if (featuredNewestOption && featuredOldestOption) {
+            if (showFeaturedOptions) {
+                featuredNewestOption.style.display = '';
+                featuredOldestOption.style.display = '';
+            } else {
+                featuredNewestOption.style.display = 'none';
+                featuredOldestOption.style.display = 'none';
+
+                // Reset sort if currently using featured sort
+                const sortBySelect = document.getElementById('sortByFilter');
+                if (sortBySelect.value === 'featuredNewest' || sortBySelect.value === 'featuredOldest') {
+                    sortBySelect.value = 'rankingHighLow';
+                }
+            }
+        }
+    }
+
     function toggleFilters() {
     const filters = document.getElementById("filters");
     filters.style.display = filters.style.display === "none" || filters.style.display === "" ? "flex" : "none";
@@ -2137,6 +2180,7 @@
                     if (currentStatusFilter.includes(s)) b.classList.add('active');
                     else b.classList.remove('active');
                 });
+                updateFeaturedSortOptions();
                 refreshUI();
             });
         });
@@ -2278,6 +2322,20 @@
                     const nameA = (a["Instagram Name"] || a["Artist"] || "").toLowerCase();
                     const nameB = (b["Instagram Name"] || b["Artist"] || "").toLowerCase();
                     return nameB.localeCompare(nameA);
+                } else if (sortBy === "featuredNewest") {
+                    const dateA = a["Spotlighted"] ? parseDate(a["Spotlighted"]) : null;
+                    const dateB = b["Spotlighted"] ? parseDate(b["Spotlighted"]) : null;
+                    if (!dateA && !dateB) return 0;
+                    if (!dateA) return 1; // Items without dates go to end
+                    if (!dateB) return -1;
+                    return dateB - dateA; // Newest first
+                } else if (sortBy === "featuredOldest") {
+                    const dateA = a["Spotlighted"] ? parseDate(a["Spotlighted"]) : null;
+                    const dateB = b["Spotlighted"] ? parseDate(b["Spotlighted"]) : null;
+                    if (!dateA && !dateB) return 0;
+                    if (!dateA) return 1; // Items without dates go to end
+                    if (!dateB) return -1;
+                    return dateA - dateB; // Oldest first
                 }
                 return 0;
             });
@@ -2565,6 +2623,9 @@
                         // Clear tag filter
                         currentTagFilter = null;
 
+                        // Update featured sort options
+                        updateFeaturedSortOptions();
+
                         // Refresh the UI to show all artists
                         refreshUI();
 
@@ -2625,6 +2686,9 @@
                     document.getElementById('whereFoundFilter').value = 'All';
                     document.getElementById('followersFilter').value = 'All';
                     currentTagFilter = null;
+
+                    // Update featured sort options
+                    updateFeaturedSortOptions();
 
                     // Refresh UI first to show all artists
                     refreshUI();
@@ -2861,6 +2925,7 @@
         // Load state from URL on initial load
         loadStateFromURL();
 
+        updateFeaturedSortOptions(); // Update sort options visibility based on initial status
         refreshUI(); // Initial render
 
         // Back to Top button visibility
@@ -2910,6 +2975,7 @@
         currentTagFilter = null;
         document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+        updateFeaturedSortOptions();
         refreshUI();
         // On mobile, hide filters after reset
         if (window.innerWidth <= 768) {
