@@ -361,6 +361,65 @@ a.activity-item:hover {
     color: #666;
 }
 
+.top-performers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.performer-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border: 1px solid rgba(214, 179, 112, 0.2);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.performer-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(214, 179, 112, 0.15);
+    border-color: rgba(214, 179, 112, 0.4);
+}
+
+.performer-rank {
+    display: none;
+}
+
+.performer-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0D0D0D;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.performer-stat {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.75rem;
+    line-height: 1.4;
+}
+
+.performer-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #D6B370;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.performer-artist-name {
+    font-weight: 600;
+    color: #0D0D0D;
+    font-size: 0.95rem;
+}
+
 .recent-full-width {
     grid-column: 1 / -1;
 }
@@ -695,6 +754,11 @@ a.activity-item:hover {
 
     .funnel-stage {
         height: 45px;
+    }
+
+    .top-performers-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
 
@@ -1328,6 +1392,8 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
                 <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
                 <button class="sort-btn" data-sort="views">Views (High to Low)</button>
                 <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
+                <button class="sort-btn" data-sort="featured-recent">Most Recent Feature</button>
+                <button class="sort-btn" data-sort="featured-oldest">Least Recent Feature</button>
             </div>
             <div class="post-performance-container">
                 <div class="post-chart-wrapper">
@@ -1338,6 +1404,12 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             <div id="postDetailCard" class="post-detail-card"></div>
         </div>
         
+        <div class="chart-container recent-full-width">
+            <div class="chart-title">Top Performers</div>
+            <div class="chart-subtitle">Your best performing posts and most responsive sources</div>
+            <div class="top-performers-grid" id="topPerformers">Loading...</div>
+        </div>
+
         <div class="chart-container recent-full-width">
             <div class="chart-title">Recent Additions</div>
             <div class="chart-subtitle">Last 20 artists added</div>
@@ -1581,7 +1653,8 @@ function renderPostPerformance(data, sortBy = 'date') {
                 views: parseInt(row["Views"]) || 0,
                 likes: parseInt(row["Likes"]) || 0,
                 engagementRate: parseFloat(row["Likes / Reach"]) || 0,
-                notes: row["Notes"] || ""
+                notes: row["Notes"] || "",
+                spotlighted: row["Spotlighted"] || ""
             }));
         // Store raw data for re-sorting
         postPerformanceRawData = data;
@@ -1597,7 +1670,8 @@ function renderPostPerformance(data, sortBy = 'date') {
                 views: parseInt(row["Views"]) || 0,
                 likes: parseInt(row["Likes"]) || 0,
                 engagementRate: parseFloat(row["Likes / Reach"]) || 0,
-                notes: row["Notes"] || ""
+                notes: row["Notes"] || "",
+                spotlighted: row["Spotlighted"] || ""
             }));
     }
 
@@ -1609,6 +1683,26 @@ function renderPostPerformance(data, sortBy = 'date') {
         sortedData = [...processedData].sort((a, b) => b.views - a.views);
     } else if (sortBy === 'engagement') {
         sortedData = [...processedData].sort((a, b) => b.engagementRate - a.engagementRate);
+    } else if (sortBy === 'featured-recent') {
+        // Most recent feature date (newest first)
+        sortedData = [...processedData].sort((a, b) => {
+            const dateA = a.spotlighted ? parseDate(a.spotlighted) : null;
+            const dateB = b.spotlighted ? parseDate(b.spotlighted) : null;
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            return dateB - dateA;
+        });
+    } else if (sortBy === 'featured-oldest') {
+        // Least recent feature date (oldest first)
+        sortedData = [...processedData].sort((a, b) => {
+            const dateA = a.spotlighted ? parseDate(a.spotlighted) : null;
+            const dateB = b.spotlighted ? parseDate(b.spotlighted) : null;
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            return dateA - dateB;
+        });
     } else {
         // Default: sort by date
         sortedData = [...processedData].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1978,6 +2072,64 @@ function renderWhereFound(data) {
     }
 }
 
+function renderSourceQuality(data) {
+    const container = document.getElementById('sourceQualityChart');
+    if (!container) return;
+
+    // Filter artists who have been contacted
+    const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
+
+    if (contacted.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">No outreach data yet</p>';
+        return;
+    }
+
+    // Calculate response rates by source
+    const sourceStats = {};
+    contacted.forEach(row => {
+        const source = row["Where Found"] || "Unknown";
+        if (!sourceStats[source]) {
+            sourceStats[source] = { contacted: 0, responded: 0 };
+        }
+        sourceStats[source].contacted++;
+
+        const responseStatus = (row["Response Status"] || "").trim().toLowerCase();
+        const dateResponded = (row["Date Responded"] || "").trim();
+        if (responseStatus || dateResponded) {
+            sourceStats[source].responded++;
+        }
+    });
+
+    // Calculate percentages and filter sources with at least 3 contacts
+    const sourceQuality = Object.entries(sourceStats)
+        .filter(([source, stats]) => stats.contacted >= 3)
+        .map(([source, stats]) => ({
+            source,
+            responseRate: ((stats.responded / stats.contacted) * 100).toFixed(1),
+            contacted: stats.contacted,
+            responded: stats.responded
+        }))
+        .sort((a, b) => parseFloat(b.responseRate) - parseFloat(a.responseRate))
+        .slice(0, 8);
+
+    if (sourceQuality.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">Need at least 3 contacts per source</p>';
+        return;
+    }
+
+    const maxRate = Math.max(...sourceQuality.map(s => parseFloat(s.responseRate)));
+
+    container.innerHTML = sourceQuality.map(item => `
+        <div class="bar-item">
+            <div class="bar-label">${item.source} <span style="font-size: 0.75rem; color: #999;">(${item.responded}/${item.contacted})</span></div>
+            <div class="bar-wrapper">
+                <div class="bar" style="width: ${(parseFloat(item.responseRate) / maxRate) * 100}%; background: #10b981;"></div>
+                <span class="bar-count">${item.responseRate}%</span>
+            </div>
+        </div>
+    `).join('');
+}
+
 function renderGenres(data) {
     const counts = {};
     data.forEach(row => {
@@ -2163,6 +2315,59 @@ function parseDate(dateString) {
     }
 
     return date;
+}
+
+function renderTopPerformers(artistData, postData) {
+    const container = document.getElementById('topPerformers');
+    if (!container) return;
+
+    if (!postData || postData.length === 0 || !artistData || artistData.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center;">No data available</p>';
+        return;
+    }
+
+    // Find best performing posts (by engagement rate)
+    const validPosts = postData.filter(row => row["Likes / Reach"] && row["Artist"]);
+    const sortedPosts = validPosts.sort((a, b) => {
+        const engagementA = parseFloat(a["Likes / Reach"]) || 0;
+        const engagementB = parseFloat(b["Likes / Reach"]) || 0;
+        return engagementB - engagementA;
+    });
+
+    const bestPost = sortedPosts[0];
+
+    const bestReachPost = [...validPosts].sort((a, b) => {
+        const reachA = parseInt(String(a["Reach"]).replace(/,/g, '')) || 0;
+        const reachB = parseInt(String(b["Reach"]).replace(/,/g, '')) || 0;
+        return reachB - reachA;
+    })[0];
+
+    const bestLikesPost = [...validPosts].sort((a, b) => {
+        const likesA = parseInt(String(a["Likes"]).replace(/,/g, '')) || 0;
+        const likesB = parseInt(String(b["Likes"]).replace(/,/g, '')) || 0;
+        return likesB - likesA;
+    })[0];
+
+    container.innerHTML = `
+        <div class="performer-card">
+            <div class="performer-name">Highest Engagement</div>
+            <div class="performer-stat-value">${parseFloat(bestPost["Likes / Reach"]).toFixed(2)}%</div>
+            <div class="performer-artist-name">${bestPost["Artist"] || "Unknown"}</div>
+            <div class="performer-stat">${bestPost["Post Title"] ? bestPost["Post Title"].substring(0, 40) + (bestPost["Post Title"].length > 40 ? '...' : '') : ''}</div>
+        </div>
+        <div class="performer-card">
+            <div class="performer-name">Most Reach</div>
+            <div class="performer-stat-value">${parseInt(String(bestReachPost["Reach"]).replace(/,/g, '')).toLocaleString()}</div>
+            <div class="performer-artist-name">${bestReachPost["Artist"] || "Unknown"}</div>
+            <div class="performer-stat">${bestReachPost["Post Title"] ? bestReachPost["Post Title"].substring(0, 40) + (bestReachPost["Post Title"].length > 40 ? '...' : '') : ''}</div>
+        </div>
+        <div class="performer-card">
+            <div class="performer-name">Most Likes</div>
+            <div class="performer-stat-value">${parseInt(String(bestLikesPost["Likes"]).replace(/,/g, '')).toLocaleString()}</div>
+            <div class="performer-artist-name">${bestLikesPost["Artist"] || "Unknown"}</div>
+            <div class="performer-stat">${bestLikesPost["Post Title"] ? bestLikesPost["Post Title"].substring(0, 40) + (bestLikesPost["Post Title"].length > 40 ? '...' : '') : ''}</div>
+        </div>
+    `;
 }
 
 function renderRecent(data) {
@@ -2781,6 +2986,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         followerGrowthData = parseCSV(cleanedCsv);
         console.log('Parsed follower data rows:', followerGrowthData.length);
         renderFollowerGrowth(followerGrowthData);
+        renderTopPerformers(artistData, postPerformanceData);
         updateSummary(artistData, followerGrowthData, postPerformanceData);
     })
     .catch(err => {
