@@ -1416,14 +1416,6 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             <div class="activity-table" id="recentActivity">Loading...</div>
         </div>
 
-        <div class="chart-container recent-full-width">
-            <div class="chart-title">Follower Growth</div>
-            <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
-            <div id="followerGrowthContainer">
-                <canvas id="followerGrowthChart"></canvas>
-            </div>
-        </div>
-
         <div class="chart-container response-analytics-full">
             <div class="chart-title">Response Analytics</div>
             <div class="chart-subtitle" id="responseAnalyticsSubtitle">Outreach effectiveness and conversion insights</div>
@@ -1436,6 +1428,14 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
                     <h3 class="response-section-title">Key Insights</h3>
                     <div id="responseInsights">Loading...</div>
                 </div>
+            </div>
+        </div>
+
+        <div class="chart-container recent-full-width">
+            <div class="chart-title">Follower Growth</div>
+            <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
+            <div id="followerGrowthContainer">
+                <canvas id="followerGrowthChart"></canvas>
             </div>
         </div>
     </div>
@@ -1977,7 +1977,7 @@ function renderPostPerformance(data, sortBy = 'date') {
 
                 // Re-render with new sort
                 const sortType = this.getAttribute('data-sort');
-                renderPostPerformance([], sortType);
+                renderPostPerformance(postPerformanceRawData, sortType);
             });
         });
         window.postSortListenersAdded = true;
