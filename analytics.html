@@ -1388,12 +1388,11 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             <div class="post-summary-stats" id="postSummaryStats">Loading...</div>
             <div class="post-sort-controls" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <span style="font-size: 0.85rem; color: #666; margin-right: 0.5rem; align-self: center;">Sort by:</span>
-                <button class="sort-btn active" data-sort="date">Date</button>
+                <button class="sort-btn active" data-sort="featured-recent">Date (Newest to Oldest)</button>
+                <button class="sort-btn" data-sort="featured-oldest">Date (Oldest to Newest)</button>
                 <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
                 <button class="sort-btn" data-sort="views">Views (High to Low)</button>
                 <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
-                <button class="sort-btn" data-sort="featured-recent">Most Recent Feature</button>
-                <button class="sort-btn" data-sort="featured-oldest">Least Recent Feature</button>
             </div>
             <div class="post-performance-container">
                 <div class="post-chart-wrapper">
@@ -1654,7 +1653,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                 likes: parseInt(row["Likes"]) || 0,
                 engagementRate: parseFloat(row["Likes / Reach"]) || 0,
                 notes: row["Notes"] || "",
-                spotlighted: row["Spotlighted"] || ""
+                spotlighted: row["Post Date"] || ""
             }));
         // Store raw data for re-sorting
         postPerformanceRawData = data;
@@ -1671,7 +1670,7 @@ function renderPostPerformance(data, sortBy = 'date') {
                 likes: parseInt(row["Likes"]) || 0,
                 engagementRate: parseFloat(row["Likes / Reach"]) || 0,
                 notes: row["Notes"] || "",
-                spotlighted: row["Spotlighted"] || ""
+                spotlighted: row["Post Date"] || ""
             }));
     }
 
@@ -1691,8 +1690,10 @@ function renderPostPerformance(data, sortBy = 'date') {
             if (!dateA && !dateB) return 0;
             if (!dateA) return 1;
             if (!dateB) return -1;
+            console.log('Sorting featured-recent:', a.title, dateA, 'vs', b.title, dateB, 'result:', dateB - dateA);
             return dateB - dateA;
         });
+        console.log('Featured-recent sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
     } else if (sortBy === 'featured-oldest') {
         // Least recent feature date (oldest first)
         sortedData = [...processedData].sort((a, b) => {
@@ -1701,8 +1702,10 @@ function renderPostPerformance(data, sortBy = 'date') {
             if (!dateA && !dateB) return 0;
             if (!dateA) return 1;
             if (!dateB) return -1;
+            console.log('Sorting featured-oldest:', a.title, dateA, 'vs', b.title, dateB, 'result:', dateA - dateB);
             return dateA - dateB;
         });
+        console.log('Featured-oldest sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
     } else {
         // Default: sort by date
         sortedData = [...processedData].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -3040,7 +3043,7 @@ function initDarkMode() {
         if (postPerformanceChart && postPerformanceRawData.length > 0) {
             const activeSort = document.querySelector('.sort-btn.active');
             const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
-            renderPostPerformance([], sortType);
+            renderPostPerformance(postPerformanceRawData, sortType);
         }
     });
 }
