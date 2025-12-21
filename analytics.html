@@ -183,10 +183,19 @@ canvas {
 }
 
 .post-summary-stats {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #666;
     margin-bottom: 1.5rem;
     line-height: 1.6;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border: 1px solid rgba(214, 179, 112, 0.2);
+    border-radius: 12px;
+    font-weight: 500;
+    font-family: 'Satoshi', sans-serif;
+    letter-spacing: 0.01em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .bar-chart {
@@ -513,21 +522,25 @@ a.activity-item:hover {
     }
 
     .post-performance-container::-webkit-scrollbar {
-        height: 12px;
+        height: 14px;
     }
 
     .post-performance-container::-webkit-scrollbar-track {
-        background: rgba(214, 179, 112, 0.1);
-        border-radius: 6px;
+        background: rgba(214, 179, 112, 0.15);
+        border-radius: 8px;
+        margin: 0 10px;
     }
 
     .post-performance-container::-webkit-scrollbar-thumb {
-        background: #D6B370;
-        border-radius: 6px;
+        background: linear-gradient(to right, #D6B370, #C4A563);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
     }
 
     .post-performance-container::-webkit-scrollbar-thumb:hover {
-        background: #B8965A;
+        background: linear-gradient(to right, #C4A563, #B8965A);
+        background-clip: padding-box;
     }
 
     .post-chart-wrapper {
@@ -1169,6 +1182,8 @@ body.dark-mode .chart-subtitle {
 
 body.dark-mode .post-summary-stats {
     color: #b0b0b0;
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.9) 0%, rgba(40, 40, 40, 0.7) 100%);
+    border-color: rgba(232, 200, 130, 0.2);
 }
 
 body.dark-mode .bar-label {
@@ -1717,7 +1732,16 @@ function renderPostPerformance(data, sortBy = 'date') {
     const avgLikes = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.likes, 0) / totalPosts) : 0;
     const avgEngagement = totalPosts > 0 ? (sortedData.reduce((sum, p) => sum + p.engagementRate, 0) / totalPosts).toFixed(2) : '0.00';
 
-    const summaryStatsHTML = `Avg Reach: ${avgReach.toLocaleString()} | Avg Views: ${avgViews.toLocaleString()} | Avg Likes: ${avgLikes.toLocaleString()} | Avg Engagement Rate: ${avgEngagement}%`;
+    const summaryStatsHTML = `
+        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Reach</span>
+        <strong style="color: #95392E; margin: 0 1rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgReach.toLocaleString()}</strong>
+        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Views</span>
+        <strong style="color: #95392E; margin: 0 1rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgViews.toLocaleString()}</strong>
+        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Likes</span>
+        <strong style="color: #95392E; margin: 0 1rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgLikes.toLocaleString()}</strong>
+        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Engagement</span>
+        <strong style="color: #95392E; margin-left: 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgEngagement}%</strong>
+    `;
     document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
 
     // Mobile-first detection
@@ -1739,7 +1763,7 @@ function renderPostPerformance(data, sortBy = 'date') {
         } else if (isMobile) {
             postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total`;
         } else {
-            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total — click any bar for details`;
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total`;
         }
     }
 
@@ -1748,13 +1772,20 @@ function renderPostPerformance(data, sortBy = 'date') {
         postPerformanceChart.destroy();
     }
 
-    // Shorten labels for better readability
+    // Shorten labels for better readability with artist name
     const labels = displayData.map(post => {
-        const maxLength = isMobile ? 15 : 30;
-        if (post.title.length > maxLength) {
-            return post.title.substring(0, maxLength - 3) + '...';
-        }
-        return post.title;
+        const maxTitleLength = isMobile ? 12 : 25;
+        const maxArtistLength = isMobile ? 10 : 15;
+
+        let title = post.title.length > maxTitleLength
+            ? post.title.substring(0, maxTitleLength - 3) + '...'
+            : post.title;
+
+        let artist = post.artist.length > maxArtistLength
+            ? post.artist.substring(0, maxArtistLength - 3) + '...'
+            : post.artist;
+
+        return isMobile ? title : `${title}\n(${artist})`;
     });
 
     const canvas = document.getElementById('postPerformanceChart');
@@ -1784,34 +1815,37 @@ function renderPostPerformance(data, sortBy = 'date') {
                 {
                     label: 'Reach',
                     data: displayData.map(post => post.reach),
-                    backgroundColor: '#2552FF',
+                    backgroundColor: isDarkMode ? '#4A6FFF' : '#2552FF',
                     yAxisID: 'y',
                     barPercentage: 0.85,
-                    categoryPercentage: 0.9
+                    categoryPercentage: 0.9,
+                    borderRadius: 0
                 },
                 {
                     label: 'Views',
                     data: displayData.map(post => post.views),
-                    backgroundColor: 'rgba(37, 82, 255, 0.5)',
+                    backgroundColor: isDarkMode ? 'rgba(74, 111, 255, 0.5)' : 'rgba(37, 82, 255, 0.5)',
                     yAxisID: 'y',
                     barPercentage: 0.85,
-                    categoryPercentage: 0.9
+                    categoryPercentage: 0.9,
+                    borderRadius: 0
                 },
                 {
                     label: 'Engagement %',
                     data: displayData.map(post => post.engagementRate),
                     type: 'line',
-                    borderColor: '#D6B370',
-                    backgroundColor: '#D6B370',
-                    borderWidth: isMobile ? 2.5 : 3,
+                    borderColor: isDarkMode ? '#E8C882' : '#D6B370',
+                    backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                    borderWidth: isMobile ? 2 : 2.5,
                     fill: false,
                     tension: 0.1,
                     yAxisID: 'y1',
                     pointRadius: isMobile ? 4 : 5,
-                    pointHoverRadius: isMobile ? 6 : 8,
-                    pointBackgroundColor: '#D6B370',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2
+                    pointHoverRadius: isMobile ? 6 : 7,
+                    pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                    pointBorderColor: isDarkMode ? '#1a1a1a' : '#F3EFE9',
+                    pointBorderWidth: 2,
+                    pointHoverBorderWidth: 2.5
                 }
             ]
         },
@@ -1827,10 +1861,10 @@ function renderPostPerformance(data, sortBy = 'date') {
             } : null,
             layout: {
                 padding: {
-                    left: isMobile ? 5 : 10,
-                    right: isMobile ? 5 : 10,
-                    top: isMobile ? 45 : 60,
-                    bottom: isMobile ? 5 : 10
+                    left: isMobile ? 5 : 15,
+                    right: isMobile ? 5 : 15,
+                    top: isMobile ? 45 : 70,
+                    bottom: isMobile ? 5 : 15
                 }
             },
             scales: {
@@ -1839,22 +1873,28 @@ function renderPostPerformance(data, sortBy = 'date') {
                     display: true,
                     position: 'left',
                     title: {
-                        display: !isMobile,
+                        display: true,
                         text: 'Reach / Views',
                         font: {
-                            size: isMobile ? 14 : 16,
+                            size: isMobile ? 10 : 13,
                             weight: '500',
                             family: "'Space Grotesk', sans-serif"
                         },
-                        color: textColor
+                        color: '#D6B370',
+                        padding: { top: 0, bottom: isMobile ? 5 : 8 }
                     },
                     ticks: {
                         font: {
-                            size: isMobile ? 10 : 14,
-                            family: "'Satoshi', sans-serif"
+                            size: isMobile ? 9 : 12,
+                            family: "'Satoshi', sans-serif",
+                            weight: '400'
                         },
-                        color: textColor,
+                        color: '#666',
+                        padding: isMobile ? 4 : 6,
                         callback: function(value) {
+                            if (value >= 1000000) {
+                                return (value / 1000000).toFixed(1) + 'M';
+                            }
                             if (value >= 1000) {
                                 return (value / 1000).toFixed(1) + 'k';
                             }
@@ -1862,47 +1902,55 @@ function renderPostPerformance(data, sortBy = 'date') {
                         }
                     },
                     grid: {
-                        color: gridColor
-                    }
+                        color: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(214, 179, 112, 0.15)',
+                        lineWidth: 1
+                    },
+                    beginAtZero: true
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
                     title: {
-                        display: !isMobile,
+                        display: true,
                         text: 'Engagement %',
                         font: {
-                            size: isMobile ? 14 : 16,
+                            size: isMobile ? 10 : 13,
                             weight: '500',
                             family: "'Space Grotesk', sans-serif"
                         },
-                        color: '#D6B370'
+                        color: '#D6B370',
+                        padding: { top: 0, bottom: isMobile ? 5 : 8 }
                     },
                     ticks: {
                         font: {
-                            size: isMobile ? 10 : 14,
-                            family: "'Satoshi', sans-serif"
+                            size: isMobile ? 9 : 12,
+                            family: "'Satoshi', sans-serif",
+                            weight: '400'
                         },
-                        color: '#D6B370',
+                        color: '#666',
+                        padding: isMobile ? 4 : 6,
                         callback: function(value) {
                             return value.toFixed(1) + '%';
                         }
                     },
                     grid: {
                         drawOnChartArea: false
-                    }
+                    },
+                    beginAtZero: true
                 },
                 x: {
                     ticks: {
                         font: {
-                            size: isMobile ? 9 : 13,
-                            family: "'Satoshi', sans-serif"
+                            size: isMobile ? 8 : 11,
+                            family: "'Satoshi', sans-serif",
+                            weight: '400'
                         },
-                        color: textColor,
+                        color: '#666',
                         maxRotation: 45,
                         minRotation: 45,
-                        autoSkip: false
+                        autoSkip: false,
+                        padding: isMobile ? 6 : 8
                     },
                     grid: {
                         display: false
@@ -1912,54 +1960,83 @@ function renderPostPerformance(data, sortBy = 'date') {
             plugins: {
                 legend: {
                     position: 'top',
-                    align: 'center',
+                    align: 'start',
                     labels: {
                         font: {
-                            size: isMobile ? 11 : 16,
-                            family: "'Satoshi', sans-serif",
+                            size: isMobile ? 10 : 13,
+                            family: "'Space Grotesk', sans-serif",
                             weight: '500'
                         },
-                        color: textColor,
+                        color: '#666',
                         padding: isMobile ? 8 : 15,
-                        boxWidth: isMobile ? 30 : 40,
-                        boxHeight: isMobile ? 10 : 14,
-                        usePointStyle: false
+                        boxWidth: isMobile ? 30 : 38,
+                        boxHeight: isMobile ? 10 : 13,
+                        usePointStyle: false,
+                        generateLabels: function(chart) {
+                            const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                            const labels = original.call(this, chart);
+                            // Make legend items more distinct
+                            labels.forEach((label, index) => {
+                                if (index === 2) { // Engagement % line
+                                    label.lineWidth = 2.5;
+                                }
+                            });
+                            return labels;
+                        }
                     }
                 },
                 tooltip: {
                     enabled: true,
-                    backgroundColor: isDarkMode ? 'rgba(40, 40, 40, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                    titleColor: textColor,
-                    bodyColor: textColor,
-                    borderColor: '#D6B370',
-                    borderWidth: 2,
+                    backgroundColor: isDarkMode ? 'rgba(26, 26, 26, 0.95)' : 'rgba(243, 239, 233, 0.98)',
+                    titleColor: isDarkMode ? '#e0e0e0' : '#0D0D0D',
+                    bodyColor: isDarkMode ? '#b0b0b0' : '#666',
+                    borderColor: isDarkMode ? 'rgba(232, 200, 130, 0.3)' : 'rgba(214, 179, 112, 0.4)',
+                    borderWidth: 1,
                     padding: isMobile ? 10 : 14,
                     titleFont: {
-                        size: isMobile ? 13 : 18,
+                        size: isMobile ? 12 : 15,
                         family: "'Space Grotesk', sans-serif",
-                        weight: '600'
+                        weight: '500'
                     },
                     bodyFont: {
-                        size: isMobile ? 12 : 15,
-                        family: "'Satoshi', sans-serif"
+                        size: isMobile ? 10 : 13,
+                        family: "'Satoshi', sans-serif",
+                        weight: '400'
                     },
                     displayColors: true,
                     boxWidth: 12,
                     boxHeight: 12,
+                    boxPadding: 4,
+                    bodySpacing: 5,
+                    titleSpacing: 6,
                     callbacks: {
                         title: function(context) {
                             const dataIndex = context[0].dataIndex;
                             const post = displayData[dataIndex];
                             return post.title;
                         },
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.dataset.type === 'line') {
+                                label += context.parsed.y.toFixed(2) + '%';
+                            } else {
+                                label += context.parsed.y.toLocaleString();
+                            }
+                            return label;
+                        },
                         afterBody: function(context) {
                             const dataIndex = context[0].dataIndex;
                             const post = displayData[dataIndex];
                             const extra = [];
-                            extra.push(`Date: ${post.date}`);
+                            extra.push('');
                             extra.push(`Artist: ${post.artist}`);
+                            extra.push(`Date: ${post.date}`);
                             extra.push(`Likes: ${post.likes.toLocaleString()}`);
-                            if (post.notes) {
+                            if (post.notes && post.notes.trim()) {
+                                extra.push('');
                                 extra.push(`Notes: ${post.notes}`);
                             }
                             return extra;
