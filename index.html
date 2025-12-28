@@ -16,7 +16,7 @@
         background-color: #F3EFE9;
         margin: 0;
         padding: 2rem;
-        color: #0D0D0D;
+        color: #2C2C2C;
         position: relative;
         }
         
@@ -34,13 +34,13 @@
         min-width: 100px;
         min-height: 100px;
         background: #F3EFE9;
-        border: 2px solid #0D0D0D;
+        border: 1px solid rgba(44, 44, 44, 0.2);
         border-radius: 0;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-end;
-        color: #0D0D0D;
+        color: #2C2C2C;
         font-family: 'Space Grotesk', sans-serif;
         font-size: 0.7rem;
         font-weight: 500;
@@ -61,8 +61,8 @@
         
         h1 {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 2rem;
-        font-weight: 500;
+        font-size: 2.8rem;
+        font-weight: 300;
         margin-bottom: 0.25rem;
         margin-right: 120px;
         letter-spacing: -0.02em;
@@ -70,11 +70,11 @@
         
         h2 {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 1rem;
-        font-weight: 400;
+        font-size: 1.3rem;
+        font-weight: 300;
         margin-top: 0;
         margin-left: 0;
-        border-bottom: 2px solid #2552FF;
+        border-bottom: 1px solid #95392E;
         padding-bottom: 0.25rem;
         padding-left: 0;
         display: inline-block;
@@ -101,7 +101,7 @@
         .summary-number {
         font-family: 'Space Grotesk', sans-serif;
         font-size: 2rem;
-        font-weight: 500;
+        font-weight: 400;
         color: #D6B370;
         display: block;
         line-height: 1;
@@ -111,7 +111,7 @@
         .summary-label {
         font-family: 'Satoshi', sans-serif;
         font-size: 0.875rem;
-        color: #666;
+        color: #8A8580;
         font-weight: 500;
         letter-spacing: 0.05em;
         }
@@ -128,7 +128,7 @@
     font-size: 1rem;
     font-weight: 400;
     padding: 0.5rem 1rem;
-    border: 2px solid #D6B370;
+    border: 1px solid #D6B370;
     border-radius: 20px;
     background-color: white;
     color: #0D0D0D;
@@ -140,15 +140,15 @@
 
     .filter-select:focus {
         outline: none;
-        border-color: #2552FF;
-        box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+        border-color: #95392E;
+        box-shadow: 0 4px 12px rgba(149, 57, 46, 0.2);
         transform: translateY(-1px);
     }
 
     .filter-checkbox {
     width: 1.1rem;
     height: 1.1rem;
-    accent-color: #2552FF;
+    accent-color: #95392E;
     margin-top: 0.4rem;
     transform: scale(1.1);
     }
@@ -167,10 +167,10 @@
         font-size: 0.85rem;
         font-weight: 500;
         padding: 0.5rem 1rem;
-        border: 2px solid #D6B370;
+        border: 1px solid #D6B370;
         border-radius: 20px;
         background: white;
-        color: #0D0D0D;
+        color: #2C2C2C;
         width: 100%;
         max-width: 400px;
         transition: all 0.3s ease;
@@ -184,8 +184,8 @@
 
     .search-input:focus {
         outline: none;
-        border-color: #2552FF;
-        box-shadow: 0 4px 12px rgba(37, 82, 255, 0.2);
+        border-color: #95392E;
+        box-shadow: 0 4px 12px rgba(149, 57, 46, 0.2);
         transform: translateY(-1px);
         background-image: none;
         padding-right: 1rem;
@@ -199,9 +199,9 @@
 
     .clear-btn {
         padding: 0.5rem 1rem;
-        border: 2px solid #D6B370;
+        border: 1px solid #D6B370;
         background: transparent;
-        color: #0D0D0D;
+        color: #2C2C2C;
         border-radius: 20px;
         cursor: pointer;
         font-family: 'Satoshi', sans-serif;
@@ -229,9 +229,9 @@
 
     .status-btn {
         padding: 0.5rem 1rem;
-        border: 2px solid #D6B370;
+        border: 1px solid #D6B370;
         background: transparent;
-        color: #0D0D0D;
+        color: #2C2C2C;
         border-radius: 20px;
         cursor: pointer;
         font-family: 'Satoshi', sans-serif;
@@ -243,7 +243,7 @@
 
     .status-btn.active {
         background: #D6B370;
-        color: #0D0D0D;
+        color: #2C2C2C;
     }
 
     .status-btn:hover {
@@ -284,7 +284,7 @@
         top: 3rem;
         right: 1rem;
         background: white;
-        border: 2px solid #D6B370;
+        border: 1px solid #D6B370;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         z-index: 100;
@@ -312,7 +312,7 @@
     }
 
     .status-option:hover {
-        background: rgba(37, 82, 255, 0.1);
+        background: rgba(149, 57, 46, 0.1);
     }
 
     .status-updating {
@@ -423,22 +423,22 @@
         }
 
         .card.highlight-glow {
-        box-shadow: 0 0 20px rgba(37, 82, 255, 0.6), 0 0 40px rgba(37, 82, 255, 0.3);
+        box-shadow: 0 0 20px rgba(149, 57, 46, 0.6), 0 0 40px rgba(149, 57, 46, 0.3);
         animation: pulseGlow 2s ease-in-out;
         }
 
         @keyframes pulseGlow {
         0%, 100% {
-            box-shadow: 0 0 20px rgba(37, 82, 255, 0.6), 0 0 40px rgba(37, 82, 255, 0.3);
+            box-shadow: 0 0 20px rgba(149, 57, 46, 0.6), 0 0 40px rgba(149, 57, 46, 0.3);
         }
         50% {
-            box-shadow: 0 0 30px rgba(37, 82, 255, 0.8), 0 0 60px rgba(37, 82, 255, 0.4);
+            box-shadow: 0 0 30px rgba(149, 57, 46, 0.8), 0 0 60px rgba(149, 57, 46, 0.4);
         }
         }
         
         .artist-name {
         font-family: 'Space Grotesk', sans-serif;
-        font-weight: 500;
+        font-weight: 400;
         font-size: 1.25rem;
         letter-spacing: -0.02em;
         padding-right: 140px;
@@ -451,7 +451,7 @@
         gap: 0.5rem;
         text-decoration: none;
         width: fit-content;
-        color: #2552FF;
+        color: #95392E;
         font-family: 'Satoshi', sans-serif;
         font-weight: 500;
         }
@@ -606,7 +606,7 @@
         font-size: 1rem;
         font-weight: 400;
         margin-bottom: 0.35rem;
-        color: #0D0D0D;
+        color: #2C2C2C;
         display: block;
         }
 
@@ -638,7 +638,7 @@
         }
 
         .lightbox-close:hover {
-        background: rgba(214, 179, 112, 0.8);
+        background: rgba(149, 57, 46, 0.9);
         transform: rotate(90deg);
         }
 
@@ -664,7 +664,7 @@
         }
 
         .lightbox-arrow:hover {
-        background: rgba(214, 179, 112, 0.9);
+        background: rgba(149, 57, 46, 0.9);
         transform: translateY(-50%) scale(1.1);
         }
 
@@ -776,7 +776,7 @@
         
         .website-link {
         font-family: 'Satoshi', sans-serif;
-        color: #2552FF;
+        color: #95392E;
         text-decoration: none;
         font-weight: 500;
         }
@@ -786,15 +786,15 @@
         }
 
         .similar-artist-link {
-        color: #2552FF;
+        color: #2C2C2C;
         cursor: pointer;
         text-decoration: none;
         transition: color 0.2s ease;
-        font-weight: 500;
+        font-weight: 400;
         }
 
         .similar-artist-link:hover {
-        color: #D6B370;
+        color: #95392E;
         text-decoration: underline;
         }
 
@@ -807,12 +807,12 @@
         }
 
         .similar-artists-label-link:hover {
-        color: #2552FF;
-        border-bottom: 2px solid #2552FF;
+        color: #95392E;
+        border-bottom: 1px solid #95392E;
         }
 
         .tag-link {
-        color: #2552FF;
+        color: #95392E;
         cursor: pointer;
         text-decoration: none;
         transition: color 0.2s ease;
@@ -835,7 +835,7 @@
         font-family: 'Space Grotesk', sans-serif;
         font-size: 1.8rem;
         font-weight: 700;
-        color: #0D0D0D;
+        color: #2C2C2C;
         letter-spacing: -0.02em;
         text-transform: lowercase;
         transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -868,11 +868,11 @@
         }
 
         .nav-title.active {
-            color: #0D0D0D;
+            color: #2C2C2C;
         }
 
         .nav-title:not(.active) {
-            color: #666;
+            color: #8A8580;
         }
 
         .nav-title a {
@@ -1060,7 +1060,7 @@
     /* Dark mode toggle button */
     .dark-mode-toggle {
         background: transparent;
-        border: 2px solid #D6B370;
+        border: 1px solid #D6B370;
         border-radius: 50%;
         width: 45px;
         height: 45px;
@@ -1152,13 +1152,13 @@
 
     body.dark-mode .status-btn.active {
         background: #D6B370;
-        color: #0D0D0D;
+        color: #2C2C2C;
     }
 
     body.dark-mode .clear-btn:hover,
     body.dark-mode .status-btn:hover {
         background: #D6B370;
-        color: #0D0D0D;
+        color: #2C2C2C;
     }
 
     body.dark-mode .filter-select {
