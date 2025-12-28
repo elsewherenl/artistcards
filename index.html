@@ -2460,6 +2460,27 @@
                     openLightbox(index, currentCardImageIndex);
                 };
 
+                // Add wheel event for scrolling through images
+                if (artistImages.length > 1) {
+                    imageContainer.addEventListener('wheel', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Determine scroll direction
+                        const delta = e.deltaY;
+
+                        if (delta > 0) {
+                            // Scroll down - next image
+                            const nextIndex = (currentCardImageIndex + 1) % artistImages.length;
+                            updateCardImage(nextIndex);
+                        } else if (delta < 0) {
+                            // Scroll up - previous image
+                            const prevIndex = (currentCardImageIndex - 1 + artistImages.length) % artistImages.length;
+                            updateCardImage(prevIndex);
+                        }
+                    }, { passive: false });
+                }
+
                 imageContainer.appendChild(image);
 
                 // Add image indicators if multiple images
