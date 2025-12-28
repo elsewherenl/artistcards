@@ -1445,6 +1445,21 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             </div>
         </div>
 
+        <div class="chart-container response-analytics-full">
+            <div class="chart-title">Source Performance</div>
+            <div class="chart-subtitle" id="sourcePerformanceSubtitle">Response rates by contact method</div>
+            <div class="response-analytics-container">
+                <div class="response-funnel-section">
+                    <h3 class="response-section-title">Contact Method Performance</h3>
+                    <div id="contactMethodPerformance">Loading...</div>
+                </div>
+                <div class="response-insights-section">
+                    <h3 class="response-section-title">Method Insights</h3>
+                    <div id="methodInsights">Loading...</div>
+                </div>
+            </div>
+        </div>
+
         <div class="chart-container recent-full-width">
             <div class="chart-title">Follower Growth</div>
             <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
@@ -3028,6 +3043,188 @@ function renderResponseAnalytics(data) {
     }
 }
 
+function renderSourcePerformance(data) {
+    // Filter artists who have been contacted
+    const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
+
+    if (contacted.length === 0) {
+        document.getElementById('contactMethodPerformance').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">No outreach data yet.</div>';
+        document.getElementById('methodInsights').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Insights will appear once you have outreach data.</div>';
+        return;
+    }
+
+    // Calculate stats by contact method
+    const methodStats = {};
+    contacted.forEach(row => {
+        const method = (row["Contact Method"] || "Not Specified").trim();
+        if (!methodStats[method]) {
+            methodStats[method] = { contacted: 0, responded: 0, positiveResponse: 0, spotlighted: 0 };
+        }
+        methodStats[method].contacted++;
+
+        const respStatus = (row["Response Status"] || "").trim();
+        const dateResponded = (row["Date Responded"] || "").trim();
+
+        // Only count as responded if they actually responded (has Date Responded or specific status)
+        if (respStatus === "Responded - Interested") {
+            methodStats[method].responded++;
+            methodStats[method].positiveResponse++;
+        } else if (dateResponded || respStatus.toLowerCase().includes("responded")) {
+            methodStats[method].responded++;
+        }
+
+        // Check if spotlighted (has a date in Spotlighted column)
+        const spotlightedDate = (row["Spotlighted"] || "").trim();
+        if (spotlightedDate) {
+            methodStats[method].spotlighted++;
+        }
+    });
+
+    // Calculate response rates
+    const methodPerformance = Object.keys(methodStats)
+        .map(method => ({
+            method,
+            contacted: methodStats[method].contacted,
+            responded: methodStats[method].responded,
+            positiveResponse: methodStats[method].positiveResponse,
+            spotlighted: methodStats[method].spotlighted,
+            responseRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].responded / methodStats[method].contacted) * 100)
+                : 0,
+            positiveRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].positiveResponse / methodStats[method].contacted) * 100)
+                : 0,
+            spotlightedRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].spotlighted / methodStats[method].contacted) * 100)
+                : 0
+        }))
+        .filter(m => m.contacted >= 2) // Only show methods with 2+ contacts
+        .sort((a, b) => b.positiveRate - a.positiveRate);
+
+    // Render contact method performance table
+    const performanceContainer = document.getElementById('contactMethodPerformance');
+    let performanceHtml = '';
+
+    if (methodPerformance.length === 0) {
+        performanceHtml = '<div style="text-align: center; color: #666; padding: 2rem;">Not enough data yet. Need at least 2 contacts per method.</div>';
+    } else {
+        performanceHtml = `
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #D6B370;">
+                        <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 600; color: #0D0D0D;">Method</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: #0D0D0D;">Contacts</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: #0D0D0D;">Response</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: #0D0D0D;">Positive</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: #0D0D0D;">Featured</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        methodPerformance.forEach((m, index) => {
+            const rowBg = index % 2 === 0 ? '#F9F7F4' : 'transparent';
+            performanceHtml += `
+                <tr style="background: ${rowBg}; border-bottom: 1px solid #E5E1D8;">
+                    <td style="padding: 0.75rem 0.5rem; font-weight: 500;">${m.method}</td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">${m.contacted}</td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#2E7D32' : m.responseRate >= 30 ? '#D6B370' : '#666'};">
+                            ${m.responseRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: #999; display: block;">(${m.responded}/${m.contacted})</span>
+                    </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#2E7D32' : m.positiveRate >= 20 ? '#D6B370' : '#666'};">
+                            ${m.positiveRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: #999; display: block;">(${m.positiveResponse}/${m.contacted})</span>
+                    </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#2E7D32' : m.spotlightedRate >= 15 ? '#D6B370' : '#666'};">
+                            ${m.spotlightedRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: #999; display: block;">(${m.spotlighted}/${m.contacted})</span>
+                    </td>
+                </tr>
+            `;
+        });
+
+        performanceHtml += `
+                </tbody>
+            </table>
+        `;
+    }
+
+    performanceContainer.innerHTML = performanceHtml;
+
+    // Render insights
+    const insightsContainer = document.getElementById('methodInsights');
+    let insightsHtml = '';
+
+    // Best performing method (by positive response rate)
+    if (methodPerformance.length > 0) {
+        const best = methodPerformance[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Best Performing</div>
+                <div class="insight-value">${best.method}</div>
+                <div class="insight-detail">${best.positiveRate}% positive response rate</div>
+            </div>
+        `;
+    }
+
+    // Highest conversion to featured
+    if (methodPerformance.length > 0) {
+        const bestConversion = methodPerformance.reduce((max, m) => m.spotlightedRate > max.spotlightedRate ? m : max, methodPerformance[0]);
+        if (bestConversion.spotlightedRate > 0) {
+            insightsHtml += `
+                <div class="insight-item">
+                    <div class="insight-label">Best Conversion</div>
+                    <div class="insight-value">${bestConversion.method}</div>
+                    <div class="insight-detail">${bestConversion.spotlightedRate}% featured (${bestConversion.spotlighted}/${bestConversion.contacted})</div>
+                </div>
+            `;
+        }
+    }
+
+    // Total methods used
+    insightsHtml += `
+        <div class="insight-item">
+            <div class="insight-label">Methods Tracked</div>
+            <div class="insight-value">${methodPerformance.length}</div>
+            <div class="insight-detail">Different contact approaches</div>
+        </div>
+    `;
+
+    // Method with most contacts
+    if (methodPerformance.length > 0) {
+        const mostUsed = methodPerformance.reduce((max, m) => m.contacted > max.contacted ? m : max, methodPerformance[0]);
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Most Used</div>
+                <div class="insight-value">${mostUsed.method}</div>
+                <div class="insight-detail">${mostUsed.contacted} contacts (${mostUsed.positiveRate}% positive)</div>
+            </div>
+        `;
+    }
+
+    insightsContainer.innerHTML = insightsHtml;
+
+    // Update subtitle
+    const totalContacted = contacted.length;
+    const totalResponded = contacted.filter(row => {
+        const status = (row["Response Status"] || "").trim();
+        return status === "Responded - Interested";
+    }).length;
+    const overallRate = totalContacted > 0 ? Math.round((totalResponded / totalContacted) * 100) : 0;
+
+    const subtitle = document.getElementById('sourcePerformanceSubtitle');
+    if (subtitle) {
+        subtitle.textContent = `${methodPerformance.length} contact methods tracked — ${totalContacted} total contacts — ${overallRate}% overall response rate`;
+    }
+}
+
 // Store data globally for summary updates
 let artistData = [];
 let postPerformanceData = [];
@@ -3044,6 +3241,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderFunnel(artistData);
         renderRecent(artistData);
         renderResponseAnalytics(artistData);
+        renderSourcePerformance(artistData);
 
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
     })
