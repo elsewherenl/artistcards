@@ -7,12 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
 <style>
+:root {
+    --cream-bg: #F3EFE9;
+    --deep-charcoal: #2C2C2C;
+    --warm-gray: #8A8580;
+    --warm-off-white: #FDFCF8;
+    --biscuit-gold: #D6B370;
+    --terracotta-red: #95392E;
+    --sage-green: #A8B5A0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'Satoshi', sans-serif;
-    background-color: #F3EFE9;
+    background-color: var(--cream-bg);
     margin: 0;
     padding: 2rem;
-    color: #2C2C2C;
+    color: var(--deep-charcoal);
 }
 
 .header {
@@ -22,40 +36,37 @@ body {
 
 .logo {
     position: absolute;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     right: 0;
-    width: 100px;
-    height: 100px;
-    background: #F3EFE9;
-    border: 1px solid rgba(44, 44, 44, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-end;
-    color: #2C2C2C;
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 500;
-    line-height: 0.9;
-    text-transform: lowercase;
-    letter-spacing: 0.02em;
-    padding: 0.5rem;
-    padding-bottom: 0.8rem;
-    box-sizing: border-box;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--deep-charcoal);
     text-decoration: none;
+    letter-spacing: 0.05em;
+    text-transform: lowercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    color: var(--biscuit-gold);
+    letter-spacing: 0.08em;
+    transform: translateY(-50%) scale(1.02);
 }
 
 .nav-section {
     display: flex;
     gap: 3rem;
-    align-items: baseline;
-    margin-right: 120px;
+    align-items: center;
+    position: relative;
 }
 
 .nav-title {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 2rem;
-    font-weight: 500;
+    font-size: 3rem;
+    font-weight: 300;
     margin: 0;
     letter-spacing: -0.02em;
     cursor: pointer;
@@ -83,7 +94,7 @@ body {
     padding: 1.5rem;
     margin-bottom: 2rem;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
@@ -111,11 +122,50 @@ body {
     line-height: 1.2;
 }
 
+.section-navigation {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.section-navigation .nav-label {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.85rem;
+    color: #8A8580;
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.section-navigation .nav-link {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #2C2C2C;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid #D6B370;
+    background: transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.section-navigation .nav-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(214, 179, 112, 0.3);
+    background: var(--terracotta-red);
+    color: var(--warm-off-white);
+    border-color: var(--terracotta-red);
+}
+
 .analytics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto auto;
-    gap: 2rem;
+    gap: 1.5rem;
     max-width: 100%;
     margin: 0;
 }
@@ -173,7 +223,19 @@ canvas {
     font-size: 1.3rem;
     font-weight: 400;
     margin-bottom: 0.75rem;
-    color: #2C2C2C;
+    padding-bottom: 0.5rem;
+    color: var(--deep-charcoal);
+    position: relative;
+}
+
+.chart-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 1px;
+    background: var(--terracotta-red);
 }
 
 .chart-subtitle {
@@ -735,8 +797,20 @@ a.activity-item:hover {
 }
 
 @media (max-width: 768px) {
-    .analytics-grid {
-        grid-template-columns: 1fr;
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 3rem;
+    }
+
+    .logo {
+        position: relative;
+        right: auto;
+        top: auto;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        text-align: center;
     }
 
     .nav-section {
@@ -744,6 +818,14 @@ a.activity-item:hover {
         gap: 2rem;
         flex-wrap: wrap;
         justify-content: center;
+    }
+
+    .nav-title {
+        font-size: 2rem;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
     }
 
     .post-performance-container {
@@ -1163,6 +1245,22 @@ body.dark-mode .summary {
     border-color: rgba(214, 179, 112, 0.25);
 }
 
+body.dark-mode .section-navigation .nav-label {
+    color: #999;
+}
+
+body.dark-mode .section-navigation .nav-link {
+    background: transparent;
+    color: #e0e0e0;
+    border-color: #D6B370;
+}
+
+body.dark-mode .section-navigation .nav-link:hover {
+    background: var(--terracotta-red);
+    color: var(--warm-off-white);
+    border-color: var(--terracotta-red);
+}
+
 body.dark-mode .summary-label {
     color: #b0b0b0;
 }
@@ -1332,14 +1430,10 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
 </head>
 <body>
     <div class="header">
-        <div class="logo">
-            <div>else</div>
-            <div>where</div>
-            <div>collective</div>
-        </div>
+        <a href="index2.html" class="logo">elsewhere collective</a>
         <div class="nav-section">
-            <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
-            <div class="nav-title active">Analytics</div>
+            <div class="nav-title"><a href="index2.html">Artist Prospecting</a></div>
+            <div class="nav-title active"><a href="analytics2.html">Analytics</a></div>
             <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
         </div>
     </div>
@@ -1355,10 +1449,6 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             <span class="summary-label">Planned Outreach</span>
         </div>
         <div class="summary-item">
-            <span class="summary-number" id="summaryConversionRate">-</span>
-            <span class="summary-label">Response → Featured</span>
-        </div>
-        <div class="summary-item">
             <span class="summary-number" id="summaryFollowerGrowth">-</span>
             <span class="summary-label" id="summaryFollowerGrowthLabel">Follower Growth</span>
         </div>
@@ -1372,32 +1462,69 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
         </div>
     </div>
 
+    <!-- Section Navigation -->
+    <div class="section-navigation">
+        <span class="nav-label">Jump to:</span>
+        <a href="#pipeline" class="nav-link">Pipeline</a>
+        <a href="#discovery" class="nav-link">Discovery</a>
+        <a href="#outreach" class="nav-link">Outreach</a>
+        <a href="#performance" class="nav-link">Performance</a>
+    </div>
+
     <div class="analytics-grid">
-        <div class="chart-container">
+        <!-- Pipeline Over Time - Full Width -->
+        <div id="pipeline" class="chart-container recent-full-width">
+            <div class="chart-title">Pipeline Over Time</div>
+            <div class="chart-subtitle">Weekly adds vs total pipeline size</div>
+            <div style="position: relative; height: 400px; width: 100%;">
+                <canvas id="pipelineTimeline"></canvas>
+            </div>
+        </div>
+
+        <!-- Where Found -->
+        <div id="discovery" class="chart-container">
             <div class="chart-title">Where Found</div>
             <div class="chart-subtitle">Where you're discovering artists</div>
             <div class="bar-chart" id="whereFoundChart">Loading...</div>
         </div>
-        
+
+        <!-- Recent Additions -->
+        <div class="chart-container">
+            <div class="chart-title">Recent Additions</div>
+            <div class="chart-subtitle">Last 20 artists added</div>
+            <div class="activity-table" id="recentActivity">Loading...</div>
+        </div>
+
+        <!-- Pipeline Funnel -->
         <div class="chart-container">
             <div class="chart-title">Pipeline Funnel</div>
             <div class="chart-subtitle"></div>
             <div class="funnel" id="pipelineFunnel">Loading...</div>
         </div>
-        
-        <div class="chart-container">
-            <div class="chart-title">Genres Spotlighted</div>
-            <div class="chart-subtitle">Art styles you're featuring</div>
-            <div class="bar-chart" id="genresChart">Loading...</div>
+
+        <!-- Response Funnel -->
+        <div id="outreach" class="chart-container">
+            <div class="chart-title">Response Funnel</div>
+            <div class="chart-subtitle" id="responseAnalyticsSubtitle">Outreach effectiveness</div>
+            <div class="funnel" id="responseFunnel">Loading...</div>
         </div>
 
-        <div class="chart-container">
-            <div class="chart-title">Pipeline Over Time</div>
-            <div class="chart-subtitle">Weekly adds vs total pipeline size</div>
-            <canvas id="pipelineTimeline"></canvas>
+        <!-- Source Performance - Full Width -->
+        <div class="chart-container response-analytics-full">
+            <div class="chart-title">Source Performance</div>
+            <div class="chart-subtitle" id="sourcePerformanceSubtitle">Response rates by contact method</div>
+            <div id="contactMethodPerformance">Loading...</div>
         </div>
-        
-        <div class="chart-container post-performance-full">
+
+        <!-- Response Insights - Full Width -->
+        <div class="chart-container response-analytics-full">
+            <div class="chart-title">Response Analytics</div>
+            <div class="chart-subtitle">Key insights and conversion metrics</div>
+            <div id="responseInsights">Loading...</div>
+        </div>
+
+        <!-- Post Performance - Full Width -->
+        <div id="performance" class="chart-container post-performance-full">
             <div class="chart-title">Post Performance</div>
             <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
             <div class="post-summary-stats" id="postSummaryStats">Loading...</div>
@@ -1417,50 +1544,16 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
             <div class="scroll-hint-below">← Scroll horizontally to see all posts →</div>
             <div id="postDetailCard" class="post-detail-card"></div>
         </div>
-        
-        <div class="chart-container recent-full-width">
-            <div class="chart-title">Top Performers</div>
-            <div class="chart-subtitle">Your best performing posts and most responsive sources</div>
-            <div class="top-performers-grid" id="topPerformers">Loading...</div>
+
+        <!-- Genres Spotlighted -->
+        <div class="chart-container">
+            <div class="chart-title">Genres Spotlighted</div>
+            <div class="chart-subtitle">Art styles you're featuring</div>
+            <div class="bar-chart" id="genresChart">Loading...</div>
         </div>
 
-        <div class="chart-container recent-full-width">
-            <div class="chart-title">Recent Additions</div>
-            <div class="chart-subtitle">Last 20 artists added</div>
-            <div class="activity-table" id="recentActivity">Loading...</div>
-        </div>
-
-        <div class="chart-container response-analytics-full">
-            <div class="chart-title">Response Analytics</div>
-            <div class="chart-subtitle" id="responseAnalyticsSubtitle">Outreach effectiveness and conversion insights</div>
-            <div class="response-analytics-container">
-                <div class="response-funnel-section">
-                    <h3 class="response-section-title">Response Funnel</h3>
-                    <div class="funnel" id="responseFunnel">Loading...</div>
-                </div>
-                <div class="response-insights-section">
-                    <h3 class="response-section-title">Key Insights</h3>
-                    <div id="responseInsights">Loading...</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="chart-container response-analytics-full">
-            <div class="chart-title">Source Performance</div>
-            <div class="chart-subtitle" id="sourcePerformanceSubtitle">Response rates by contact method</div>
-            <div class="response-analytics-container">
-                <div class="response-funnel-section">
-                    <h3 class="response-section-title">Contact Method Performance</h3>
-                    <div id="contactMethodPerformance">Loading...</div>
-                </div>
-                <div class="response-insights-section">
-                    <h3 class="response-section-title">Method Insights</h3>
-                    <div id="methodInsights">Loading...</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="chart-container recent-full-width">
+        <!-- Follower Growth -->
+        <div class="chart-container">
             <div class="chart-title">Follower Growth</div>
             <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
             <div id="followerGrowthContainer">
@@ -1515,7 +1608,7 @@ function renderPipelineTimeline(data) {
         return `w/c ${day} ${month}`;
     });
 
-    const timelineSubtitle = document.querySelector('.chart-container:nth-of-type(4) .chart-subtitle');
+    const timelineSubtitle = document.querySelector('.chart-container:nth-of-type(1) .chart-subtitle');
     if (timelineSubtitle) {
         timelineSubtitle.textContent = `Weekly adds vs total pipeline size — Avg: ${avgAddsPerWeek} artists/week`;
     }
@@ -1551,6 +1644,7 @@ function renderPipelineTimeline(data) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     type: 'linear',
@@ -2134,7 +2228,7 @@ function renderWhereFound(data) {
     const container = document.getElementById('whereFoundChart');
     container.innerHTML = '';
 
-    const wfSubtitle = document.querySelector('.chart-container:nth-of-type(1) .chart-subtitle');
+    const wfSubtitle = document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle');
     if (wfSubtitle) {
       wfSubtitle.textContent = `Sources with ≥5 artists — showing ${shownTotal} of ${totalWhereFound}`;
     }
@@ -2331,7 +2425,7 @@ function renderFunnel(data) {
         { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
     ];
     const total = data.length;
-    document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle').innerText = `Total: ${total}`;
+    document.querySelector('.chart-container:nth-of-type(4) .chart-subtitle').innerText = `Total: ${total}`;
 
     // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 30%, 20%)
     const funnelWidths = [100, 85, 70, 55, 40, 30, 20];
@@ -2529,26 +2623,9 @@ function updateSummary(data, followerData = null, postData = null) {
         return status === "planned outreach" || status.includes("planned") && status.includes("outreach");
     }).length;
 
-    // Calculate Conversion Rate: Responded → Featured/Spotlighted
-    const respondedArtists = data.filter(row => {
-        const status = (row["Current Status"] || "").toLowerCase().trim();
-        return status === "responded" || status.includes("response");
-    }).length;
-
-    const featuredArtists = data.filter(row => {
-        const status = (row["Current Status"] || "").toLowerCase().trim();
-        return status === "featured" || status === "spotlighted" ||
-               status.includes("featured") || status.includes("spotlight");
-    }).length;
-
-    const conversionRate = respondedArtists > 0
-        ? ((featuredArtists / respondedArtists) * 100).toFixed(0) + '%'
-        : '-';
-
     // Update basic stats
     document.getElementById('summaryNewArtists').textContent = newArtists;
     document.getElementById('summaryPlannedOutreach').textContent = plannedOutreach;
-    document.getElementById('summaryConversionRate').textContent = conversionRate;
 
     // Follower Growth (from follower data)
     if (followerData && followerData.length > 0) {
@@ -3059,7 +3136,6 @@ function renderSourcePerformance(data) {
 
     if (contacted.length === 0) {
         document.getElementById('contactMethodPerformance').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">No outreach data yet.</div>';
-        document.getElementById('methodInsights').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Insights will appear once you have outreach data.</div>';
         return;
     }
 
@@ -3175,59 +3251,6 @@ function renderSourcePerformance(data) {
     }
 
     performanceContainer.innerHTML = performanceHtml;
-
-    // Render insights
-    const insightsContainer = document.getElementById('methodInsights');
-    let insightsHtml = '';
-
-    // Best performing method (by positive response rate)
-    if (methodPerformance.length > 0) {
-        const best = methodPerformance[0];
-        insightsHtml += `
-            <div class="insight-item">
-                <div class="insight-label">Best Performing</div>
-                <div class="insight-value">${best.method}</div>
-                <div class="insight-detail">${best.positiveRate}% positive response rate</div>
-            </div>
-        `;
-    }
-
-    // Highest conversion to featured
-    if (methodPerformance.length > 0) {
-        const bestConversion = methodPerformance.reduce((max, m) => m.spotlightedRate > max.spotlightedRate ? m : max, methodPerformance[0]);
-        if (bestConversion.spotlightedRate > 0) {
-            insightsHtml += `
-                <div class="insight-item">
-                    <div class="insight-label">Best Conversion</div>
-                    <div class="insight-value">${bestConversion.method}</div>
-                    <div class="insight-detail">${bestConversion.spotlightedRate}% featured (${bestConversion.spotlighted}/${bestConversion.contacted})</div>
-                </div>
-            `;
-        }
-    }
-
-    // Total methods used
-    insightsHtml += `
-        <div class="insight-item">
-            <div class="insight-label">Methods Tracked</div>
-            <div class="insight-value">${methodPerformance.length}</div>
-            <div class="insight-detail">Different contact approaches</div>
-        </div>
-    `;
-
-    // Method with most contacts
-    if (methodPerformance.length > 0) {
-        const mostUsed = methodPerformance.reduce((max, m) => m.contacted > max.contacted ? m : max, methodPerformance[0]);
-        insightsHtml += `
-            <div class="insight-item">
-                <div class="insight-label">Most Used</div>
-                <div class="insight-value">${mostUsed.method}</div>
-                <div class="insight-detail">${mostUsed.contacted} contacts (${mostUsed.positiveRate}% positive)</div>
-            </div>
-        `;
-    }
-
-    insightsContainer.innerHTML = insightsHtml;
 
     // Update subtitle
     const totalContacted = contacted.length;
