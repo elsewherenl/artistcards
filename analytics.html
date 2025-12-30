@@ -801,27 +801,34 @@ a.activity-item:hover {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
+        position: static;
     }
 
     .logo {
-        position: relative;
-        right: auto;
-        top: auto;
+        position: static;
+        transform: none;
+        margin: 0 auto 1.5rem auto;
         font-size: 1.8rem;
-        margin-bottom: 1rem;
         text-align: center;
+        width: 100%;
+    }
+
+    .logo:hover {
+        transform: scale(1.02);
     }
 
     .nav-section {
         margin-right: 0;
-        gap: 2rem;
+        gap: 1.5rem;
         flex-wrap: wrap;
         justify-content: center;
+        width: 100%;
     }
 
     .nav-title {
-        font-size: 2rem;
+        font-size: 1.5rem;
+        text-align: center;
     }
 
     .analytics-grid {
@@ -1430,10 +1437,10 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
 </head>
 <body>
     <div class="header">
-        <a href="index2.html" class="logo">elsewhere collective</a>
+        <a href="index.html" class="logo">elsewhere collective</a>
         <div class="nav-section">
-            <div class="nav-title"><a href="index2.html">Artist Prospecting</a></div>
-            <div class="nav-title active"><a href="analytics2.html">Analytics</a></div>
+            <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
+            <div class="nav-title active"><a href="analytics.html">Analytics</a></div>
             <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
         </div>
     </div>
