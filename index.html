@@ -24,39 +24,27 @@
         position: relative;
         margin-bottom: 4rem;
         }
-        
+
         .logo {
         position: absolute;
-        top: 0;
+        top: 50%;
+        transform: translateY(-50%);
         right: 0;
-        width: 100px;
-        height: 100px;
-        min-width: 100px;
-        min-height: 100px;
-        background: #F3EFE9;
-        border: 1px solid rgba(44, 44, 44, 0.2);
-        border-radius: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-end;
-        color: #2C2C2C;
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 0.7rem;
-        font-weight: 500;
-        line-height: 0.9;
-        text-transform: lowercase;
-        letter-spacing: 0.02em;
-        padding: 0.5rem;
-        padding-bottom: 0.8rem;
-        box-sizing: border-box;
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: #2C2C2C;
         text-decoration: none;
-        flex-shrink: 0;
+        letter-spacing: 0.05em;
+        text-transform: lowercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
         }
 
-        .logo > div {
-        width: 100%;
-        text-align: left;
+        .logo:hover {
+        color: #D6B370;
+        letter-spacing: 0.08em;
+        transform: translateY(-50%) scale(1.02);
         }
         
         h1 {
@@ -853,14 +841,14 @@
         .nav-section {
             display: flex;
             gap: 3rem;
-            align-items: baseline;
-            margin-right: 120px;
+            align-items: center;
+            position: relative;
         }
 
         .nav-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 500;
+            font-size: 3rem;
+            font-weight: 300;
             margin: 0;
             letter-spacing: -0.02em;
             cursor: pointer;
@@ -881,15 +869,33 @@
         }
         
         @media (max-width: 768px) {
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
         .logo {
             position: relative;
+            right: auto;
+            top: auto;
             margin: 0 auto 1rem auto;
-            width: 80px;
-            height: 80px;
-            min-width: 80px;
-            min-height: 80px;
-            font-size: 0.6rem;
+            font-size: 1.8rem;
+            text-align: center;
         }
+
+        .nav-section {
+            margin-right: 0;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-title {
+            font-size: 2rem;
+        }
+
         h1 {
             margin-right: 0;
             text-align: center;
@@ -1430,14 +1436,10 @@
     </head>
     <body>
     <div class="header">
-        <div class="logo">
-        <div>else</div>
-        <div>where</div>
-        <div>collective</div>
-        </div>
+        <a href="index.html" class="logo">elsewhere collective</a>
     <div class="nav-section">
-    <div class="nav-title active"><a href="index.html">Artist Prospecting</a></div>
-    <div class="nav-title"><a href="analytics.html">Analytics</a></div>
+    <div class="nav-title active"><a href="index2.html">Artist Prospecting</a></div>
+    <div class="nav-title"><a href="analytics2.html">Analytics</a></div>
         </div>
     </div>
 
