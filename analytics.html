@@ -785,6 +785,31 @@ a.activity-item:hover {
     font-weight: 500;
 }
 
+.filter-btn {
+    padding: 0.35rem 0.75rem;
+    background: rgba(37, 82, 255, 0.1);
+    border: 1px solid rgba(37, 82, 255, 0.3);
+    border-radius: 6px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.75rem;
+    color: #2C2C2C;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: rgba(37, 82, 255, 0.2);
+    border-color: rgba(37, 82, 255, 0.5);
+}
+
+.filter-btn.active {
+    background: #2552FF;
+    border-color: #2552FF;
+    color: #FFF;
+    font-weight: 500;
+}
+
 @media (max-width: 1200px) {
     .analytics-grid {
         grid-template-columns: 1fr;
@@ -1052,7 +1077,21 @@ a.activity-item:hover {
     font-size: 0.7rem !important;
     text-align: center !important;
     line-height: 1.6 !important;
-    margin-bottom: 1rem !important;
+  }
+
+  .post-filter-controls {
+    justify-content: center !important;
+    gap: 0.25rem !important;
+  }
+
+  .post-filter-controls span {
+    font-size: 0.7rem !important;
+    margin-right: 0.2rem !important;
+  }
+
+  .filter-btn {
+    font-size: 0.65rem !important;
+    padding: 0.3rem 0.5rem !important;
   }
 
   .post-sort-controls {
@@ -1360,6 +1399,23 @@ body.dark-mode .sort-btn.active {
     color: #2C2C2C;
 }
 
+body.dark-mode .filter-btn {
+    background: rgba(37, 82, 255, 0.15);
+    border-color: rgba(37, 82, 255, 0.3);
+    color: #e0e0e0;
+}
+
+body.dark-mode .filter-btn:hover {
+    background: rgba(37, 82, 255, 0.25);
+    border-color: rgba(37, 82, 255, 0.5);
+}
+
+body.dark-mode .filter-btn.active {
+    background: #2552FF;
+    border-color: #2552FF;
+    color: #FFF;
+}
+
 body.dark-mode .scroll-hint {
     background: rgba(214, 179, 112, 0.9);
     color: #2C2C2C;
@@ -1535,7 +1591,15 @@ Chart.defaults.plugins.tooltip.bodyFont.size = 16;
         <div id="performance" class="chart-container post-performance-full">
             <div class="chart-title">Post Performance</div>
             <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
-            <div class="post-summary-stats" id="postSummaryStats">Loading...</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%); border: 1px solid rgba(214, 179, 112, 0.2); border-radius: 12px;">
+                <div class="post-filter-controls" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">View:</span>
+                    <button class="filter-btn active" data-filter="total">Total</button>
+                    <button class="filter-btn" data-filter="with-artist">With Artist Shares</button>
+                    <button class="filter-btn" data-filter="without-artist">Without Artist Shares</button>
+                </div>
+                <div class="post-summary-stats" id="postSummaryStats" style="margin: 0; padding: 0; background: none; border: none;">Loading...</div>
+            </div>
             <div class="post-sort-controls" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <span style="font-size: 0.85rem; color: #8A8580; margin-right: 0.5rem; align-self: center;">Sort by:</span>
                 <button class="sort-btn active" data-sort="featured-recent">Date (Newest to Oldest)</button>
@@ -1722,6 +1786,7 @@ function renderPipelineTimeline(data) {
 
 let postPerformanceRawData = [];
 let postPerformanceChart = null;
+let currentFilterMode = 'total'; // Track current filter mode: 'total', 'with-artist', 'without-artist'
 
 function showPostDetail(post) {
     const card = document.getElementById('postDetailCard');
@@ -1767,9 +1832,32 @@ function showPostDetail(post) {
     }, 100);
 }
 
-function renderPostPerformance(data, sortBy = 'date') {
+function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
+    // Update current filter mode if provided
+    if (filterMode !== null) {
+        currentFilterMode = filterMode;
+    }
+
     // Check if this is raw CSV data or already processed
     const isRawData = data.length > 0 && data[0].hasOwnProperty("Post Date");
+
+    // Debug: Log the first row to see column names
+    if (isRawData && data.length > 0) {
+        console.log('CSV Column names:', Object.keys(data[0]));
+        console.log('Looking for artist share column...');
+        const artistShareKeys = Object.keys(data[0]).filter(key =>
+            key.toLowerCase().includes('artist') && key.toLowerCase().includes('share')
+        );
+        console.log('Possible artist share columns:', artistShareKeys);
+        console.log('First row artist share values:', artistShareKeys.map(key => ({ [key]: data[0][key] })));
+        console.log('First 5 rows sample:', data.slice(0, 5).map(row => {
+            const artistShareCol = artistShareKeys[0];
+            return {
+                title: row["Post Title"],
+                artistShared: row[artistShareCol] || 'NOT FOUND'
+            };
+        }));
+    }
 
     let processedData;
     if (isRawData) {
@@ -1784,8 +1872,9 @@ function renderPostPerformance(data, sortBy = 'date') {
                 views: parseInt(row["Views"]) || 0,
                 likes: parseInt(row["Likes"]) || 0,
                 engagementRate: parseFloat(row["Likes / Reach"]) || 0,
-                notes: row["Notes"] || "",
-                spotlighted: row["Post Date"] || ""
+                notes: row["Notes"] || "",  // Column I - Notes/Artist share status
+                spotlighted: row["Post Date"] || "",
+                artistShared: row["Notes"] || ""  // Column I - contains artist share status
             }));
         // Store raw data for re-sorting
         postPerformanceRawData = data;
@@ -1801,10 +1890,33 @@ function renderPostPerformance(data, sortBy = 'date') {
                 views: parseInt(row["Views"]) || 0,
                 likes: parseInt(row["Likes"]) || 0,
                 engagementRate: parseFloat(row["Likes / Reach"]) || 0,
-                notes: row["Notes"] || "",
-                spotlighted: row["Post Date"] || ""
+                notes: row["Notes"] || "",  // Column I - Notes/Artist share status
+                spotlighted: row["Post Date"] || "",
+                artistShared: row["Notes"] || ""  // Column I - contains artist share status
             }));
     }
+
+    // Apply filter based on current filter mode
+    // Column I logic: "No artist share" = Without Artist Shares, anything else = With Artist Shares
+    console.log('Current filter mode:', currentFilterMode);
+    console.log('Sample artist shared values:', processedData.slice(0, 5).map(p => ({ title: p.title, artistShared: p.artistShared })));
+
+    if (currentFilterMode === 'with-artist') {
+        processedData = processedData.filter(post => {
+            const shared = String(post.artistShared).toLowerCase().trim();
+            // With Artist Shares = anything that is NOT "no artist share"
+            return shared !== 'no artist share' && shared !== '';
+        });
+        console.log('After with-artist filter:', processedData.length, 'posts');
+    } else if (currentFilterMode === 'without-artist') {
+        processedData = processedData.filter(post => {
+            const shared = String(post.artistShared).toLowerCase().trim();
+            // Without Artist Shares = "no artist share" or empty
+            return shared === 'no artist share' || shared === '';
+        });
+        console.log('After without-artist filter:', processedData.length, 'posts');
+    }
+    // If 'total', no filtering is applied
 
     // Sort based on selected option
     let sortedData;
@@ -1873,14 +1985,22 @@ function renderPostPerformance(data, sortBy = 'date') {
     // Desktop: show all with horizontal scroll
     const displayData = isMobile ? sortedData.slice(-8) : sortedData;
 
+    // Update subtitle with filter info
     const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
     if (postSubtitle) {
+        let filterText = '';
+        if (currentFilterMode === 'with-artist') {
+            filterText = ' (with artist shares)';
+        } else if (currentFilterMode === 'without-artist') {
+            filterText = ' (without artist shares)';
+        }
+
         if (isMobile && sortedData.length > 8) {
-            postSubtitle.textContent = `Showing most recent 8 of ${sortedData.length} posts`;
+            postSubtitle.textContent = `Showing most recent 8 of ${sortedData.length} posts${filterText}`;
         } else if (isMobile) {
-            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total`;
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total${filterText}`;
         } else {
-            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total`;
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total${filterText}`;
         }
     }
 
@@ -2178,6 +2298,26 @@ function renderPostPerformance(data, sortBy = 'date') {
             });
         });
         window.postSortListenersAdded = true;
+    }
+
+    // Setup filter button listeners (only once)
+    if (!window.postFilterListenersAdded) {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Get current sort type
+                const activeSort = document.querySelector('.sort-btn.active');
+                const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
+
+                // Re-render with new filter
+                const filterType = this.getAttribute('data-filter');
+                renderPostPerformance(postPerformanceRawData, sortType, filterType);
+            });
+        });
+        window.postFilterListenersAdded = true;
     }
 }
 
