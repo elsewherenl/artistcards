@@ -408,6 +408,7 @@
         font-family: 'Satoshi', sans-serif;
         position: relative;
         transition: box-shadow 0.3s ease;
+        min-height: 400px;
         }
 
         .card.highlight-glow {
@@ -754,8 +755,11 @@
         font-family: 'Satoshi', sans-serif;
         font-size: 0.85rem;
         font-style: italic;
-        color: #444;
-        margin-top: 0.5rem;
+        color: #666;
+        margin-top: auto;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(149, 57, 46, 0.5);
+        min-height: 1.5rem;
         }
         
         .field-item {
@@ -2618,12 +2622,13 @@
                 card.appendChild(el);
             }
 
-            if (row["Notes"]) {
-                const notes = document.createElement("div");
-                notes.className = "notes";
+            // Always add notes section (even if empty) to maintain consistent card layout
+            const notes = document.createElement("div");
+            notes.className = "notes";
+            if (row["Notes"] && row["Notes"].trim()) {
                 notes.textContent = row["Notes"];
-                card.appendChild(notes);
             }
+            card.appendChild(notes);
 
             container.appendChild(card);
             });
