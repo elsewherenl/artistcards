@@ -63,14 +63,14 @@ function renderPipelineTimeline(data) {
                 {
                     label: "New Artists",
                     data: adds,
-                    backgroundColor: "#D6B370",
+                    backgroundColor: "#95392E",
                     yAxisID: 'y'
                 },
                 {
                     label: "Total Pipeline",
                     data: cumulativeTotals,
                     type: "line",
-                    borderColor: "#2552FF",
+                    borderColor: "#D6B370",
                     borderWidth: isMobile ? 1.5 : 2,
                     fill: false,
                     yAxisID: 'y1'
@@ -324,15 +324,18 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
     const avgLikes = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.likes, 0) / totalPosts) : 0;
     const avgEngagement = totalPosts > 0 ? (sortedData.reduce((sum, p) => sum + p.engagementRate, 0) / totalPosts).toFixed(2) : '0.00';
 
+    const isDarkModeStats = document.body.classList.contains('dark-mode');
+    const statValueColor = isDarkModeStats ? '#F0EAE0' : '#95392E';
+    const statLabelColor = isDarkModeStats ? '#b0b0b0' : '#8A8580';
     const summaryStatsHTML = `
-        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Reach</span>
-        <strong style="color: #95392E; margin: 0 1rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgReach.toLocaleString()}</strong>
-        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Views</span>
-        <strong style="color: #95392E; margin: 0 1rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgViews.toLocaleString()}</strong>
-        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Likes</span>
-        <strong style="color: #95392E; margin: 0 1rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgLikes.toLocaleString()}</strong>
-        <span style="color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Engagement</span>
-        <strong style="color: #95392E; margin-left: 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem;">${avgEngagement}%</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Reach</span>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgReach.toLocaleString()}</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Views</span>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgViews.toLocaleString()}</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Likes</span>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgLikes.toLocaleString()}</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Engagement</span>
+        <strong style="color: ${statValueColor}; margin-left: 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgEngagement}%</strong>
     `;
     document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
 
@@ -415,7 +418,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                 {
                     label: 'Reach',
                     data: displayData.map(post => post.reach),
-                    backgroundColor: isDarkMode ? '#4A6FFF' : '#2552FF',
+                    backgroundColor: isDarkMode ? '#B8503F' : '#95392E',
                     yAxisID: 'y',
                     barPercentage: 0.85,
                     categoryPercentage: 0.9,
@@ -424,7 +427,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                 {
                     label: 'Views',
                     data: displayData.map(post => post.views),
-                    backgroundColor: isDarkMode ? 'rgba(74, 111, 255, 0.5)' : 'rgba(37, 82, 255, 0.5)',
+                    backgroundColor: isDarkMode ? 'rgba(184, 80, 63, 0.5)' : 'rgba(149, 57, 46, 0.5)',
                     yAxisID: 'y',
                     barPercentage: 0.85,
                     categoryPercentage: 0.9,
@@ -1344,6 +1347,9 @@ function renderFollowerGrowth(data) {
     });
 
     const ctx = document.getElementById('followerGrowthChart').getContext('2d');
+    const isDarkModeFollower = document.body.classList.contains('dark-mode');
+    const followerLineColor = isDarkModeFollower ? '#B8503F' : '#95392E';
+    const followerFillColor = isDarkModeFollower ? 'rgba(184, 80, 63, 0.12)' : 'rgba(149, 57, 46, 0.08)';
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -1351,14 +1357,14 @@ function renderFollowerGrowth(data) {
             datasets: [{
                 label: 'Followers',
                 data: followerData.map(d => d.followers),
-                borderColor: '#2552FF',
-                backgroundColor: 'rgba(37, 82, 255, 0.1)',
+                borderColor: followerLineColor,
+                backgroundColor: followerFillColor,
                 borderWidth: 3,
                 fill: true,
                 tension: 0.3,
                 pointRadius: 4,
-                pointBackgroundColor: '#2552FF',
-                pointBorderColor: '#fff',
+                pointBackgroundColor: followerLineColor,
+                pointBorderColor: isDarkModeFollower ? '#1a1a1a' : '#F3EFE9',
                 pointBorderWidth: 2,
                 pointHoverRadius: 6
             }]
@@ -1366,7 +1372,7 @@ function renderFollowerGrowth(data) {
         options: {
             responsive: true,
             maintainAspectRatio: true,
-            aspectRatio: 3,
+            aspectRatio: 1.8,
             scales: {
                 y: {
                     beginAtZero: false,
@@ -1706,7 +1712,7 @@ function renderSourcePerformance(data) {
     const isDarkMode = document.body.classList.contains('dark-mode');
     const headerColor = isDarkMode ? '#e0e0e0' : '#0D0D0D';
     const secondaryColor = isDarkMode ? '#b0b0b0' : '#999';
-    const borderColor = isDarkMode ? 'rgba(214, 179, 112, 0.3)' : '#E5E1D8';
+    const borderColor = isDarkMode ? 'rgba(149, 57, 46, 0.25)' : 'rgba(149, 57, 46, 0.12)';
 
     if (methodPerformance.length === 0) {
         performanceHtml = `<div style="text-align: center; color: ${secondaryColor}; padding: 2rem;">Not enough data yet. Need at least 2 contacts per method.</div>`;
@@ -1714,7 +1720,7 @@ function renderSourcePerformance(data) {
         performanceHtml = `
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
                 <thead>
-                    <tr style="border-bottom: 2px solid #D6B370;">
+                    <tr style="border-bottom: 2px solid #95392E;">
                         <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Method</th>
                         <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Contacts</th>
                         <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Response</th>
@@ -1727,26 +1733,26 @@ function renderSourcePerformance(data) {
 
         methodPerformance.forEach((m, index) => {
             const rowBg = index % 2 === 0
-                ? (isDarkMode ? 'rgba(214, 179, 112, 0.08)' : '#F9F7F4')
+                ? (isDarkMode ? 'rgba(149, 57, 46, 0.08)' : 'rgba(149, 57, 46, 0.04)')
                 : 'transparent';
             performanceHtml += `
                 <tr style="background: ${rowBg}; border-bottom: 1px solid ${borderColor};">
                     <td style="padding: 0.75rem 0.5rem; font-weight: 500; color: ${headerColor};">${m.method}</td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center; color: ${headerColor};">${m.contacted}</td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#4CAF50' : m.responseRate >= 30 ? '#D6B370' : secondaryColor};">
+                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#4CAF50' : m.responseRate >= 30 ? '#95392E' : secondaryColor};">
                             ${m.responseRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.responded}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#4CAF50' : m.positiveRate >= 20 ? '#D6B370' : secondaryColor};">
+                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#4CAF50' : m.positiveRate >= 20 ? '#95392E' : secondaryColor};">
                             ${m.positiveRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.positiveResponse}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#4CAF50' : m.spotlightedRate >= 15 ? '#D6B370' : secondaryColor};">
+                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#4CAF50' : m.spotlightedRate >= 15 ? '#95392E' : secondaryColor};">
                             ${m.spotlightedRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.spotlighted}/${m.contacted})</span>
@@ -1876,6 +1882,16 @@ function initDarkMode() {
         // Re-render Source Performance table to update colors
         if (artistData && artistData.length > 0) {
             renderSourcePerformance(artistData);
+        }
+
+        // Re-render Follower Growth chart to update colors
+        if (followerGrowthData && followerGrowthData.length > 0) {
+            const followerCanvas = document.getElementById('followerGrowthChart');
+            if (followerCanvas) {
+                const existingChart = Chart.getChart(followerCanvas);
+                if (existingChart) existingChart.destroy();
+            }
+            renderFollowerGrowth(followerGrowthData);
         }
     });
 }
