@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Analytics - Elsewhere Collective</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css">
@@ -107,14 +109,14 @@
         <div id="performance" class="chart-container post-performance-full">
             <div class="chart-title">Post Performance</div>
             <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%); border: 1px solid rgba(214, 179, 112, 0.2); border-radius: 12px;">
+            <div class="post-controls-bar">
                 <div class="post-filter-controls" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
                     <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">View:</span>
                     <button class="filter-btn active" data-filter="total">Total</button>
                     <button class="filter-btn" data-filter="with-artist">With Artist Shares</button>
                     <button class="filter-btn" data-filter="without-artist">Without Artist Shares</button>
                 </div>
-                <div class="post-summary-stats" id="postSummaryStats" style="margin: 0; padding: 0; background: none; border: none;">Loading...</div>
+                <div id="postSummaryStats" style="margin: 0; padding: 0;">Loading...</div>
             </div>
             <div class="post-sort-controls" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <span style="font-size: 0.85rem; color: #8A8580; margin-right: 0.5rem; align-self: center;">Sort by:</span>
@@ -129,7 +131,6 @@
                     <canvas id="postPerformanceChart"></canvas>
                 </div>
             </div>
-            <div class="scroll-hint-below">← Scroll horizontally to see all posts →</div>
             <div id="postDetailCard" class="post-detail-card"></div>
         </div>
 
