@@ -1094,7 +1094,7 @@ function renderRecent(data) {
         const instaHandle = row["Insta Handle"] || "#";
 
         // Create artist ID for linking to main page
-        const artistNameForId = artistName.toLowerCase().replace(/\s+/g, '-');
+        const artistNameForId = artistName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         const artistCardLink = `index.html#artist-${artistNameForId}`;
 
         const daysAgo = Math.floor((new Date() - row.parsedDate) / (1000 * 60 * 60 * 24));
@@ -1597,9 +1597,9 @@ function renderResponseAnalytics(data) {
         const topSource = sourceRates[0];
         insightsHtml += `
             <div class="insight-item">
-                <div class="insight-label">Best Performing Source</div>
+                <div class="insight-label">Best Discovery Source (by response rate)</div>
                 <div class="insight-value">${topSource.source}</div>
-                <div class="insight-detail">${Math.round(topSource.rate)}% response rate (${topSource.contacted} contacted)</div>
+                <div class="insight-detail">${Math.round(topSource.rate)}% of ${topSource.source}-discovered artists responded when contacted (${topSource.contacted} contacted)</div>
             </div>
         `;
     }
