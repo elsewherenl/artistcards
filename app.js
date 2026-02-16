@@ -812,7 +812,7 @@
             const card = document.createElement("div");
             card.className = "card";
             // Add unique ID to card based on artist name
-            const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-');
+            const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
             card.id = `artist-${artistNameForId}`;
 
             // Add status badge (now clickable)
@@ -1041,12 +1041,12 @@
                 // Split by comma and make each artist name clickable
                 const artistNames = similarArtistsText.split(',').map(name => name.trim());
                 const clickableNames = artistNames.map(name => {
-                    const nameForId = name.toLowerCase().replace(/\s+/g, '-');
+                    const nameForId = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
                     return `<span class="similar-artist-link" data-artist-id="artist-${nameForId}">${name}</span>`;
                 }).join(', ');
 
                 // Make the label clickable to show all similar artists
-                const artistIdsArray = artistNames.map(name => name.toLowerCase().replace(/\s+/g, '-'));
+                const artistIdsArray = artistNames.map(name => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
                 el.innerHTML = `<span class="label similar-artists-label-link" data-artist-ids='${JSON.stringify(artistIdsArray)}'>Similar Artists:</span> ${clickableNames}`;
                 card.appendChild(el);
             }
