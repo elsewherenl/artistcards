@@ -839,7 +839,14 @@
 
             const insta = document.createElement("a");
             insta.className = "insta-link";
-            insta.href = row["Insta Handle"] || "#";
+            const rawHandle = (row["Insta Handle"] || "").trim();
+            if (rawHandle.startsWith("http://") || rawHandle.startsWith("https://")) {
+                insta.href = rawHandle;
+            } else if (rawHandle) {
+                insta.href = "https://instagram.com/" + rawHandle.replace(/^@/, "");
+            } else {
+                insta.href = "#";
+            }
             insta.target = "_blank";
             const img = document.createElement("img");
             img.src = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png";
