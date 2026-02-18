@@ -12,7 +12,8 @@
         'Spotlighted',
         'Negotiating',
         'Feature Planned',
-        'Featured'
+        'Featured',
+        'Networking'
     ];
 
     // Set keyboard shortcut hint based on platform
