@@ -326,16 +326,16 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
 
     const isDarkModeStats = document.body.classList.contains('dark-mode');
     const statValueColor = isDarkModeStats ? '#F0EAE0' : '#95392E';
-    const statLabelColor = isDarkModeStats ? '#b0b0b0' : '#8A8580';
+    const statLabelColor = isDarkModeStats ? 'rgba(243, 239, 233, 0.7)' : '#8A8580';
     const summaryStatsHTML = `
         <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Reach</span>
-        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgReach.toLocaleString()}</strong>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgReach.toLocaleString()}</strong>
         <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Views</span>
-        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgViews.toLocaleString()}</strong>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgViews.toLocaleString()}</strong>
         <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Likes</span>
-        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgLikes.toLocaleString()}</strong>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgLikes.toLocaleString()}</strong>
         <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Engagement</span>
-        <strong style="color: ${statValueColor}; margin-left: 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;">${avgEngagement}%</strong>
+        <strong style="color: ${statValueColor}; margin-left: 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgEngagement}%</strong>
     `;
     document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
 
@@ -344,7 +344,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
 
     // Dark mode detection
     const isDarkMode = document.body.classList.contains('dark-mode');
-    const textColor = isDarkMode ? '#e0e0e0' : '#0D0D0D';
+    const textColor = isDarkMode ? '#F3EFE9' : '#0D0D0D';
     const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)';
 
     // Mobile: show last 8 posts only for better readability
@@ -446,7 +446,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     pointRadius: isMobile ? 4 : 5,
                     pointHoverRadius: isMobile ? 6 : 7,
                     pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
-                    pointBorderColor: isDarkMode ? '#1a1a1a' : '#F3EFE9',
+                    pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
                     pointBorderWidth: 2,
                     pointHoverBorderWidth: 2.5
                 }
@@ -481,7 +481,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                         font: {
                             size: isMobile ? 10 : 13,
                             weight: '500',
-                            family: "'Space Grotesk', sans-serif"
+                            family: "'Suisse Intl', sans-serif"
                         },
                         color: '#D6B370',
                         padding: { top: 0, bottom: isMobile ? 5 : 8 }
@@ -489,7 +489,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     ticks: {
                         font: {
                             size: isMobile ? 9 : 12,
-                            family: "'Satoshi', sans-serif",
+                            family: "'Suisse Intl', sans-serif",
                             weight: '400'
                         },
                         color: '#666',
@@ -520,7 +520,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                         font: {
                             size: isMobile ? 10 : 13,
                             weight: '500',
-                            family: "'Space Grotesk', sans-serif"
+                            family: "'Suisse Intl', sans-serif"
                         },
                         color: '#D6B370',
                         padding: { top: 0, bottom: isMobile ? 5 : 8 }
@@ -528,7 +528,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     ticks: {
                         font: {
                             size: isMobile ? 9 : 12,
-                            family: "'Satoshi', sans-serif",
+                            family: "'Suisse Intl', sans-serif",
                             weight: '400'
                         },
                         color: '#666',
@@ -546,7 +546,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     ticks: {
                         font: {
                             size: isMobile ? 8 : 11,
-                            family: "'Satoshi', sans-serif",
+                            family: "'Suisse Intl', sans-serif",
                             weight: '400'
                         },
                         color: '#666',
@@ -567,7 +567,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     labels: {
                         font: {
                             size: isMobile ? 10 : 13,
-                            family: "'Space Grotesk', sans-serif",
+                            family: "'Suisse Intl', sans-serif",
                             weight: '500'
                         },
                         color: '#666',
@@ -590,20 +590,20 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                 },
                 tooltip: {
                     enabled: true,
-                    backgroundColor: isDarkMode ? 'rgba(26, 26, 26, 0.95)' : 'rgba(243, 239, 233, 0.98)',
-                    titleColor: isDarkMode ? '#e0e0e0' : '#0D0D0D',
-                    bodyColor: isDarkMode ? '#b0b0b0' : '#666',
+                    backgroundColor: isDarkMode ? 'rgba(44, 44, 44, 0.95)' : 'rgba(243, 239, 233, 0.98)',
+                    titleColor: isDarkMode ? '#F3EFE9' : '#0D0D0D',
+                    bodyColor: isDarkMode ? 'rgba(243, 239, 233, 0.7)' : '#666',
                     borderColor: isDarkMode ? 'rgba(232, 200, 130, 0.3)' : 'rgba(214, 179, 112, 0.4)',
                     borderWidth: 1,
                     padding: isMobile ? 10 : 14,
                     titleFont: {
                         size: isMobile ? 12 : 15,
-                        family: "'Space Grotesk', sans-serif",
+                        family: "'Suisse Intl', sans-serif",
                         weight: '500'
                     },
                     bodyFont: {
                         size: isMobile ? 10 : 13,
-                        family: "'Satoshi', sans-serif",
+                        family: "'Suisse Intl', sans-serif",
                         weight: '400'
                     },
                     displayColors: true,
@@ -853,7 +853,7 @@ function renderGenres(data) {
     }
 
     const maxCount = Math.max(...sorted.map(([, count]) => count));
-    
+
     sorted.forEach(([genre, count]) => {
         const barItem = document.createElement('div');
         barItem.className = 'bar-item';
@@ -863,6 +863,58 @@ function renderGenres(data) {
             <div class="bar-label">${genre}</div>
             <div class="bar genre-bar" style="width: ${widthPercent}%;"></div>
             <div class="bar-value">${count}</div>
+        `;
+        container.appendChild(barItem);
+    });
+}
+
+function renderArtistRanking(data) {
+    // Count artists by ranking (1-5)
+    const rankingCounts = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0
+    };
+
+    data.forEach(row => {
+        const ranking = (row["Ranking"] || "").trim();
+        if (ranking && rankingCounts.hasOwnProperty(ranking)) {
+            rankingCounts[ranking]++;
+        }
+    });
+
+    const container = document.getElementById('artistRankingChart');
+    container.innerHTML = '';
+
+    const totalRanked = Object.values(rankingCounts).reduce((sum, count) => sum + count, 0);
+
+    if (totalRanked === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #666;">No ranked artists yet</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...Object.values(rankingCounts));
+
+    // Update subtitle with total
+    const rankingSubtitle = document.querySelector('.chart-container:has(#artistRankingChart) .chart-subtitle');
+    if (rankingSubtitle) {
+        rankingSubtitle.textContent = `Distribution by potential (1 = highest, 5 = lowest) — ${totalRanked} ranked artists`;
+    }
+
+    // Always display rankings 1-5 in order
+    ['1', '2', '3', '4', '5'].forEach(ranking => {
+        const count = rankingCounts[ranking];
+        const percent = totalRanked > 0 ? Math.round((count / totalRanked) * 100) : 0;
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        const widthPercent = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+
+        barItem.innerHTML = `
+            <div class="bar-label">Ranking ${ranking}</div>
+            <div class="bar" style="width: ${widthPercent}%;"></div>
+            <div class="bar-value">${count} <span style="font-size: 0.85rem; color: #999;">(${percent}%)</span></div>
         `;
         container.appendChild(barItem);
     });
@@ -1348,8 +1400,8 @@ function renderFollowerGrowth(data) {
 
     const ctx = document.getElementById('followerGrowthChart').getContext('2d');
     const isDarkModeFollower = document.body.classList.contains('dark-mode');
-    const followerLineColor = isDarkModeFollower ? '#B8503F' : '#95392E';
-    const followerFillColor = isDarkModeFollower ? 'rgba(184, 80, 63, 0.12)' : 'rgba(149, 57, 46, 0.08)';
+    const followerLineColor = isDarkModeFollower ? '#C4D4BE' : '#A8B5A0';
+    const followerFillColor = isDarkModeFollower ? 'rgba(168, 181, 160, 0.15)' : 'rgba(168, 181, 160, 0.12)';
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -1364,7 +1416,7 @@ function renderFollowerGrowth(data) {
                 tension: 0.3,
                 pointRadius: 4,
                 pointBackgroundColor: followerLineColor,
-                pointBorderColor: isDarkModeFollower ? '#1a1a1a' : '#F3EFE9',
+                pointBorderColor: isDarkModeFollower ? '#2C2C2C' : '#F3EFE9',
                 pointBorderWidth: 2,
                 pointHoverRadius: 6
             }]
@@ -1423,8 +1475,8 @@ function renderResponseAnalytics(data) {
                currentStatus.includes("showcas");
     });
 
-    // Calculate response times for those who responded
-    const responseTimes = respondedInterested
+    // Calculate response times for those who responded (anyone with a Date Responded)
+    const responseTimes = contacted
         .filter(row => row["Date Responded"] && row["Date Responded"].trim())
         .map(row => {
             const contacted = parseDate(row["Date Contacted"]);
@@ -1480,12 +1532,12 @@ function renderResponseAnalytics(data) {
 
     console.log('Average response→feature time:', avgResponseToFeature);
 
-    // Response rate by source
+    // Response rate by source WITH response times
     const sourceStats = {};
     contacted.forEach(row => {
         const source = row["Where Found"] || "Unknown";
         if (!sourceStats[source]) {
-            sourceStats[source] = { contacted: 0, responded: 0 };
+            sourceStats[source] = { contacted: 0, responded: 0, responseTimes: [] };
         }
         sourceStats[source].contacted++;
 
@@ -1493,16 +1545,68 @@ function renderResponseAnalytics(data) {
         if (respStatus === "Responded - Interested") {
             sourceStats[source].responded++;
         }
+
+        // Track response times for this source
+        if (row["Date Responded"] && row["Date Responded"].trim()) {
+            const contactedDate = parseDate(row["Date Contacted"]);
+            const respondedDate = parseDate(row["Date Responded"]);
+            if (contactedDate && respondedDate && !isNaN(contactedDate) && !isNaN(respondedDate)) {
+                const days = Math.floor((respondedDate - contactedDate) / (1000 * 60 * 60 * 24));
+                if (days >= 0) {
+                    sourceStats[source].responseTimes.push(days);
+                }
+            }
+        }
     });
 
     const sourceRates = Object.entries(sourceStats)
         .map(([source, stats]) => ({
             source,
             rate: stats.contacted > 0 ? (stats.responded / stats.contacted * 100) : 0,
-            contacted: stats.contacted
+            contacted: stats.contacted,
+            avgResponseTime: stats.responseTimes.length > 0
+                ? Math.round(stats.responseTimes.reduce((sum, days) => sum + days, 0) / stats.responseTimes.length)
+                : null
         }))
         .filter(s => s.contacted >= 3) // Only show sources with 3+ contacts
         .sort((a, b) => b.rate - a.rate);
+
+    // Find fastest responding source (minimum average response time)
+    const fastestSource = sourceRates
+        .filter(s => s.avgResponseTime !== null)
+        .sort((a, b) => a.avgResponseTime - b.avgResponseTime)[0];
+
+    // Analyze response patterns by day of week contacted
+    const dayOfWeekStats = {
+        0: { name: 'Sunday', contacted: 0, responded: 0 },
+        1: { name: 'Monday', contacted: 0, responded: 0 },
+        2: { name: 'Tuesday', contacted: 0, responded: 0 },
+        3: { name: 'Wednesday', contacted: 0, responded: 0 },
+        4: { name: 'Thursday', contacted: 0, responded: 0 },
+        5: { name: 'Friday', contacted: 0, responded: 0 },
+        6: { name: 'Saturday', contacted: 0, responded: 0 }
+    };
+
+    contacted.forEach(row => {
+        const contactedDate = parseDate(row["Date Contacted"]);
+        if (contactedDate && !isNaN(contactedDate)) {
+            const dayOfWeek = contactedDate.getDay();
+            dayOfWeekStats[dayOfWeek].contacted++;
+
+            if (row["Date Responded"] && row["Date Responded"].trim()) {
+                dayOfWeekStats[dayOfWeek].responded++;
+            }
+        }
+    });
+
+    const dayOfWeekRates = Object.values(dayOfWeekStats)
+        .map(day => ({
+            name: day.name,
+            contacted: day.contacted,
+            responded: day.responded,
+            rate: day.contacted > 0 ? ((day.responded / day.contacted) * 100).toFixed(1) : 0
+        }))
+        .filter(day => day.contacted > 0); // Only show days with contacts
 
     // Response rate by genre
     const genreStats = {};
@@ -1616,6 +1720,29 @@ function renderResponseAnalytics(data) {
         `;
     }
 
+    // Fastest responding source
+    if (fastestSource) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Fastest Response Source</div>
+                <div class="insight-value">${fastestSource.source}</div>
+                <div class="insight-detail">Artists respond in ~${fastestSource.avgResponseTime} days on average</div>
+            </div>
+        `;
+    }
+
+    // Best day of week to contact
+    if (dayOfWeekRates.length > 0) {
+        const bestDay = dayOfWeekRates.sort((a, b) => parseFloat(b.rate) - parseFloat(a.rate))[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Best Day to Contact</div>
+                <div class="insight-value">${bestDay.name}</div>
+                <div class="insight-detail">${bestDay.rate}% response rate (${bestDay.responded}/${bestDay.contacted} responded)</div>
+            </div>
+        `;
+    }
+
     // Conversion to featured
     if (totalResponded > 0) {
         insightsHtml += `
@@ -1710,8 +1837,8 @@ function renderSourcePerformance(data) {
 
     // Check for dark mode
     const isDarkMode = document.body.classList.contains('dark-mode');
-    const headerColor = isDarkMode ? '#e0e0e0' : '#0D0D0D';
-    const secondaryColor = isDarkMode ? '#b0b0b0' : '#999';
+    const headerColor = isDarkMode ? '#F3EFE9' : '#0D0D0D';
+    const secondaryColor = isDarkMode ? 'rgba(243, 239, 233, 0.7)' : '#999';
     const borderColor = isDarkMode ? 'rgba(149, 57, 46, 0.25)' : 'rgba(149, 57, 46, 0.12)';
 
     if (methodPerformance.length === 0) {
@@ -1721,11 +1848,11 @@ function renderSourcePerformance(data) {
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
                 <thead>
                     <tr style="border-bottom: 2px solid #95392E;">
-                        <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Method</th>
-                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Contacts</th>
-                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Response</th>
-                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Positive</th>
-                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 600; color: ${headerColor};">Featured</th>
+                        <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Method</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Contacts</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Response</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Positive</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Featured</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1740,19 +1867,19 @@ function renderSourcePerformance(data) {
                     <td style="padding: 0.75rem 0.5rem; font-weight: 500; color: ${headerColor};">${m.method}</td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center; color: ${headerColor};">${m.contacted}</td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#4CAF50' : m.responseRate >= 30 ? '#95392E' : secondaryColor};">
+                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#A8B5A0' : m.responseRate >= 30 ? '#D6B370' : '#8A8580'};">
                             ${m.responseRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.responded}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#4CAF50' : m.positiveRate >= 20 ? '#95392E' : secondaryColor};">
+                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#A8B5A0' : m.positiveRate >= 20 ? '#D6B370' : '#8A8580'};">
                             ${m.positiveRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.positiveResponse}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#4CAF50' : m.spotlightedRate >= 15 ? '#95392E' : secondaryColor};">
+                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#A8B5A0' : m.spotlightedRate >= 15 ? '#D6B370' : '#8A8580'};">
                             ${m.spotlightedRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.spotlighted}/${m.contacted})</span>
@@ -1795,6 +1922,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         updateSummary(artistData, followerGrowthData, postPerformanceData);
         renderWhereFound(artistData);
         renderGenres(artistData);
+        renderArtistRanking(artistData);
         renderPipelineTimeline(artistData);
         renderFunnel(artistData);
         renderRecent(artistData);
