@@ -1,5 +1,33 @@
+/* Font Declarations */
+@font-face {
+    font-family: 'Suisse Intl';
+    src: url('fonts/SuisseIntl-Regular.woff2') format('woff2'),
+         url('fonts/SuisseIntl-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Suisse Intl';
+    src: url('fonts/SuisseIntl-Book.woff2') format('woff2'),
+         url('fonts/SuisseIntl-Book.woff') format('woff');
+    font-weight: 450;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Suisse Intl';
+    src: url('fonts/SuisseIntl-Medium.woff2') format('woff2'),
+         url('fonts/SuisseIntl-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
         body {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background-color: #F3EFE9;
         margin: 0;
         padding: 2rem;
@@ -17,12 +45,12 @@
         top: 50%;
         transform: translateY(-50%);
         right: 0;
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
         font-size: 2.2rem;
-        font-weight: 600;
         color: #2C2C2C;
         text-decoration: none;
-        letter-spacing: 0.05em;
+        letter-spacing: 0;
         text-transform: lowercase;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -30,12 +58,13 @@
 
         .logo:hover {
         color: #D6B370;
-        letter-spacing: 0.08em;
+        letter-spacing: 0;
         transform: translateY(-50%) scale(1.02);
         }
         
         h1 {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
         font-size: 2.8rem;
         font-weight: 300;
         margin-bottom: 0.25rem;
@@ -44,7 +73,8 @@
         }
         
         h2 {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
         font-size: 1.3rem;
         font-weight: 300;
         margin-top: 0;
@@ -74,9 +104,9 @@
         }
         
         .summary-number {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 2rem;
-        font-weight: 400;
+        font-weight: 450;
         color: #D6B370;
         display: block;
         line-height: 1;
@@ -84,10 +114,10 @@
         }
 
         .summary-label {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.875rem;
         color: #8A8580;
-        font-weight: 500;
+        font-weight: 450;
         letter-spacing: 0.05em;
         }
         
@@ -99,7 +129,7 @@
         }
         
     .filter-select {
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 1rem;
     font-weight: 400;
     padding: 0.5rem 1rem;
@@ -138,7 +168,7 @@
     }
 
     .search-input {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.85rem;
         font-weight: 500;
         padding: 0.5rem 1rem;
@@ -179,7 +209,7 @@
         color: #2C2C2C;
         border-radius: 20px;
         cursor: pointer;
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.85rem;
         font-weight: 500;
         transition: all 0.3s ease;
@@ -209,7 +239,7 @@
         color: #2C2C2C;
         border-radius: 20px;
         cursor: pointer;
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.85rem;
         font-weight: 500;
         transition: all 0.3s ease;
@@ -234,7 +264,7 @@
         padding: 0.35rem 0.85rem;
         border-radius: 12px;
         font-size: 0.7rem;
-        font-weight: 600;
+        font-weight: 450;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         z-index: 1;
@@ -274,7 +304,7 @@
     .status-option {
         padding: 0.5rem 0.75rem;
         cursor: pointer;
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.75rem;
         font-weight: 500;
         text-transform: capitalize;
@@ -398,7 +428,7 @@
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         position: relative;
         transition: box-shadow 0.3s ease;
         min-height: 400px;
@@ -419,10 +449,10 @@
         }
         
         .artist-name {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 400;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 450;
         font-size: 1.25rem;
-        letter-spacing: -0.02em;
+        letter-spacing: 0;
         padding-right: 140px;
         word-wrap: break-word;
         }
@@ -434,7 +464,7 @@
         text-decoration: none;
         width: fit-content;
         color: #95392E;
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-weight: 500;
         }
         
@@ -570,7 +600,7 @@
         border-radius: 8px;
         width: 240px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         z-index: 10000;
         }
 
@@ -583,7 +613,8 @@
         }
 
         .lightbox-info-label {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
         font-size: 1rem;
         font-weight: 400;
         margin-bottom: 0.35rem;
@@ -671,7 +702,7 @@
         padding: 0.5rem 1rem;
         border-radius: 20px;
         font-size: 0.9rem;
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         z-index: 10001;
         backdrop-filter: blur(4px);
         }
@@ -743,12 +774,12 @@
         }
         
         .label {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-weight: 600;
         }
         
         .notes {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.85rem;
         font-style: italic;
         color: #666;
@@ -759,11 +790,11 @@
         }
         
         .field-item {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         }
         
         .website-link {
-        font-family: 'Satoshi', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
         color: #95392E;
         text-decoration: none;
         font-weight: 500;
@@ -820,7 +851,8 @@
         }
         
         .footer-brand {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
         font-size: 1.8rem;
         font-weight: 700;
         color: #2C2C2C;
@@ -846,11 +878,12 @@
         }
 
         .nav-title {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Suisse Intl', sans-serif;
+            font-weight: 500;
             font-size: 2rem;
-            font-weight: 300;
             margin: 0;
-            letter-spacing: -0.02em;
+            letter-spacing: 0;
+            text-transform: lowercase;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -884,7 +917,8 @@
             margin: 0 0 1rem 0;
             font-size: 1.8rem;
             text-align: left;
-            font-weight: 600;
+            font-weight: 500;
+            letter-spacing: 0;
         }
 
         .logo:hover {
@@ -921,7 +955,8 @@
             font-size: 2.75rem;
             text-align: center;
             width: 100%;
-            font-weight: 400;
+            font-weight: 500;
+            letter-spacing: 0;
         }
 
         .logo:hover {
@@ -964,7 +999,7 @@
     font-size: 0.85rem;
     border-radius: 20px;
     cursor: pointer;
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-weight: 500;
     width: 100%;
     box-sizing: border-box;
@@ -1159,18 +1194,18 @@
 
     /* Dark mode styles */
     body.dark-mode {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
+        background-color: #2C2C2C;
+        color: #F3EFE9;
     }
 
     body.dark-mode .logo {
-        background: #1a1a1a;
+        background: #2C2C2C;
         border-color: #D6B370;
         color: #D6B370;
     }
 
     body.dark-mode .nav-title.active {
-        color: #e0e0e0;
+        color: #F3EFE9;
     }
 
     body.dark-mode .nav-title:not(.active) {
@@ -1183,7 +1218,7 @@
     }
 
     body.dark-mode .summary-label {
-        color: #b0b0b0;
+        color: rgba(243, 239, 233, 0.7);
     }
 
     body.dark-mode .card {
@@ -1192,7 +1227,7 @@
     }
 
     body.dark-mode .artist-name {
-        color: #e0e0e0;
+        color: #F3EFE9;
     }
 
     body.dark-mode .insta-link {
@@ -1201,7 +1236,7 @@
 
     body.dark-mode .search-input {
         background: #2a2a2a;
-        color: #e0e0e0;
+        color: #F3EFE9;
         border-color: #D6B370;
     }
 
@@ -1216,7 +1251,7 @@
     body.dark-mode .clear-btn,
     body.dark-mode .status-btn {
         background: transparent;
-        color: #e0e0e0;
+        color: #F3EFE9;
         border-color: #D6B370;
     }
 
@@ -1233,7 +1268,7 @@
 
     body.dark-mode .filter-select {
         background: #2a2a2a;
-        color: #e0e0e0;
+        color: #F3EFE9;
         border-color: #D6B370;
     }
 
@@ -1251,7 +1286,7 @@
     }
 
     body.dark-mode .lightbox-info-label {
-        color: #e0e0e0;
+        color: #F3EFE9;
     }
 
     body.dark-mode .lightbox-info-item span:not(.lightbox-info-label) {
@@ -1259,7 +1294,7 @@
     }
 
     body.dark-mode .lightbox-info-item a {
-        color: #e0e0e0;
+        color: #F3EFE9;
     }
 
     body.dark-mode .image-indicators {
@@ -1279,11 +1314,11 @@
     }
 
     body.dark-mode .website-link {
-        color: #b0b0b0;
+        color: rgba(243, 239, 233, 0.7);
     }
 
     body.dark-mode .similar-artist-link {
-        color: #b0b0b0;
+        color: rgba(243, 239, 233, 0.7);
     }
 
     body.dark-mode .tag-link {
@@ -1301,11 +1336,11 @@
     }
 
     body.dark-mode .notes {
-        color: #b0b0b0;
+        color: rgba(243, 239, 233, 0.7);
     }
 
     body.dark-mode .footer-brand {
-        color: #e0e0e0;
+        color: #F3EFE9;
     }
 
     body.dark-mode .footer-brand:hover {
@@ -1333,12 +1368,12 @@
     }
 
     body.dark-mode .field-item {
-        color: #b0b0b0;
+        color: rgba(243, 239, 233, 0.7);
     }
 
     @media (max-width: 768px) {
         body.dark-mode #filters {
-            background-color: #1a1a1a;
+            background-color: #2C2C2C;
             border-color: rgba(214, 179, 112, 0.3);
         }
     }
@@ -1373,7 +1408,8 @@
         font-size: 2.75rem !important;
         text-align: center !important;
         width: 100% !important;
-        font-weight: 400 !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.11em !important;
     }
 
     /* Enhanced search bar & filters for mobile */
@@ -1448,7 +1484,7 @@
     }
 
     body.dark-mode .status-filters::after {
-        background: linear-gradient(to right, transparent, #1a1a1a);
+        background: linear-gradient(to right, transparent, #2C2C2C);
     }
 
     .status-btn {
@@ -1521,7 +1557,7 @@ html {
 }
 
 body {
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     background-color: var(--cream-bg);
     margin: 0;
     padding: 2rem;
@@ -1538,12 +1574,12 @@ body {
     top: 50%;
     transform: translateY(-50%);
     right: 0;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+    font-weight: 500;
     font-size: 2.2rem;
-    font-weight: 600;
     color: var(--deep-charcoal);
     text-decoration: none;
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
     text-transform: lowercase;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1551,7 +1587,7 @@ body {
 
 .logo:hover {
     color: var(--biscuit-gold);
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     transform: translateY(-50%) scale(1.02);
 }
 
@@ -1563,11 +1599,12 @@ body {
 }
 
 .nav-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+    font-weight: 500;
     font-size: 2rem;
-    font-weight: 300;
     margin: 0;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
+    text-transform: lowercase;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -1603,7 +1640,8 @@ body {
 }
 
 .summary-number {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-size: 1.75rem;
     font-weight: 400;
     color: #D6B370;
@@ -1613,7 +1651,7 @@ body {
 }
 
 .summary-label {
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 0.75rem;
     color: #8A8580;
     font-weight: 500;
@@ -1631,7 +1669,7 @@ body {
 }
 
 .section-navigation .nav-label {
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 0.85rem;
     color: #8A8580;
     font-weight: 500;
@@ -1639,7 +1677,7 @@ body {
 }
 
 .section-navigation .nav-link {
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
     color: #2C2C2C;
@@ -1718,9 +1756,9 @@ canvas {
 }
 
 .chart-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 1.3rem;
-    font-weight: 400;
+    font-weight: 450;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
     color: var(--deep-charcoal);
@@ -1774,7 +1812,7 @@ body.dark-mode .post-controls-bar {
     border: 1px solid rgba(214, 179, 112, 0.2);
     border-radius: 12px;
     font-weight: 500;
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     letter-spacing: 0.01em;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -1886,7 +1924,8 @@ body.dark-mode .post-controls-bar {
     font-size: 1rem;
     font-weight: 600;
     color: #2C2C2C;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
 }
 
 .funnel-percentage {
@@ -1937,7 +1976,7 @@ a.activity-item:hover {
 }
 
 .activity-name {
-    font-weight: 500;
+    font-weight: 400;
     color: #2C2C2C;
     margin-bottom: 0.2rem;
 }
@@ -1984,7 +2023,8 @@ a.activity-item:hover {
 }
 
 .performer-name {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-weight: 600;
     font-size: 1rem;
     color: #2C2C2C;
@@ -2001,7 +2041,8 @@ a.activity-item:hover {
 }
 
 .performer-stat-value {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-size: 1.75rem;
     font-weight: 700;
     color: #D6B370;
@@ -2041,7 +2082,8 @@ a.activity-item:hover {
 }
 
 .response-section-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-size: 1.1rem;
     font-weight: 500;
     margin: 0 0 1rem 0;
@@ -2074,7 +2116,8 @@ a.activity-item:hover {
 }
 
 .insight-value {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-size: 1.4rem;
     font-weight: 600;
     color: #95392E;
@@ -2217,7 +2260,8 @@ a.activity-item:hover {
 }
 
 .post-detail-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-size: 1.3rem;
     font-weight: 600;
     color: #2C2C2C;
@@ -2252,7 +2296,8 @@ a.activity-item:hover {
 }
 
 .post-detail-stat-value {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
     font-size: 1.5rem;
     font-weight: 600;
     color: #95392E;
@@ -2298,7 +2343,7 @@ a.activity-item:hover {
     background: rgba(214, 179, 112, 0.1);
     border: 1px solid rgba(214, 179, 112, 0.3);
     border-radius: 6px;
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 0.85rem;
     color: #2C2C2C;
     cursor: pointer;
@@ -2322,7 +2367,7 @@ a.activity-item:hover {
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(149, 57, 46, 0.3);
     border-radius: 6px;
-    font-family: 'Satoshi', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 0.75rem;
     color: #4A4A4A;
     cursor: pointer;
@@ -2370,7 +2415,8 @@ a.activity-item:hover {
         margin: 0 0 1rem 0;
         font-size: 1.8rem;
         text-align: left;
-        font-weight: 600;
+        font-weight: 500;
+        letter-spacing: 0;
     }
 
     .logo:hover {
@@ -2407,7 +2453,8 @@ a.activity-item:hover {
         font-size: 2.75rem;
         text-align: center;
         width: 100%;
-        font-weight: 400;
+        font-weight: 500;
+        letter-spacing: 0;
     }
 
     .logo:hover {
@@ -2498,7 +2545,8 @@ a.activity-item:hover {
     font-size: 2.75rem !important;
     text-align: center !important;
     width: 100% !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.11em !important;
   }
 
   .nav-section {
@@ -2839,18 +2887,18 @@ a.activity-item:hover {
 
 /* Dark mode styles */
 body.dark-mode {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
+    background-color: #2C2C2C;
+    color: #F3EFE9;
 }
 
 body.dark-mode .logo {
-    background: #1a1a1a;
+    background: #2C2C2C;
     border-color: #D6B370;
     color: #D6B370;
 }
 
 body.dark-mode .nav-title.active {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .nav-title:not(.active) {
@@ -2868,7 +2916,7 @@ body.dark-mode .section-navigation .nav-label {
 
 body.dark-mode .section-navigation .nav-link {
     background: transparent;
-    color: #e0e0e0;
+    color: #F3EFE9;
     border-color: #D6B370;
 }
 
@@ -2879,7 +2927,7 @@ body.dark-mode .section-navigation .nav-link:hover {
 }
 
 body.dark-mode .summary-label {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .chart-container {
@@ -2888,37 +2936,37 @@ body.dark-mode .chart-container {
 }
 
 body.dark-mode .chart-title {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .chart-subtitle {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .post-summary-stats {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
     background: linear-gradient(135deg, rgba(40, 40, 40, 0.9) 0%, rgba(40, 40, 40, 0.7) 100%);
     border-color: rgba(232, 200, 130, 0.2);
 }
 
 body.dark-mode .bar-label {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .bar-value {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .funnel-label {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .funnel-number {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .funnel-percentage {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .funnel-stage {
@@ -2944,22 +2992,22 @@ body.dark-mode .activity-item {
 }
 
 body.dark-mode .activity-name {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .activity-source {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
     background: rgba(214, 179, 112, 0.15);
 }
 
 body.dark-mode .activity-date {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .sort-btn {
     background: rgba(214, 179, 112, 0.15);
     border-color: rgba(214, 179, 112, 0.3);
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .sort-btn:hover {
@@ -3009,7 +3057,7 @@ body.dark-mode .post-performance-container::-webkit-scrollbar-track {
 }
 
 body.dark-mode .response-section-title {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .insight-item {
@@ -3024,7 +3072,7 @@ body.dark-mode .insight-value {
 
 body.dark-mode .insight-label,
 body.dark-mode .insight-detail {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .post-detail-card {
@@ -3033,11 +3081,11 @@ body.dark-mode .post-detail-card {
 }
 
 body.dark-mode .post-detail-title {
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .post-detail-meta {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .post-detail-stat {
@@ -3045,12 +3093,12 @@ body.dark-mode .post-detail-stat {
 }
 
 body.dark-mode .post-detail-stat-label {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .post-detail-notes {
     background: rgba(40, 40, 40, 0.6);
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
 
 body.dark-mode .post-detail-stat-value {
@@ -3062,10 +3110,10 @@ body.dark-mode .post-detail-stat-value.engagement {
 }
 
 body.dark-mode .post-detail-close {
-    color: #b0b0b0;
+    color: rgba(243, 239, 233, 0.7);
 }
 
 body.dark-mode .post-detail-close:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #e0e0e0;
+    color: #F3EFE9;
 }
