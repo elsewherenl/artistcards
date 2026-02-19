@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Analytics - Elsewhere Collective</title>
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="shortcut icon" type="image/png" href="favicon.png">
+<!-- Apple Touch Icon -->
 <link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap" rel="stylesheet" />
+<title>Analytics - Elsewhere Collective</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -75,6 +78,13 @@
             <div class="chart-title">Recent Additions</div>
             <div class="chart-subtitle">Last 20 artists added</div>
             <div class="activity-table" id="recentActivity">Loading...</div>
+        </div>
+
+        <!-- Artist Ranking -->
+        <div class="chart-container">
+            <div class="chart-title">Artist Ranking</div>
+            <div class="chart-subtitle">Distribution by potential (1 = highest, 5 = lowest)</div>
+            <div class="bar-chart" id="artistRankingChart">Loading...</div>
         </div>
 
         <!-- Pipeline Funnel -->
