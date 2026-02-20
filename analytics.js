@@ -726,6 +726,29 @@ function parseCSV(csv) {
     return result;
 }
 
+function cleanSourceLabel(source) {
+    // Clean up common patterns in source names
+    if (!source) return source;
+
+    // Remove "https://", "http://", "www."
+    let cleaned = source.replace(/^https?:\/\/(www\.)?/i, '');
+
+    // Remove trailing slashes
+    cleaned = cleaned.replace(/\/+$/, '');
+
+    // Truncate if too long (keep first part of domain or name)
+    if (cleaned.length > 30) {
+        // Try to split by slash and take first meaningful part
+        const parts = cleaned.split('/');
+        cleaned = parts[0];
+        if (cleaned.length > 30) {
+            cleaned = cleaned.substring(0, 27) + '...';
+        }
+    }
+
+    return cleaned;
+}
+
 function renderWhereFound(data) {
     const counts = {};
     data.forEach(row => {
@@ -754,8 +777,9 @@ function renderWhereFound(data) {
       const barItem = document.createElement('div');
       barItem.className = 'bar-item';
       const widthPercent = Math.round((count / maxCount) * 100);
+      const displayLabel = cleanSourceLabel(source);
       barItem.innerHTML = `
-          <div class="bar-label">${source}</div>
+          <div class="bar-label" title="${source}">${displayLabel}</div>
           <div class="bar" style="width: ${widthPercent}%;"></div>
           <div class="bar-value">${count}</div>
       `;
@@ -903,6 +927,15 @@ function renderArtistRanking(data) {
         rankingSubtitle.textContent = `Distribution by potential (1 = highest, 5 = lowest) — ${totalRanked} ranked artists`;
     }
 
+    // Color palette for rankings (warm sunset to earthy tones)
+    const rankingColors = {
+        '1': '#E8C48A', // Light warm gold - highest potential
+        '2': '#D6B370', // Primary gold
+        '3': '#B88B5D', // Warm brown
+        '4': '#A3674A', // Rich terracotta brown
+        '5': '#95392E'  // Deep terracotta - lowest ranking
+    };
+
     // Always display rankings 1-5 in order
     ['1', '2', '3', '4', '5'].forEach(ranking => {
         const count = rankingCounts[ranking];
@@ -910,10 +943,11 @@ function renderArtistRanking(data) {
         const barItem = document.createElement('div');
         barItem.className = 'bar-item';
         const widthPercent = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+        const barColor = rankingColors[ranking];
 
         barItem.innerHTML = `
             <div class="bar-label">Ranking ${ranking}</div>
-            <div class="bar" style="width: ${widthPercent}%;"></div>
+            <div class="bar" style="width: ${widthPercent}%; background: ${barColor};"></div>
             <div class="bar-value">${count} <span style="font-size: 0.85rem; color: #999;">(${percent}%)</span></div>
         `;
         container.appendChild(barItem);
@@ -1183,6 +1217,32 @@ function updateSummary(data, followerData = null, postData = null) {
         return addedDate && addedDate >= twoWeeksAgo;
     }).length;
 
+    // Calculate average new artists per week
+    let avgNewArtistsPerWeek = '-';
+    try {
+        const artistsWithDates = data
+            .filter(row => row["When Added"])
+            .map(row => ({ date: parseDate(row["When Added"]) }))
+            .filter(r => r.date && !isNaN(r.date))
+            .sort((a, b) => a.date - b.date);
+
+        if (artistsWithDates.length > 0) {
+            const weeklyAdds = {};
+            artistsWithDates.forEach(r => {
+                const week = `${r.date.getFullYear()}-W${getWeekNumber(r.date)}`;
+                if (!weeklyAdds[week]) weeklyAdds[week] = 0;
+                weeklyAdds[week]++;
+            });
+
+            const totalWeeks = Object.keys(weeklyAdds).length;
+            const totalArtists = artistsWithDates.length;
+            avgNewArtistsPerWeek = totalWeeks > 0 ? Math.round(totalArtists / totalWeeks) : '-';
+        }
+    } catch (error) {
+        console.error('Error calculating avg new artists per week:', error);
+        avgNewArtistsPerWeek = '-';
+    }
+
     // Count Planned Outreach
     const plannedOutreach = data.filter(row => {
         const status = (row["Current Status"] || "").toLowerCase().trim();
@@ -1191,6 +1251,7 @@ function updateSummary(data, followerData = null, postData = null) {
 
     // Update basic stats
     document.getElementById('summaryNewArtists').textContent = newArtists;
+    document.getElementById('summaryAvgNewArtists').textContent = avgNewArtistsPerWeek;
     document.getElementById('summaryPlannedOutreach').textContent = plannedOutreach;
 
     // Follower Growth (from follower data)
