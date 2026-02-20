@@ -451,10 +451,12 @@
         .artist-name {
         font-family: 'Suisse Intl', sans-serif;
         font-weight: 450;
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         letter-spacing: 0;
         padding-right: 140px;
-        word-wrap: break-word;
+        word-break: keep-all;
+        overflow-wrap: normal;
+        hyphens: none;
         }
         
         .insta-link {
