@@ -56,10 +56,33 @@
                 </div>
                 <form id="passwordForm">
                     <input
+                        type="email"
+                        id="emailInput"
+                        name="username"
+                        placeholder="Email"
+                        autocomplete="username"
+                        value="alex@elsewherecollective.nl"
+                        readonly
+                        style="
+                            width: 100%;
+                            padding: 1rem;
+                            border: 1px solid rgba(214, 179, 112, 0.3);
+                            border-radius: 0;
+                            font-size: 1rem;
+                            font-family: 'Suisse Intl', sans-serif;
+                            box-sizing: border-box;
+                            margin-bottom: 1rem;
+                            background: rgba(255, 255, 255, 0.4);
+                            color: #2C2C2C;
+                            opacity: 0.8;
+                        "
+                    />
+                    <input
                         type="password"
                         id="passwordInput"
+                        name="password"
                         placeholder="Password"
-                        autocomplete="off"
+                        autocomplete="current-password"
                         style="
                             width: 100%;
                             padding: 1rem;
