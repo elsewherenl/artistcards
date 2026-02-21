@@ -91,11 +91,11 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(214, 179, 112, 0.15);
         border-radius: 0;
-        padding: 1.5rem;
+        padding: 1.5rem 3rem;
         margin-bottom: 2rem;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 2rem;
+        gap: 3rem;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
         
@@ -1629,11 +1629,11 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(214, 179, 112, 0.15);
     border-radius: 0;
-    padding: 1.5rem;
+    padding: 1.5rem 3rem;
     margin-bottom: 2rem;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -2447,8 +2447,9 @@ a.activity-item:hover {
     }
 
     .summary {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        padding: 1.5rem 2rem;
     }
 }
 
