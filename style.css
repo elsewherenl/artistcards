@@ -1829,6 +1829,57 @@ body.dark-mode .post-controls-bar {
     overflow: hidden;
 }
 
+.where-found-chart {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: flex-start;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar styling for Where Found chart */
+.where-found-chart::-webkit-scrollbar {
+    width: 8px;
+}
+
+.where-found-chart::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.1);
+    border-radius: 4px;
+}
+
+.where-found-chart::-webkit-scrollbar-thumb {
+    background: rgba(214, 179, 112, 0.4);
+    border-radius: 4px;
+}
+
+.where-found-chart::-webkit-scrollbar-thumb:hover {
+    background: rgba(214, 179, 112, 0.6);
+}
+
+.source-performance-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.source-performance-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.source-performance-wrapper::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.1);
+    border-radius: 4px;
+}
+
+.source-performance-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(214, 179, 112, 0.4);
+    border-radius: 4px;
+}
+
+.source-performance-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(214, 179, 112, 0.6);
+}
+
 .bar-item {
     display: flex;
     align-items: center;
@@ -2609,6 +2660,18 @@ a.activity-item:hover {
     padding: 0 1rem !important;
   }
 
+  /* Reset Where Found scrolling on mobile */
+  .where-found-chart {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  /* Reset Source Performance scrolling on mobile */
+  .source-performance-wrapper {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
   .bar-item {
     width: 100% !important;
     max-width: 100% !important;
@@ -3118,4 +3181,28 @@ body.dark-mode .post-detail-close {
 body.dark-mode .post-detail-close:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #F3EFE9;
+}
+
+body.dark-mode .where-found-chart::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.15);
+}
+
+body.dark-mode .where-found-chart::-webkit-scrollbar-thumb {
+    background: rgba(214, 179, 112, 0.3);
+}
+
+body.dark-mode .where-found-chart::-webkit-scrollbar-thumb:hover {
+    background: rgba(214, 179, 112, 0.5);
+}
+
+body.dark-mode .source-performance-wrapper::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.15);
+}
+
+body.dark-mode .source-performance-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(214, 179, 112, 0.3);
+}
+
+body.dark-mode .source-performance-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(214, 179, 112, 0.5);
 }
