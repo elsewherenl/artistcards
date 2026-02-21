@@ -855,20 +855,20 @@
         .footer-brand {
         font-family: 'Suisse Intl', sans-serif;
         font-weight: 500;
-        font-size: 1.8rem;
-        font-weight: 700;
+        font-size: 2.2rem;
         color: #2C2C2C;
-        letter-spacing: -0.02em;
+        text-decoration: none;
+        letter-spacing: 0;
         text-transform: lowercase;
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
         }
-        
+
         .footer-brand:hover {
-        transform: scale(1.05);
-        transform-origin: left center;
         color: #D6B370;
-        letter-spacing: 0.02em;
+        letter-spacing: 0;
+        transform: scale(1.02);
         }
 
         /* Navigation section styles (updated to match Analytics.html) */
