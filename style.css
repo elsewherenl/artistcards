@@ -1411,7 +1411,7 @@
         text-align: center !important;
         width: 100% !important;
         font-weight: 500 !important;
-        letter-spacing: 0.11em !important;
+        letter-spacing: 0 !important;
     }
 
     /* Enhanced search bar & filters for mobile */
@@ -2599,7 +2599,7 @@ a.activity-item:hover {
     text-align: center !important;
     width: 100% !important;
     font-weight: 500 !important;
-    letter-spacing: 0.11em !important;
+    letter-spacing: 0 !important;
   }
 
   .nav-section {
