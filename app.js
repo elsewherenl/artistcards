@@ -315,7 +315,17 @@
             return;
         }
 
-        // 8. Sort order (reset to default)
+        // 8. Ranking filter
+        if (selectedRankings.length > 0) {
+            console.log('Clearing ranking filter');
+            rankingCheckboxes.forEach(cb => cb.checked = false);
+            selectedRankings = [];
+            rankingDisplay.textContent = "All";
+            refreshUI();
+            return;
+        }
+
+        // 9. Sort order (reset to default)
         if (sortBySelect && sortBySelect.value !== "rankingHighLow") {
             console.log('Resetting sort order');
             sortBySelect.value = "rankingHighLow";
@@ -372,6 +382,53 @@
         setTimeout(() => {
             document.addEventListener('click', function closeSelector(e) {
                 if (!selector.contains(e.target) && e.target !== statusBadge) {
+                    selector.remove();
+                    document.removeEventListener('click', closeSelector);
+                }
+            });
+        }, 10);
+    }
+
+    // Ranking selector function
+    function createRankingSelector(rankingBadge, currentRanking, artistName) {
+        // Remove any existing selectors
+        const existingSelector = rankingBadge.parentElement.querySelector('.ranking-selector');
+        if (existingSelector) {
+            existingSelector.remove();
+            return;
+        }
+
+        // Create dropdown
+        const selector = document.createElement('div');
+        selector.className = 'ranking-selector active';
+
+        // Add ranking options 1-5
+        const rankings = ['1', '2', '3', '4', '5'];
+        rankings.forEach(rank => {
+            const option = document.createElement('div');
+            option.className = 'ranking-option';
+            option.textContent = rank;
+
+            // Highlight current ranking
+            if (rank === currentRanking.toString()) {
+                option.style.background = 'rgba(214, 179, 112, 0.2)';
+                option.style.fontWeight = '700';
+            }
+
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateArtistRanking(artistName, rank, rankingBadge, selector);
+            });
+
+            selector.appendChild(option);
+        });
+
+        rankingBadge.parentElement.appendChild(selector);
+
+        // Close selector when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', function closeSelector(e) {
+                if (!selector.contains(e.target) && e.target !== rankingBadge) {
                     selector.remove();
                     document.removeEventListener('click', closeSelector);
                 }
@@ -441,6 +498,80 @@
             console.error('Error message:', error.message);
             statusBadge.classList.remove('status-updating');
             statusBadge.textContent = statusBadge.getAttribute('data-original-status');
+            selector.remove();
+            showStatusMessage('✗ Failed to update: ' + error.message, 'error');
+        }
+    }
+
+    async function updateArtistRanking(artistName, newRanking, rankingBadge, selector) {
+        // Check if Apps Script URL is configured
+        if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+            alert('Please configure the Google Apps Script URL first!\n\nSee the setup instructions in GoogleAppsScript.gs');
+            selector.remove();
+            return;
+        }
+
+        // Add updating state
+        rankingBadge.classList.add('ranking-updating');
+        rankingBadge.textContent = 'Updating...';
+
+        try {
+            console.log('=== RANKING UPDATE DEBUG ===');
+            console.log('Artist Name (raw):', artistName);
+            console.log('Artist Name (type):', typeof artistName);
+            console.log('New Ranking (raw):', newRanking);
+            console.log('New Ranking (type):', typeof newRanking);
+
+            // Use GET with URL parameters for Google Apps Script compatibility
+            const url = `${APPS_SCRIPT_URL}?artistName=${encodeURIComponent(artistName)}&newRanking=${encodeURIComponent(newRanking)}`;
+
+            console.log('Sending request to:', url);
+            console.log('Artist:', artistName);
+            console.log('New Ranking:', newRanking);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+
+            console.log('Response received:', response);
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
+            // Try to read the response
+            let result;
+            try {
+                const text = await response.text();
+                console.log('Response text:', text);
+                result = JSON.parse(text);
+                console.log('Parsed result:', result);
+            } catch (e) {
+                console.log('Could not parse response:', e);
+                result = { success: true }; // Assume success if we can't parse
+            }
+
+            if (response.ok && result.success !== false) {
+                // Update badge
+                rankingBadge.textContent = `Rank: ${newRanking}`;
+                rankingBadge.className = 'ranking-badge';
+                rankingBadge.classList.remove('ranking-updating');
+                rankingBadge.setAttribute('data-original-ranking', newRanking);
+
+                // Remove selector
+                selector.remove();
+
+                // Show success message
+                showStatusMessage('✓ Ranking updated to: ' + newRanking, 'success');
+            } else {
+                throw new Error(result.message || 'Update failed - check Google Apps Script logs');
+            }
+
+        } catch (error) {
+            console.error('Error updating ranking:', error);
+            console.error('Error name:', error.name);
+            console.error('Error message:', error.message);
+            rankingBadge.classList.remove('ranking-updating');
+            rankingBadge.textContent = `Rank: ${rankingBadge.getAttribute('data-original-ranking')}`;
             selector.remove();
             showStatusMessage('✗ Failed to update: ' + error.message, 'error');
         }
@@ -575,6 +706,48 @@
         const followersSelect = document.getElementById("followersFilter");
         const sortBySelect = document.getElementById("sortByFilter");
 
+        // Custom ranking dropdown elements
+        const rankingTrigger = document.getElementById("rankingTrigger");
+        const rankingMenu = document.getElementById("rankingMenu");
+        const rankingDisplay = document.getElementById("rankingDisplay");
+        const rankingCheckboxes = document.querySelectorAll(".ranking-checkbox");
+        let selectedRankings = [];
+
+        // Toggle dropdown
+        rankingTrigger.addEventListener("click", (e) => {
+            e.stopPropagation();
+            rankingTrigger.classList.toggle("active");
+            rankingMenu.classList.toggle("active");
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!document.getElementById("rankingDropdown").contains(e.target)) {
+                rankingTrigger.classList.remove("active");
+                rankingMenu.classList.remove("active");
+            }
+        });
+
+        // Handle checkbox changes
+        rankingCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", () => {
+                selectedRankings = Array.from(rankingCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                // Update display text
+                if (selectedRankings.length === 0) {
+                    rankingDisplay.textContent = "All";
+                } else if (selectedRankings.length === 1) {
+                    rankingDisplay.textContent = selectedRankings[0];
+                } else {
+                    rankingDisplay.textContent = selectedRankings.join(", ");
+                }
+
+                refreshUI();
+            });
+        });
+
         // Store all data for re-filtering
         let fullData = data;
 
@@ -689,7 +862,14 @@
                 else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
                 else if (followersRange === "10kplus") followersMatch = followers > 10000;
 
-                return statusMatch && searchMatch && genreMatch && whereFoundMatch && tagMatch && followersMatch;
+                // Ranking filter - multi-select
+                let rankingMatch = true;
+                if (selectedRankings.length > 0) {
+                    const rowRanking = (row["Ranking"] || "").toString().trim();
+                    rankingMatch = selectedRankings.includes(rowRanking);
+                }
+
+                return statusMatch && searchMatch && genreMatch && whereFoundMatch && tagMatch && followersMatch && rankingMatch;
             });
         }
 
@@ -816,6 +996,10 @@
             const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
             card.id = `artist-${artistNameForId}`;
 
+            // Add badges container (positioned absolutely in top-right)
+            const badgesContainer = document.createElement("div");
+            badgesContainer.className = "badges-container";
+
             // Add status badge (now clickable)
             const status = row["Current Status"] || "Prospect";
             const artistName = row["Artist"] || row["Instagram Name"] || "Untitled";
@@ -831,7 +1015,27 @@
                 createStatusSelector(statusBadge, status, artistName);
             });
 
-            card.appendChild(statusBadge);
+            badgesContainer.appendChild(statusBadge);
+
+            // Add ranking badge (clickable)
+            const ranking = row["Ranking"] || "";
+            if (ranking) {
+                const rankingBadge = document.createElement("div");
+                rankingBadge.className = "ranking-badge";
+                rankingBadge.textContent = `Rank: ${ranking}`;
+                rankingBadge.setAttribute('data-original-ranking', ranking);
+                rankingBadge.setAttribute('title', 'Click to change ranking');
+
+                // Make ranking badge clickable
+                rankingBadge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    createRankingSelector(rankingBadge, ranking, artistName);
+                });
+
+                badgesContainer.appendChild(rankingBadge);
+            }
+
+            card.appendChild(badgesContainer);
 
             const name = document.createElement("div");
             name.className = "artist-name";
@@ -1032,6 +1236,28 @@
                     card.appendChild(el);
                 }
             });
+
+            // Add Price Estimate if present (Column AE) - only show if there's a number
+            const priceEstimate = row["Price Estimate"] || "";
+            const priceSource = row["Price Source"] || "";
+            if (priceEstimate && priceEstimate.toString().trim()) {
+                const priceContainer = document.createElement("div");
+                priceContainer.className = "price-info";
+
+                const priceEstimateEl = document.createElement("div");
+                priceEstimateEl.className = "field-item price-estimate-item";
+                priceEstimateEl.innerHTML = `<span class="label">Indicative Pricing:</span> ${priceEstimate}`;
+                priceContainer.appendChild(priceEstimateEl);
+
+                if (priceSource && priceSource.toString().trim()) {
+                    const priceSourceEl = document.createElement("div");
+                    priceSourceEl.className = "field-item price-source-item";
+                    priceSourceEl.innerHTML = `<span class="label">Price Source:</span> ${priceSource}`;
+                    priceContainer.appendChild(priceSourceEl);
+                }
+
+                card.appendChild(priceContainer);
+            }
 
             // Add Similar Artists if present
             if (row["Similar Artists"] && row["Similar Artists"].toString().trim()) {
@@ -1450,6 +1676,9 @@
         genreSelect.value = "All";
         whereFoundSelect.value = "All";
         followersSelect.value = "All";
+        rankingCheckboxes.forEach(cb => cb.checked = false);
+        selectedRankings = [];
+        rankingDisplay.textContent = "All";
         sortBySelect.value = "rankingHighLow";
         searchInput.value = "";
         currentSearchTerm = "";
