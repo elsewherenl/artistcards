@@ -1010,27 +1010,22 @@
 
         /* Price info styling */
         .price-info {
-        margin-top: 0.75rem;
-        padding: 0.75rem;
-        background: linear-gradient(135deg, rgba(214, 179, 112, 0.08) 0%, rgba(214, 179, 112, 0.03) 100%);
-        border-left: 3px solid #D6B370;
-        border-radius: 4px;
+        margin-top: 0;
         }
 
         .price-estimate-item {
-        font-weight: 500;
         color: #2C2C2C;
         }
 
         .price-estimate-item .label {
-        color: #95392E;
+        color: #D6B370;
         font-weight: 500;
         }
 
         .price-source-item {
         font-size: 0.85rem;
         margin-top: 0.25rem;
-        opacity: 0.9;
+        color: #2C2C2C;
         }
         
         .website-link:hover {
@@ -1660,13 +1655,8 @@
         color: rgba(243, 239, 233, 0.7);
     }
 
-    body.dark-mode .price-info {
-        background: linear-gradient(135deg, rgba(214, 179, 112, 0.12) 0%, rgba(214, 179, 112, 0.05) 100%);
-        border-left-color: #D6B370;
-    }
-
     body.dark-mode .price-estimate-item {
-        color: #F3EFE9;
+        color: rgba(243, 239, 233, 0.6);
     }
 
     body.dark-mode .price-estimate-item .label {
@@ -1674,7 +1664,7 @@
     }
 
     body.dark-mode .price-source-item {
-        color: rgba(243, 239, 233, 0.8);
+        color: rgba(243, 239, 233, 0.6);
     }
 
     @media (max-width: 768px) {
