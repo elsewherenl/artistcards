@@ -346,9 +346,9 @@
         top: 1rem;
         right: 1rem;
         display: flex;
+        flex-direction: column;
         gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
+        align-items: flex-end;
         max-width: calc(100% - 2rem);
         z-index: 1;
     }
