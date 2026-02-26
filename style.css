@@ -2003,6 +2003,27 @@ body {
     margin: 0;
 }
 
+/* Three-column cards for Recent Additions and Artist Rankings */
+@media (min-width: 1400px) {
+    .analytics-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .three-col-card {
+        grid-column: span 2;
+    }
+
+    .chart-container:not(.three-col-card):not(.recent-full-width):not(.response-analytics-full):not(.post-performance-full) {
+        grid-column: span 3;
+    }
+
+    .recent-full-width,
+    .response-analytics-full,
+    .post-performance-full {
+        grid-column: 1 / -1;
+    }
+}
+
 .chart-container {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
