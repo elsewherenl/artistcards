@@ -2123,6 +2123,10 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderPostPerformance(postPerformanceData);
         updateSummary(artistData, followerGrowthData, postPerformanceData);
 
+        // Render spotlight calendar
+        spotlightCalendarData = postPerformanceData;
+        renderSpotlightCalendar(spotlightCalendarData, currentCalendarPeriod);
+
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1441529947&timestamp=${Date.now()}`);
     })
     .then(res => res.text())
@@ -2212,3 +2216,295 @@ function initDarkMode() {
 
 // Initialize dark mode on page load
 initDarkMode();
+
+// ============================================
+// SPOTLIGHT ACTIVITY CALENDAR
+// ============================================
+
+let spotlightCalendarData = [];
+let currentCalendarPeriod = 4; // Default to 4 weeks
+let currentCalendarIndex = 0;
+let calendarMonths = [];
+
+function renderSpotlightCalendar(postData, weeksToShow = 4) {
+    const container = document.getElementById('spotlightCalendar');
+    if (!container) return;
+
+    // Extract dates from post data
+    const spotlightDates = {};
+    postData.forEach(row => {
+        const dateStr = row["Post Date"];
+        if (dateStr && dateStr.trim()) {
+            const date = parseDate(dateStr);
+            if (date && !isNaN(date.getTime())) {
+                const dateKey = date.toISOString().split('T')[0];
+                if (!spotlightDates[dateKey]) {
+                    spotlightDates[dateKey] = [];
+                }
+                spotlightDates[dateKey].push({
+                    artist: row["Artist"] || "Unknown",
+                    reach: row["Reach"] || 0,
+                    views: row["Views"] || 0
+                });
+            }
+        }
+    });
+
+    // Determine date range
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let startDate;
+    if (weeksToShow === 'all') {
+        // Find earliest spotlight date
+        const allDates = Object.keys(spotlightDates).map(d => new Date(d)).sort((a, b) => a - b);
+        if (allDates.length > 0) {
+            startDate = new Date(allDates[0]);
+            startDate.setDate(1); // Start from beginning of that month
+        } else {
+            startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - 27); // Default to 4 weeks
+        }
+    } else {
+        startDate = new Date(today);
+        startDate.setDate(startDate.getDate() - (weeksToShow * 7 - 1));
+    }
+
+    // Round to beginning of week (Monday)
+    const dayOfWeek = startDate.getDay();
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    startDate.setDate(startDate.getDate() + diff);
+
+    // Calculate total weeks in the period for average calculation
+    const periodDays = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24));
+    const periodWeeks = periodDays / 7;
+
+    // Generate months to display
+    calendarMonths = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= today) {
+        const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+
+        if (!calendarMonths.find(m => m.key === monthKey)) {
+            calendarMonths.push({
+                key: monthKey,
+                year: currentDate.getFullYear(),
+                month: currentDate.getMonth(),
+                monthName: currentDate.toLocaleString('default', { month: 'long' })
+            });
+        }
+
+        currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    // Reverse to show most recent first
+    calendarMonths.reverse();
+
+    // Reset to first month
+    currentCalendarIndex = 0;
+
+    // Build calendar HTML
+    let html = '';
+
+    calendarMonths.forEach((monthData, index) => {
+        const firstDayOfMonth = new Date(monthData.year, monthData.month, 1);
+        const lastDayOfMonth = new Date(monthData.year, monthData.month + 1, 0);
+
+        // Count spotlights in this month
+        let monthSpotlights = 0;
+        for (let d = 1; d <= lastDayOfMonth.getDate(); d++) {
+            const checkDate = new Date(monthData.year, monthData.month, d);
+            const dateKey = checkDate.toISOString().split('T')[0];
+            if (spotlightDates[dateKey]) {
+                monthSpotlights += spotlightDates[dateKey].length;
+            }
+        }
+
+        // Calculate average per week for this month
+        const daysInMonth = lastDayOfMonth.getDate();
+        const weeksInMonth = daysInMonth / 7;
+        const avgPerWeek = weeksInMonth > 0 ? (monthSpotlights / weeksInMonth).toFixed(1) : '0.0';
+
+        html += '<div class="calendar-month">';
+        html += '<div class="calendar-header">';
+        html += `<span class="calendar-month-name">${monthData.monthName}</span>`;
+        html += `<span class="calendar-year">${monthData.year}</span>`;
+        html += '<div class="calendar-stats">';
+        html += '<div class="calendar-stat">';
+        html += '<span class="calendar-stat-label">Spotlights:</span>';
+        html += `<span class="calendar-stat-value">${monthSpotlights}</span>`;
+        html += '</div>';
+        html += '<div class="calendar-stat">';
+        html += '<span class="calendar-stat-label">Avg/Week:</span>';
+        html += `<span class="calendar-stat-value">${avgPerWeek}</span>`;
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        // Weekday headers
+        html += '<div class="calendar-weekdays">';
+        ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach(day => {
+            html += `<div class="calendar-weekday">${day}</div>`;
+        });
+        html += '</div>';
+
+        // Calendar grid
+        html += '<div class="calendar-grid">';
+
+        // Add empty cells for days before month starts
+        const firstDayWeekday = firstDayOfMonth.getDay();
+        const emptyCellsBefore = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+        for (let i = 0; i < emptyCellsBefore; i++) {
+            html += '<div class="calendar-day empty"></div>';
+        }
+
+        // Add days of month
+        for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+            const date = new Date(monthData.year, monthData.month, day);
+            const dateKey = date.toISOString().split('T')[0];
+            const hasActivity = spotlightDates[dateKey];
+            const isToday = dateKey === today.toISOString().split('T')[0];
+            const isFuture = date > today;
+
+            let classes = 'calendar-day';
+            if (hasActivity) classes += ' has-activity';
+            if (isToday) classes += ' today';
+            if (isFuture) classes += ' future';
+
+            const title = hasActivity
+                ? `${hasActivity.length} spotlight${hasActivity.length > 1 ? 's' : ''}: ${hasActivity.map(a => a.artist).join(', ')}`
+                : '';
+
+            html += `<div class="${classes}" title="${title}" data-date="${dateKey}">${day}</div>`;
+        }
+
+        html += '</div>'; // End calendar-grid
+        html += '</div>'; // End calendar-month
+    });
+
+    container.innerHTML = html;
+    updateCarouselPosition();
+
+    // Add click handlers for days with activity
+    container.querySelectorAll('.calendar-day.has-activity').forEach(dayEl => {
+        dayEl.addEventListener('click', function() {
+            const dateKey = this.getAttribute('data-date');
+            const posts = spotlightDates[dateKey];
+            if (posts && posts.length > 0) {
+                let message = `Spotlights on ${new Date(dateKey).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}:\n\n`;
+                posts.forEach((post, i) => {
+                    message += `${i + 1}. ${post.artist}\n`;
+                    message += `   Reach: ${post.reach.toLocaleString()}, Views: ${post.views.toLocaleString()}\n`;
+                });
+                alert(message);
+            }
+        });
+    });
+
+    // Update navigation buttons
+    updateNavigationButtons();
+}
+
+function updateCarouselPosition() {
+    const container = document.getElementById('spotlightCalendar');
+    if (!container) return;
+
+    const translateX = -(currentCalendarIndex * 100);
+    container.style.transform = `translateX(${translateX}%)`;
+}
+
+function updateNavigationButtons() {
+    const prevBtn = document.querySelector('.calendar-prev');
+    const nextBtn = document.querySelector('.calendar-next');
+
+    if (prevBtn) {
+        prevBtn.disabled = currentCalendarIndex >= calendarMonths.length - 1;
+    }
+    if (nextBtn) {
+        nextBtn.disabled = currentCalendarIndex <= 0;
+    }
+}
+
+function navigateCalendar(direction) {
+    if (direction === 'prev' && currentCalendarIndex < calendarMonths.length - 1) {
+        currentCalendarIndex++;
+    } else if (direction === 'next' && currentCalendarIndex > 0) {
+        currentCalendarIndex--;
+    }
+
+    updateCarouselPosition();
+    updateNavigationButtons();
+}
+
+function initSpotlightCalendar() {
+    const periodButtons = document.querySelectorAll('.calendar-period-btn');
+    const prevBtn = document.querySelector('.calendar-prev');
+    const nextBtn = document.querySelector('.calendar-next');
+
+    periodButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active state
+            periodButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // Get period
+            const period = this.getAttribute('data-period');
+            currentCalendarPeriod = period === 'all' ? 'all' : parseInt(period);
+
+            // Re-render calendar
+            if (spotlightCalendarData.length > 0) {
+                renderSpotlightCalendar(spotlightCalendarData, currentCalendarPeriod);
+            }
+        });
+    });
+
+    // Navigation buttons
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => navigateCalendar('prev'));
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => navigateCalendar('next'));
+    }
+
+    // Touch swipe support
+    const carousel = document.querySelector('.calendar-carousel');
+    if (carousel) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carousel.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carousel.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swiped left - show next (older month)
+                    navigateCalendar('prev');
+                } else {
+                    // Swiped right - show previous (newer month)
+                    navigateCalendar('next');
+                }
+            }
+        }
+    }
+}
+
+// Initialize calendar when data is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initSpotlightCalendar();
+});
