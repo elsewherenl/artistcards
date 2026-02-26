@@ -538,7 +538,8 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                         }
                     },
                     grid: {
-                        drawOnChartArea: false
+                        drawOnChartArea: true,
+                        color: 'rgba(214, 179, 112, 0.1)'
                     },
                     beginAtZero: true
                 },
@@ -1849,7 +1850,7 @@ function renderSourcePerformance(data) {
     contacted.forEach(row => {
         const method = (row["Contact Method"] || "Not Specified").trim();
         if (!methodStats[method]) {
-            methodStats[method] = { contacted: 0, responded: 0, positiveResponse: 0, spotlighted: 0 };
+            methodStats[method] = { contacted: 0, responded: 0, positiveResponse: 0, spotlighted: 0, noResponse: 0 };
         }
         methodStats[method].contacted++;
 
@@ -1862,6 +1863,9 @@ function renderSourcePerformance(data) {
             methodStats[method].positiveResponse++;
         } else if (dateResponded || respStatus.toLowerCase().includes("responded")) {
             methodStats[method].responded++;
+        } else if (!dateResponded && !respStatus.toLowerCase().includes("responded")) {
+            // No response if no date responded and status doesn't indicate a response
+            methodStats[method].noResponse++;
         }
 
         // Check if spotlighted (has a date in Spotlighted column)
@@ -1879,6 +1883,7 @@ function renderSourcePerformance(data) {
             responded: methodStats[method].responded,
             positiveResponse: methodStats[method].positiveResponse,
             spotlighted: methodStats[method].spotlighted,
+            noResponse: methodStats[method].noResponse,
             responseRate: methodStats[method].contacted > 0
                 ? Math.round((methodStats[method].responded / methodStats[method].contacted) * 100)
                 : 0,
@@ -1887,6 +1892,9 @@ function renderSourcePerformance(data) {
                 : 0,
             spotlightedRate: methodStats[method].contacted > 0
                 ? Math.round((methodStats[method].spotlighted / methodStats[method].contacted) * 100)
+                : 0,
+            noResponseRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].noResponse / methodStats[method].contacted) * 100)
                 : 0
         }))
         .filter(m => m.contacted >= 2) // Only show methods with 2+ contacts
@@ -1912,6 +1920,7 @@ function renderSourcePerformance(data) {
                         <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Method</th>
                         <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Contacts</th>
                         <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Response</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">No Response</th>
                         <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Positive</th>
                         <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Featured</th>
                     </tr>
@@ -1932,6 +1941,12 @@ function renderSourcePerformance(data) {
                             ${m.responseRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.responded}/${m.contacted})</span>
+                    </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.noResponseRate >= 60 ? '#B8503F' : m.noResponseRate >= 40 ? '#D6B370' : '#8A8580'};">
+                            ${m.noResponseRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.noResponse}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
                         <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#A8B5A0' : m.positiveRate >= 20 ? '#D6B370' : '#8A8580'};">
