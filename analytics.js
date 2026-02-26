@@ -955,6 +955,115 @@ function renderArtistRanking(data) {
     });
 }
 
+function renderArtistRankingLast4Weeks(data) {
+    // Get artists added in the last 4 weeks
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+
+    // Filter for artists added in last 4 weeks
+    const recentArtists = data.filter(row => {
+        const dateAdded = row["When Added"];
+        if (!dateAdded) return false;
+        const addedDate = parseDate(dateAdded);
+        return addedDate && addedDate >= fourWeeksAgo;
+    });
+
+    // Count artists by ranking for last 4 weeks
+    const rankingCounts = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0
+    };
+
+    recentArtists.forEach(row => {
+        const ranking = (row["Ranking"] || "").trim();
+        if (ranking && rankingCounts.hasOwnProperty(ranking)) {
+            rankingCounts[ranking]++;
+        }
+    });
+
+    // Calculate all-time ranking counts for comparison
+    const allTimeRankingCounts = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0
+    };
+
+    data.forEach(row => {
+        const ranking = (row["Ranking"] || "").trim();
+        if (ranking && allTimeRankingCounts.hasOwnProperty(ranking)) {
+            allTimeRankingCounts[ranking]++;
+        }
+    });
+
+    const allTimeTotalRanked = Object.values(allTimeRankingCounts).reduce((sum, count) => sum + count, 0);
+
+    const container = document.getElementById('artistRankingLast4WeeksChart');
+    container.innerHTML = '';
+
+    const totalRanked = Object.values(rankingCounts).reduce((sum, count) => sum + count, 0);
+
+    if (totalRanked === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #666;">No ranked artists in last 4 weeks</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...Object.values(rankingCounts));
+
+    // Update subtitle with total
+    const rankingSubtitle = document.querySelector('.chart-container:has(#artistRankingLast4WeeksChart) .chart-subtitle');
+    if (rankingSubtitle) {
+        rankingSubtitle.textContent = `Distribution of recent additions — ${totalRanked} ranked artists`;
+    }
+
+    // Color palette for rankings (warm sunset to earthy tones)
+    const rankingColors = {
+        '1': '#E8C48A', // Light warm gold - highest potential
+        '2': '#D6B370', // Primary gold
+        '3': '#B88B5D', // Warm brown
+        '4': '#A3674A', // Rich terracotta brown
+        '5': '#95392E'  // Deep terracotta - lowest ranking
+    };
+
+    // Always display rankings 1-5 in order
+    ['1', '2', '3', '4', '5'].forEach(ranking => {
+        const count = rankingCounts[ranking];
+        const percent = totalRanked > 0 ? Math.round((count / totalRanked) * 100) : 0;
+        const allTimePercent = allTimeTotalRanked > 0 ? Math.round((allTimeRankingCounts[ranking] / allTimeTotalRanked) * 100) : 0;
+        const percentDiff = percent - allTimePercent;
+
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        const widthPercent = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+        const barColor = rankingColors[ranking];
+
+        // Determine trend arrow and color
+        let trendHtml = '';
+        if (percentDiff > 0) {
+            // For rankings 1-2, up is good (green). For 3-5, up is bad (red)
+            const isGoodTrend = (ranking === '1' || ranking === '2');
+            const trendColor = isGoodTrend ? '#A8B5A0' : '#B8503F';
+            trendHtml = `<span style="color: ${trendColor}; font-size: 0.75rem; margin-left: 0.25rem;">↑${percentDiff}pp</span>`;
+        } else if (percentDiff < 0) {
+            // For rankings 1-2, down is bad (red). For 3-5, down is good (green)
+            const isGoodTrend = (ranking === '3' || ranking === '4' || ranking === '5');
+            const trendColor = isGoodTrend ? '#A8B5A0' : '#B8503F';
+            trendHtml = `<span style="color: ${trendColor}; font-size: 0.75rem; margin-left: 0.25rem;">↓${Math.abs(percentDiff)}pp</span>`;
+        }
+
+        barItem.innerHTML = `
+            <div class="bar-label">Ranking ${ranking}</div>
+            <div class="bar" style="width: ${widthPercent}%; background: ${barColor};"></div>
+            <div class="bar-value">${count} <span style="font-size: 0.85rem; color: #999;">(${percent}%)</span>${trendHtml}</div>
+        `;
+        container.appendChild(barItem);
+    });
+}
+
 function renderFunnel(data) {
     const canonicalLabels = {
         prospect: null,
@@ -1999,6 +2108,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderWhereFound(artistData);
         renderGenres(artistData);
         renderArtistRanking(artistData);
+        renderArtistRankingLast4Weeks(artistData);
         renderPipelineTimeline(artistData);
         renderFunnel(artistData);
         renderRecent(artistData);
