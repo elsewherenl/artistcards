@@ -3740,12 +3740,11 @@ body.dark-mode .source-performance-wrapper::-webkit-scrollbar-thumb:hover {
 }
 
 .calendar-day.today {
-    border: 2px solid #D6B370;
+    /* No special styling for today */
 }
 
 .calendar-day.today.has-activity {
-    border: 2px solid #FFFFFF;
-    box-shadow: 0 0 0 2px #D6B370;
+    /* No special styling for today */
 }
 
 /* Dark Mode Styles */
@@ -3804,12 +3803,11 @@ body.dark-mode .calendar-day.future {
 }
 
 body.dark-mode .calendar-day.today {
-    border-color: #E8C882;
+    /* No special styling for today */
 }
 
 body.dark-mode .calendar-day.today.has-activity {
-    border-color: #2C2621;
-    box-shadow: 0 0 0 2px #E8C882;
+    /* No special styling for today */
 }
 
 body.dark-mode .calendar-nav-btn {
