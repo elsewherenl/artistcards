@@ -959,6 +959,7 @@ function renderArtistRankingLast4Weeks(data) {
     // Get artists added in the last 4 weeks
     const fourWeeksAgo = new Date();
     fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+    fourWeeksAgo.setHours(0, 0, 0, 0); // Set to midnight for accurate comparison
 
     // Filter for artists added in last 4 weeks
     const recentArtists = data.filter(row => {
@@ -1135,7 +1136,10 @@ function renderFunnel(data) {
         { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
     ];
     const total = data.length;
-    document.querySelector('.chart-container:nth-of-type(4) .chart-subtitle').innerText = `Total: ${total}`;
+    const funnelSubtitle = document.querySelector('.chart-container:has(#pipelineFunnel) .chart-subtitle');
+    if (funnelSubtitle) {
+        funnelSubtitle.innerText = `Total: ${total}`;
+    }
 
     // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 30%, 20%)
     const funnelWidths = [100, 85, 70, 55, 40, 30, 20];
