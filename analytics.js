@@ -2302,11 +2302,7 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
         currentDate.setMonth(currentDate.getMonth() + 1);
     }
 
-    // Reverse to show most recent first
-    calendarMonths.reverse();
-
-    // Reset to first month
-    currentCalendarIndex = 0;
+    // Months are now in chronological order (oldest to newest, left to right)
 
     // Build calendar HTML
     let html = '';
@@ -2388,7 +2384,6 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
     });
 
     container.innerHTML = html;
-    updateCarouselPosition();
 
     // Add click handlers for days with activity
     container.querySelectorAll('.calendar-day.has-activity').forEach(dayEl => {
@@ -2410,46 +2405,12 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
             }
         });
     });
-
-    // Update navigation buttons
-    updateNavigationButtons();
 }
 
-function updateCarouselPosition() {
-    const container = document.getElementById('spotlightCalendar');
-    if (!container) return;
-
-    const translateX = -(currentCalendarIndex * 100);
-    container.style.transform = `translateX(${translateX}%)`;
-}
-
-function updateNavigationButtons() {
-    const prevBtn = document.querySelector('.calendar-prev');
-    const nextBtn = document.querySelector('.calendar-next');
-
-    if (prevBtn) {
-        prevBtn.disabled = currentCalendarIndex >= calendarMonths.length - 1;
-    }
-    if (nextBtn) {
-        nextBtn.disabled = currentCalendarIndex <= 0;
-    }
-}
-
-function navigateCalendar(direction) {
-    if (direction === 'prev' && currentCalendarIndex < calendarMonths.length - 1) {
-        currentCalendarIndex++;
-    } else if (direction === 'next' && currentCalendarIndex > 0) {
-        currentCalendarIndex--;
-    }
-
-    updateCarouselPosition();
-    updateNavigationButtons();
-}
+// Carousel navigation functions removed - now using grid layout to show all months
 
 function initSpotlightCalendar() {
     const periodButtons = document.querySelectorAll('.calendar-period-btn');
-    const prevBtn = document.querySelector('.calendar-prev');
-    const nextBtn = document.querySelector('.calendar-next');
 
     periodButtons.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -2467,45 +2428,6 @@ function initSpotlightCalendar() {
             }
         });
     });
-
-    // Navigation buttons
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => navigateCalendar('prev'));
-    }
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => navigateCalendar('next'));
-    }
-
-    // Touch swipe support
-    const carousel = document.querySelector('.calendar-carousel');
-    if (carousel) {
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        carousel.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        carousel.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            const diff = touchStartX - touchEndX;
-
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
-                    // Swiped left - show next (older month)
-                    navigateCalendar('prev');
-                } else {
-                    // Swiped right - show previous (newer month)
-                    navigateCalendar('next');
-                }
-            }
-        }
-    }
 }
 
 // Initialize calendar when data is loaded
