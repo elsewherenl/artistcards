@@ -1455,6 +1455,22 @@ function updateSummary(data, followerData = null, postData = null) {
             document.getElementById('summaryAvgEngagement').textContent = avgEngagement + '%';
         }
     }
+
+    // Easy Commerce percentage
+    const easyCommerceCount = data.filter(row => {
+        const easyCommerce = (row["Website with easy commerce"] || "").toString().trim();
+        return easyCommerce && easyCommerce.toLowerCase() !== 'no' && easyCommerce !== '';
+    }).length;
+    const easyCommercePercent = data.length > 0 ? ((easyCommerceCount / data.length) * 100).toFixed(0) : 0;
+    document.getElementById('summaryEasyCommerce').textContent = easyCommercePercent + '%';
+
+    // Gallery Representation percentage
+    const galleryRepCount = data.filter(row => {
+        const galleryRep = (row["Gallery Representation"] || "").toString().trim();
+        return galleryRep && galleryRep.toLowerCase() !== 'no' && galleryRep !== '';
+    }).length;
+    const galleryRepPercent = data.length > 0 ? ((galleryRepCount / data.length) * 100).toFixed(0) : 0;
+    document.getElementById('summaryGalleryRep').textContent = galleryRepPercent + '%';
 }
 
 function renderFollowerGrowth(data) {
