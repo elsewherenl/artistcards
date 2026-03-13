@@ -1343,12 +1343,12 @@
                             if (targetCard) {
                                 targetCard.scrollIntoView({
                                     behavior: 'smooth',
-                                    block: 'center'
+                                    block: 'start'
                                 });
-                                // Add highlight effect
-                                targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                                // Add prominent highlight effect using the glow animation
+                                targetCard.classList.add('highlight-glow');
                                 setTimeout(() => {
-                                    targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                                    targetCard.classList.remove('highlight-glow');
                                 }, 2000);
                             }
                         }, 100);
@@ -1356,12 +1356,12 @@
                         // Card is already visible, just scroll to it
                         targetCard.scrollIntoView({
                             behavior: 'smooth',
-                            block: 'center'
+                            block: 'start'
                         });
-                        // Add highlight effect
-                        targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
+                        // Add prominent highlight effect using the glow animation
+                        targetCard.classList.add('highlight-glow');
                         setTimeout(() => {
-                            targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
+                            targetCard.classList.remove('highlight-glow');
                         }, 2000);
                     }
                 });
@@ -1439,11 +1439,14 @@
                     // Set the tag filter
                     currentTagFilter = tag;
 
-                    // Scroll to top of page to see filtered results
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
+                    // Scroll to cards section to see filtered results
+                    const cardsContainer = document.getElementById('cards');
+                    if (cardsContainer) {
+                        cardsContainer.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
 
                     // Refresh UI to apply tag filter
                     refreshUI();
