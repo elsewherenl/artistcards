@@ -1859,6 +1859,39 @@ body {
     margin: 0;
     padding: 2rem;
     color: var(--deep-charcoal);
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="black"/></svg>') 12 12, auto;
+}
+
+/* Custom cursor for all elements */
+*, *::before, *::after {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="black"/></svg>') 12 12, auto !important;
+}
+
+/* Custom cursor for clickable elements */
+a, button, .tag-link, .similar-artist-link, .similar-artists-label-link,
+.status-badge, .ranking-badge, .insta-link, .website-link,
+.image, .indicator-dot, input[type="checkbox"], select, input[type="text"],
+.dark-mode-toggle, .filter-select, .search-input {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="black"/></svg>') 12 12, pointer !important;
+}
+
+/* Dark mode cursor - white ball */
+body.dark-mode,
+body.dark-mode *,
+body.dark-mode *::before,
+body.dark-mode *::after {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white"/></svg>') 12 12, auto !important;
+}
+
+body.dark-mode a, body.dark-mode button, body.dark-mode .tag-link,
+body.dark-mode .similar-artist-link, body.dark-mode .similar-artists-label-link,
+body.dark-mode .status-badge, body.dark-mode .ranking-badge,
+body.dark-mode .insta-link, body.dark-mode .website-link,
+body.dark-mode .image, body.dark-mode .indicator-dot,
+body.dark-mode input[type="checkbox"], body.dark-mode select,
+body.dark-mode input[type="text"], body.dark-mode .dark-mode-toggle,
+body.dark-mode .filter-select, body.dark-mode .search-input {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white"/></svg>') 12 12, pointer !important;
 }
 
 .header {
