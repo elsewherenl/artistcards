@@ -671,9 +671,9 @@
         gap: 0.5rem;
         text-decoration: none;
         width: fit-content;
-        color: #95392E;
+        color: #2C2C2C;
         font-family: 'Suisse Intl', sans-serif;
-        font-weight: 500;
+        font-weight: 400;
         }
         
         .insta-logo {
@@ -984,6 +984,7 @@
         .label {
         font-family: 'Suisse Intl', sans-serif;
         font-weight: 600;
+        color: #2C2C2C;
         }
         
         .notes {
@@ -1003,9 +1004,9 @@
         
         .website-link {
         font-family: 'Suisse Intl', sans-serif;
-        color: #95392E;
+        color: #2C2C2C;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 400;
         }
 
         /* Price info styling */
@@ -1018,7 +1019,7 @@
         }
 
         .price-estimate-item .label {
-        color: #D6B370;
+        color: #2C2C2C;
         font-weight: 500;
         }
 
@@ -1041,7 +1042,7 @@
         }
 
         .similar-artist-link:hover {
-        color: #95392E;
+        color: #D6B370;
         text-decoration: underline;
         }
 
@@ -1054,16 +1055,16 @@
         }
 
         .similar-artists-label-link:hover {
-        color: #95392E;
-        border-bottom: 1px solid #95392E;
+        color: #D6B370;
+        border-bottom: 1px solid #D6B370;
         }
 
         .tag-link {
-        color: #95392E;
+        color: #2C2C2C;
         cursor: pointer;
         text-decoration: none;
         transition: color 0.2s ease;
-        font-weight: 500;
+        font-weight: 400;
         }
 
         .tag-link:hover {
@@ -3005,10 +3006,12 @@ a.activity-item:hover {
     overflow-y: visible !important;
   }
 
-  /* Reset Source Performance scrolling on mobile */
+  /* Enable Source Performance scrolling on mobile */
   .source-performance-wrapper {
-    max-height: none !important;
-    overflow-y: visible !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .bar-item {
@@ -3135,12 +3138,9 @@ a.activity-item:hover {
     width: 100% !important;
   }
 
+  /* Hide Post Performance chart on mobile - too small to read */
   .post-performance-container {
-    height: auto !important;
-    min-height: 320px !important;
-    max-height: 400px !important;
-    margin-bottom: 0.5rem !important;
-    padding-bottom: 10px !important;
+    display: none !important;
   }
 
   .scroll-hint-below {
@@ -3151,15 +3151,17 @@ a.activity-item:hover {
     display: none !important;
   }
 
-  /* Reduce chart canvas size on mobile */
   #postPerformanceChart {
-    max-height: 300px !important;
-    height: 300px !important;
+    display: none !important;
   }
 
   .post-chart-wrapper {
-    height: auto !important;
-    min-height: 300px !important;
+    display: none !important;
+  }
+
+  /* Keep sort controls visible to show summary stats */
+  .post-sort-controls {
+    display: flex !important;
   }
 
   /* Recent additions - centered */
