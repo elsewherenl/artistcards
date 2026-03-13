@@ -2143,9 +2143,9 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderPostPerformance(postPerformanceData);
         updateSummary(artistData, followerGrowthData, postPerformanceData);
 
-        // Render spotlight calendar
+        // Render spotlight calendar (always show last 2 months)
         spotlightCalendarData = postPerformanceData;
-        renderSpotlightCalendar(spotlightCalendarData, currentCalendarPeriod);
+        renderSpotlightCalendar(spotlightCalendarData);
 
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1441529947&timestamp=${Date.now()}`);
     })
@@ -2270,55 +2270,31 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
         }
     });
 
-    // Determine date range
+    // Show only last 2 calendar months
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    let startDate;
-    if (weeksToShow === 'all') {
-        // Find earliest spotlight date
-        const allDates = Object.keys(spotlightDates).map(d => new Date(d)).sort((a, b) => a - b);
-        if (allDates.length > 0) {
-            startDate = new Date(allDates[0]);
-            startDate.setDate(1); // Start from beginning of that month
-        } else {
-            startDate = new Date(today);
-            startDate.setDate(startDate.getDate() - 27); // Default to 4 weeks
-        }
-    } else {
-        startDate = new Date(today);
-        startDate.setDate(startDate.getDate() - (weeksToShow * 7 - 1));
-    }
-
-    // Round to beginning of week (Monday)
-    const dayOfWeek = startDate.getDay();
-    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    startDate.setDate(startDate.getDate() + diff);
-
-    // Calculate total weeks in the period for average calculation
-    const periodDays = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24));
-    const periodWeeks = periodDays / 7;
-
-    // Generate months to display
+    // Generate last 2 months (current month and previous month)
     calendarMonths = [];
-    const currentDate = new Date(startDate);
 
-    while (currentDate <= today) {
-        const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    // Current month
+    calendarMonths.push({
+        key: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`,
+        year: today.getFullYear(),
+        month: today.getMonth(),
+        monthName: today.toLocaleString('default', { month: 'long' })
+    });
 
-        if (!calendarMonths.find(m => m.key === monthKey)) {
-            calendarMonths.push({
-                key: monthKey,
-                year: currentDate.getFullYear(),
-                month: currentDate.getMonth(),
-                monthName: currentDate.toLocaleString('default', { month: 'long' })
-            });
-        }
+    // Previous month
+    const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    calendarMonths.push({
+        key: `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`,
+        year: prevMonth.getFullYear(),
+        month: prevMonth.getMonth(),
+        monthName: prevMonth.toLocaleString('default', { month: 'long' })
+    });
 
-        currentDate.setMonth(currentDate.getMonth() + 1);
-    }
-
-    // Months are now in chronological order (oldest to newest, left to right)
+    // Months are in reverse chronological order (newest to oldest, left to right)
 
     // Build calendar HTML
     let html = '';
@@ -2426,24 +2402,7 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
 // Carousel navigation functions removed - now using grid layout to show all months
 
 function initSpotlightCalendar() {
-    const periodButtons = document.querySelectorAll('.calendar-period-btn');
-
-    periodButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Update active state
-            periodButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-
-            // Get period
-            const period = this.getAttribute('data-period');
-            currentCalendarPeriod = period === 'all' ? 'all' : parseInt(period);
-
-            // Re-render calendar
-            if (spotlightCalendarData.length > 0) {
-                renderSpotlightCalendar(spotlightCalendarData, currentCalendarPeriod);
-            }
-        });
-    });
+    // No period buttons needed - always show last 2 months
 }
 
 // Initialize calendar when data is loaded
