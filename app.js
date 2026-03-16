@@ -11,6 +11,7 @@
         'Responded',
         'Spotlighted',
         'Negotiating',
+        'Rejected',
         'Feature Planned',
         'Featured',
         'Networking'
