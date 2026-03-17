@@ -1072,6 +1072,7 @@ function renderFunnel(data) {
         outreach: null,
         responded: null,
         negotiating: null,
+        rejected: null,
         featurePlanned: null,
         showcased: null
     };
@@ -1081,6 +1082,7 @@ function renderFunnel(data) {
         outreach: 0,
         responded: 0,
         negotiating: 0,
+        rejected: 0,
         featurePlanned: 0,
         showcased: 0
     };
@@ -1105,6 +1107,9 @@ function renderFunnel(data) {
         } else if (status.includes("negotiat")) {
             stageCounts.negotiating++;
             if (!canonicalLabels.negotiating) canonicalLabels.negotiating = rawStatus;
+        } else if (status.includes("reject")) {
+            stageCounts.rejected++;
+            if (!canonicalLabels.rejected) canonicalLabels.rejected = rawStatus;
         } else if (status.includes("feature") && status.includes("planned")) {
             stageCounts.featurePlanned++;
             if (!canonicalLabels.featurePlanned) canonicalLabels.featurePlanned = rawStatus;
@@ -1123,6 +1128,7 @@ function renderFunnel(data) {
         outreach: "Outreach",
         responded: "Responded",
         negotiating: "Negotiating",
+        rejected: "Rejected",
         featurePlanned: "Feature Planned",
         showcased: "Showcased"
     };
@@ -1132,6 +1138,7 @@ function renderFunnel(data) {
         { key: "outreach", label: canonicalLabels.outreach || fallbackLabels.outreach, count: stageCounts.outreach },
         { key: "responded", label: canonicalLabels.responded || fallbackLabels.responded, count: stageCounts.responded },
         { key: "negotiating", label: canonicalLabels.negotiating || fallbackLabels.negotiating, count: stageCounts.negotiating },
+        { key: "rejected", label: canonicalLabels.rejected || fallbackLabels.rejected, count: stageCounts.rejected },
         { key: "featurePlanned", label: canonicalLabels.featurePlanned || fallbackLabels.featurePlanned, count: stageCounts.featurePlanned },
         { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
     ];
@@ -1141,8 +1148,8 @@ function renderFunnel(data) {
         funnelSubtitle.innerText = `Total: ${total}`;
     }
 
-    // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 30%, 20%)
-    const funnelWidths = [100, 85, 70, 55, 40, 30, 20];
+    // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 35%, 30%, 20%)
+    const funnelWidths = [100, 85, 70, 55, 40, 35, 30, 20];
 
     let funnelHtml = "";
     for (let i = 0; i < funnelStages.length; i++) {
@@ -1577,10 +1584,7 @@ function renderFollowerGrowth(data) {
 
     const subtitle = document.getElementById('followerGrowthSubtitle');
     if (subtitle) {
-        subtitle.innerHTML = `
-            <strong>+${totalGrowth.toLocaleString()} followers (+${growthPercentage}% since ${startDateStr})</strong><br>
-            Avg weekly growth: ${avgWeeklyGrowth.toLocaleString()} followers/week
-        `;
+        subtitle.textContent = `+${totalGrowth.toLocaleString()} followers (+${growthPercentage}% since ${startDateStr}) — Avg weekly growth: ${avgWeeklyGrowth.toLocaleString()} followers/week`;
     }
 
     const labels = followerData.map(d => {
@@ -2107,11 +2111,16 @@ function renderSourcePerformance(data) {
         const status = (row["Response Status"] || "").trim();
         return status === "Responded - Interested";
     }).length;
+    const totalPositive = contacted.filter(row => {
+        const status = (row["Response Status"] || "").trim();
+        return status === "Responded - Interested";
+    }).length;
     const overallRate = totalContacted > 0 ? Math.round((totalResponded / totalContacted) * 100) : 0;
+    const positiveRate = totalContacted > 0 ? Math.round((totalPositive / totalContacted) * 100) : 0;
 
     const subtitle = document.getElementById('sourcePerformanceSubtitle');
     if (subtitle) {
-        subtitle.textContent = `${methodPerformance.length} contact methods tracked — ${totalContacted} total contacts — ${overallRate}% overall response rate`;
+        subtitle.textContent = `${methodPerformance.length} contact methods tracked — ${totalContacted} total contacts — ${overallRate}% response rate (${positiveRate}% positive)`;
     }
 }
 
