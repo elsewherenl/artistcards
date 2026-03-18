@@ -1,0 +1,2420 @@
+function getWeekNumber(d) {
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+function renderPipelineTimeline(data) {
+    const weeklyAdds = {};
+    const sorted = data
+        .filter(row => row["When Added"])
+        .map(row => ({ date: parseDate(row["When Added"]) }))
+        .filter(r => r.date && !isNaN(r.date))
+        .sort((a, b) => a.date - b.date);
+
+    let cumulative = 0;
+    sorted.forEach(r => {
+        const week = `${r.date.getFullYear()}-W${getWeekNumber(r.date)}`;
+        if (!weeklyAdds[week]) weeklyAdds[week] = 0;
+        weeklyAdds[week]++;
+    });
+
+    const labels = Object.keys(weeklyAdds).sort();
+    const adds = labels.map(week => weeklyAdds[week]);
+    const cumulativeTotals = [];
+    adds.forEach(a => {
+        cumulative += a;
+        cumulativeTotals.push(cumulative);
+    });
+
+    const totalArtists = sorted.length;
+    const totalWeeks = labels.length;
+    const avgAddsPerWeek = totalWeeks > 0 ? Math.ceil(totalArtists / totalWeeks) : 0;
+
+    const readableLabels = labels.map(weekLabel => {
+        const [year, week] = weekLabel.split('-W');
+        const jan1 = new Date(parseInt(year), 0, 1);
+        const daysToAdd = (parseInt(week) - 1) * 7;
+        const weekStart = new Date(jan1.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+        const day = weekStart.getDate();
+        const month = weekStart.toLocaleString('default', { month: 'long' });
+        return `w/c ${day} ${month}`;
+    });
+
+    const timelineSubtitle = document.querySelector('.chart-container:nth-of-type(1) .chart-subtitle');
+    if (timelineSubtitle) {
+        timelineSubtitle.textContent = `Weekly adds vs total pipeline size — Avg: ${avgAddsPerWeek} artists/week`;
+    }
+
+    const maxAdds = Math.max(...adds);
+    const maxTotal = Math.max(...cumulativeTotals);
+
+    // Detect mobile for responsive font sizes
+    const isMobile = window.innerWidth <= 600;
+
+    const ctx = document.getElementById("pipelineTimeline").getContext("2d");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: readableLabels,
+            datasets: [
+                {
+                    label: "New Artists",
+                    data: adds,
+                    backgroundColor: "#95392E",
+                    yAxisID: 'y'
+                },
+                {
+                    label: "Total Pipeline",
+                    data: cumulativeTotals,
+                    type: "line",
+                    borderColor: "#D6B370",
+                    borderWidth: isMobile ? 1.5 : 2,
+                    fill: false,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: !isMobile,
+                        text: 'Weekly Adds',
+                        font: {
+                            size: isMobile ? 9 : 12
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: isMobile ? 9 : 12
+                        }
+                    },
+                    beginAtZero: true,
+                    max: Math.ceil(maxAdds * 1.3)
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: !isMobile,
+                        text: 'Total Pipeline',
+                        font: {
+                            size: isMobile ? 9 : 12
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: isMobile ? 9 : 12
+                        }
+                    },
+                    beginAtZero: true,
+                    max: Math.ceil(maxTotal * 1.1),
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: isMobile ? 8 : 11
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        font: {
+                            size: isMobile ? 10 : 14
+                        },
+                        padding: isMobile ? 8 : 15
+                    }
+                }
+            }
+        }
+    });
+}
+
+let postPerformanceRawData = [];
+let postPerformanceChart = null;
+let currentFilterMode = 'total'; // Track current filter mode: 'total', 'with-artist', 'without-artist'
+
+function showPostDetail(post) {
+    const card = document.getElementById('postDetailCard');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+
+    const html = `
+        <div class="post-detail-header">
+            <div>
+                <h3 class="post-detail-title">${post.title}</h3>
+                <div class="post-detail-meta">
+                    <strong>Artist:</strong> ${post.artist} | <strong>Date:</strong> ${post.date}
+                </div>
+            </div>
+            <button class="post-detail-close" onclick="document.getElementById('postDetailCard').classList.remove('active')">✕</button>
+        </div>
+        <div class="post-detail-stats">
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Reach</div>
+                <div class="post-detail-stat-value">${post.reach.toLocaleString()}</div>
+            </div>
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Views</div>
+                <div class="post-detail-stat-value">${post.views.toLocaleString()}</div>
+            </div>
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Likes</div>
+                <div class="post-detail-stat-value">${post.likes.toLocaleString()}</div>
+            </div>
+            <div class="post-detail-stat">
+                <div class="post-detail-stat-label">Engagement Rate</div>
+                <div class="post-detail-stat-value engagement">${post.engagementRate.toFixed(2)}%</div>
+            </div>
+        </div>
+        ${post.notes ? `<div class="post-detail-notes"><strong>Notes:</strong> ${post.notes}</div>` : ''}
+    `;
+
+    card.innerHTML = html;
+    card.classList.add('active');
+
+    // Scroll to the card smoothly
+    setTimeout(() => {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
+    // Update current filter mode if provided
+    if (filterMode !== null) {
+        currentFilterMode = filterMode;
+    }
+
+    // Check if this is raw CSV data or already processed
+    const isRawData = data.length > 0 && data[0].hasOwnProperty("Post Date");
+
+    // Debug: Log the first row to see column names
+    if (isRawData && data.length > 0) {
+        console.log('CSV Column names:', Object.keys(data[0]));
+        console.log('Looking for artist share column...');
+        const artistShareKeys = Object.keys(data[0]).filter(key =>
+            key.toLowerCase().includes('artist') && key.toLowerCase().includes('share')
+        );
+        console.log('Possible artist share columns:', artistShareKeys);
+        console.log('First row artist share values:', artistShareKeys.map(key => ({ [key]: data[0][key] })));
+        console.log('First 5 rows sample:', data.slice(0, 5).map(row => {
+            const artistShareCol = artistShareKeys[0];
+            return {
+                title: row["Post Title"],
+                artistShared: row[artistShareCol] || 'NOT FOUND'
+            };
+        }));
+    }
+
+    let processedData;
+    if (isRawData) {
+        // Process raw CSV data
+        processedData = data
+            .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
+            .map(row => ({
+                date: row["Post Date"],
+                title: row["Post Title"] || "Untitled",
+                artist: row["Artist"] || "Unknown",
+                reach: parseInt(row["Reach"]) || 0,
+                views: parseInt(row["Views"]) || 0,
+                likes: parseInt(row["Likes"]) || 0,
+                engagementRate: parseFloat(row["Likes / Reach"]) || 0,
+                notes: row["Notes"] || "",  // Column I - Notes/Artist share status
+                spotlighted: row["Post Date"] || "",
+                artistShared: row["Notes"] || ""  // Column I - contains artist share status
+            }));
+        // Store raw data for re-sorting
+        postPerformanceRawData = data;
+    } else {
+        // Already processed, use stored raw data
+        processedData = postPerformanceRawData
+            .filter(row => row["Post Date"] && row["Reach"] && row["Views"])
+            .map(row => ({
+                date: row["Post Date"],
+                title: row["Post Title"] || "Untitled",
+                artist: row["Artist"] || "Unknown",
+                reach: parseInt(row["Reach"]) || 0,
+                views: parseInt(row["Views"]) || 0,
+                likes: parseInt(row["Likes"]) || 0,
+                engagementRate: parseFloat(row["Likes / Reach"]) || 0,
+                notes: row["Notes"] || "",  // Column I - Notes/Artist share status
+                spotlighted: row["Post Date"] || "",
+                artistShared: row["Notes"] || ""  // Column I - contains artist share status
+            }));
+    }
+
+    // Apply filter based on current filter mode
+    // Column I logic: "No artist share" = Without Artist Shares, anything else = With Artist Shares
+    console.log('Current filter mode:', currentFilterMode);
+    console.log('Sample artist shared values:', processedData.slice(0, 5).map(p => ({ title: p.title, artistShared: p.artistShared })));
+
+    if (currentFilterMode === 'with-artist') {
+        processedData = processedData.filter(post => {
+            const shared = String(post.artistShared).toLowerCase().trim();
+            // With Artist Shares = anything that is NOT "no artist share"
+            return shared !== 'no artist share' && shared !== '';
+        });
+        console.log('After with-artist filter:', processedData.length, 'posts');
+    } else if (currentFilterMode === 'without-artist') {
+        processedData = processedData.filter(post => {
+            const shared = String(post.artistShared).toLowerCase().trim();
+            // Without Artist Shares = "no artist share" or empty
+            return shared === 'no artist share' || shared === '';
+        });
+        console.log('After without-artist filter:', processedData.length, 'posts');
+    }
+    // If 'total', no filtering is applied
+
+    // Sort based on selected option
+    let sortedData;
+    if (sortBy === 'reach') {
+        sortedData = [...processedData].sort((a, b) => b.reach - a.reach);
+    } else if (sortBy === 'views') {
+        sortedData = [...processedData].sort((a, b) => b.views - a.views);
+    } else if (sortBy === 'engagement') {
+        sortedData = [...processedData].sort((a, b) => b.engagementRate - a.engagementRate);
+    } else if (sortBy === 'featured-recent') {
+        // Most recent feature date (newest first)
+        sortedData = [...processedData].sort((a, b) => {
+            const dateA = a.spotlighted ? parseDate(a.spotlighted) : null;
+            const dateB = b.spotlighted ? parseDate(b.spotlighted) : null;
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            console.log('Sorting featured-recent:', a.title, dateA, 'vs', b.title, dateB, 'result:', dateB - dateA);
+            return dateB - dateA;
+        });
+        console.log('Featured-recent sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
+    } else if (sortBy === 'featured-oldest') {
+        // Least recent feature date (oldest first)
+        sortedData = [...processedData].sort((a, b) => {
+            const dateA = a.spotlighted ? parseDate(a.spotlighted) : null;
+            const dateB = b.spotlighted ? parseDate(b.spotlighted) : null;
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            console.log('Sorting featured-oldest:', a.title, dateA, 'vs', b.title, dateB, 'result:', dateA - dateB);
+            return dateA - dateB;
+        });
+        console.log('Featured-oldest sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
+    } else {
+        // Default: sort by date
+        sortedData = [...processedData].sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    const totalPosts = sortedData.length;
+    const avgReach = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.reach, 0) / totalPosts) : 0;
+    const avgViews = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.views, 0) / totalPosts) : 0;
+    const avgLikes = totalPosts > 0 ? Math.round(sortedData.reduce((sum, p) => sum + p.likes, 0) / totalPosts) : 0;
+    const avgEngagement = totalPosts > 0 ? (sortedData.reduce((sum, p) => sum + p.engagementRate, 0) / totalPosts).toFixed(2) : '0.00';
+
+    const isDarkModeStats = document.body.classList.contains('dark-mode');
+    const statValueColor = isDarkModeStats ? '#F0EAE0' : '#95392E';
+    const statLabelColor = isDarkModeStats ? 'rgba(243, 239, 233, 0.7)' : '#8A8580';
+    const summaryStatsHTML = `
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Reach</span>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgReach.toLocaleString()}</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Views</span>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgViews.toLocaleString()}</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Likes</span>
+        <strong style="color: ${statValueColor}; margin: 0 1.25rem 0 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgLikes.toLocaleString()}</strong>
+        <span style="color: ${statLabelColor}; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Avg Engagement</span>
+        <strong style="color: ${statValueColor}; margin-left: 0.35rem; font-family: 'Suisse Intl', sans-serif; font-size: 1rem; font-weight: 600;">${avgEngagement}%</strong>
+    `;
+    document.getElementById('postSummaryStats').innerHTML = summaryStatsHTML;
+
+    // Mobile-first detection
+    const isMobile = window.innerWidth <= 600;
+
+    // Dark mode detection
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#F3EFE9' : '#0D0D0D';
+    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)';
+
+    // Mobile: show last 8 posts only for better readability
+    // Desktop: show all with horizontal scroll
+    const displayData = isMobile ? sortedData.slice(-8) : sortedData;
+
+    // Update subtitle with filter info
+    const postSubtitle = document.querySelector('.post-performance-full .chart-subtitle');
+    if (postSubtitle) {
+        let filterText = '';
+        if (currentFilterMode === 'with-artist') {
+            filterText = ' (with artist shares)';
+        } else if (currentFilterMode === 'without-artist') {
+            filterText = ' (without artist shares)';
+        }
+
+        if (isMobile && sortedData.length > 8) {
+            postSubtitle.textContent = `Showing most recent 8 of ${sortedData.length} posts${filterText}`;
+        } else if (isMobile) {
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total${filterText}`;
+        } else {
+            postSubtitle.textContent = `Reach, views, and engagement rate per post — ${sortedData.length} posts total${filterText}`;
+        }
+    }
+
+    // Destroy existing chart if it exists
+    if (postPerformanceChart) {
+        postPerformanceChart.destroy();
+    }
+
+    // Shorten labels for better readability with artist name
+    const labels = displayData.map(post => {
+        const maxTitleLength = isMobile ? 12 : 25;
+        const maxArtistLength = isMobile ? 10 : 15;
+
+        let title = post.title.length > maxTitleLength
+            ? post.title.substring(0, maxTitleLength - 3) + '...'
+            : post.title;
+
+        let artist = post.artist.length > maxArtistLength
+            ? post.artist.substring(0, maxArtistLength - 3) + '...'
+            : post.artist;
+
+        return isMobile ? title : `${title}\n(${artist})`;
+    });
+
+    const canvas = document.getElementById('postPerformanceChart');
+    const wrapper = canvas.parentElement;
+
+    // Mobile-first: responsive canvas
+    if (isMobile) {
+        // Mobile: fit to container
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        wrapper.style.width = '100%';
+    } else {
+        // Desktop: wide scrollable canvas
+        const barWidth = 140;
+        const totalWidth = Math.max(displayData.length * barWidth, 1000);
+        canvas.style.width = totalWidth + 'px';
+        wrapper.style.width = totalWidth + 'px';
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    postPerformanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Reach',
+                    data: displayData.map(post => post.reach),
+                    backgroundColor: isDarkMode ? '#B8503F' : '#95392E',
+                    yAxisID: 'y',
+                    barPercentage: 0.85,
+                    categoryPercentage: 0.9,
+                    borderRadius: 0
+                },
+                {
+                    label: 'Views',
+                    data: displayData.map(post => post.views),
+                    backgroundColor: isDarkMode ? 'rgba(184, 80, 63, 0.5)' : 'rgba(149, 57, 46, 0.5)',
+                    yAxisID: 'y',
+                    barPercentage: 0.85,
+                    categoryPercentage: 0.9,
+                    borderRadius: 0
+                },
+                {
+                    label: 'Engagement %',
+                    data: displayData.map(post => post.engagementRate),
+                    type: 'line',
+                    borderColor: isDarkMode ? '#E8C882' : '#D6B370',
+                    backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                    borderWidth: isMobile ? 2 : 2.5,
+                    fill: false,
+                    tension: 0.1,
+                    yAxisID: 'y1',
+                    pointRadius: isMobile ? 4 : 5,
+                    pointHoverRadius: isMobile ? 6 : 7,
+                    pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                    pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
+                    pointBorderWidth: 2,
+                    pointHoverBorderWidth: 2.5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            onClick: !isMobile ? function(event, activeElements) {
+                if (activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const post = displayData[index];
+                    showPostDetail(post);
+                }
+            } : null,
+            layout: {
+                padding: {
+                    left: isMobile ? 5 : 15,
+                    right: isMobile ? 5 : 15,
+                    top: isMobile ? 45 : 15,
+                    bottom: isMobile ? 5 : 80
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Reach / Views',
+                        font: {
+                            size: isMobile ? 10 : 13,
+                            weight: '500',
+                            family: "'Suisse Intl', sans-serif"
+                        },
+                        color: '#D6B370',
+                        padding: { top: 0, bottom: isMobile ? 5 : 8 }
+                    },
+                    ticks: {
+                        font: {
+                            size: isMobile ? 9 : 12,
+                            family: "'Suisse Intl', sans-serif",
+                            weight: '400'
+                        },
+                        color: '#666',
+                        padding: isMobile ? 4 : 6,
+                        callback: function(value) {
+                            if (value >= 1000000) {
+                                return (value / 1000000).toFixed(1) + 'M';
+                            }
+                            if (value >= 1000) {
+                                return (value / 1000).toFixed(1) + 'k';
+                            }
+                            return value;
+                        }
+                    },
+                    grid: {
+                        color: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(214, 179, 112, 0.15)',
+                        lineWidth: 1
+                    },
+                    beginAtZero: true
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Engagement %',
+                        font: {
+                            size: isMobile ? 10 : 13,
+                            weight: '500',
+                            family: "'Suisse Intl', sans-serif"
+                        },
+                        color: '#D6B370',
+                        padding: { top: 0, bottom: isMobile ? 5 : 8 }
+                    },
+                    ticks: {
+                        font: {
+                            size: isMobile ? 9 : 12,
+                            family: "'Suisse Intl', sans-serif",
+                            weight: '400'
+                        },
+                        color: '#666',
+                        padding: isMobile ? 4 : 6,
+                        callback: function(value) {
+                            return value.toFixed(1) + '%';
+                        }
+                    },
+                    grid: {
+                        drawOnChartArea: true,
+                        color: 'rgba(214, 179, 112, 0.1)'
+                    },
+                    beginAtZero: true
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: isMobile ? 8 : 11,
+                            family: "'Suisse Intl', sans-serif",
+                            weight: '400'
+                        },
+                        color: '#666',
+                        maxRotation: 45,
+                        minRotation: 45,
+                        autoSkip: false,
+                        padding: isMobile ? 6 : 8
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'start',
+                    labels: {
+                        font: {
+                            size: isMobile ? 10 : 13,
+                            family: "'Suisse Intl', sans-serif",
+                            weight: '500'
+                        },
+                        color: '#666',
+                        padding: isMobile ? 8 : 15,
+                        boxWidth: isMobile ? 30 : 38,
+                        boxHeight: isMobile ? 10 : 13,
+                        usePointStyle: false,
+                        generateLabels: function(chart) {
+                            const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                            const labels = original.call(this, chart);
+                            // Make legend items more distinct
+                            labels.forEach((label, index) => {
+                                if (index === 2) { // Engagement % line
+                                    label.lineWidth = 2.5;
+                                }
+                            });
+                            return labels;
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: isDarkMode ? 'rgba(44, 44, 44, 0.95)' : 'rgba(243, 239, 233, 0.98)',
+                    titleColor: isDarkMode ? '#F3EFE9' : '#0D0D0D',
+                    bodyColor: isDarkMode ? 'rgba(243, 239, 233, 0.7)' : '#666',
+                    borderColor: isDarkMode ? 'rgba(232, 200, 130, 0.3)' : 'rgba(214, 179, 112, 0.4)',
+                    borderWidth: 1,
+                    padding: isMobile ? 10 : 14,
+                    titleFont: {
+                        size: isMobile ? 12 : 15,
+                        family: "'Suisse Intl', sans-serif",
+                        weight: '500'
+                    },
+                    bodyFont: {
+                        size: isMobile ? 10 : 13,
+                        family: "'Suisse Intl', sans-serif",
+                        weight: '400'
+                    },
+                    displayColors: true,
+                    boxWidth: 12,
+                    boxHeight: 12,
+                    boxPadding: 4,
+                    bodySpacing: 5,
+                    titleSpacing: 6,
+                    callbacks: {
+                        title: function(context) {
+                            const dataIndex = context[0].dataIndex;
+                            const post = displayData[dataIndex];
+                            return post.title;
+                        },
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.dataset.type === 'line') {
+                                label += context.parsed.y.toFixed(2) + '%';
+                            } else {
+                                label += context.parsed.y.toLocaleString();
+                            }
+                            return label;
+                        },
+                        afterBody: function(context) {
+                            const dataIndex = context[0].dataIndex;
+                            const post = displayData[dataIndex];
+                            const extra = [];
+                            extra.push('');
+                            extra.push(`Artist: ${post.artist}`);
+                            extra.push(`Date: ${post.date}`);
+                            extra.push(`Likes: ${post.likes.toLocaleString()}`);
+                            if (post.notes && post.notes.trim()) {
+                                extra.push('');
+                                extra.push(`Notes: ${post.notes}`);
+                            }
+                            return extra;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Setup sort button listeners (only once)
+    if (!window.postSortListenersAdded) {
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-render with new sort
+                const sortType = this.getAttribute('data-sort');
+                renderPostPerformance(postPerformanceRawData, sortType);
+            });
+        });
+        window.postSortListenersAdded = true;
+    }
+
+    // Setup filter button listeners (only once)
+    if (!window.postFilterListenersAdded) {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Get current sort type
+                const activeSort = document.querySelector('.sort-btn.active');
+                const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
+
+                // Re-render with new filter
+                const filterType = this.getAttribute('data-filter');
+                renderPostPerformance(postPerformanceRawData, sortType, filterType);
+            });
+        });
+        window.postFilterListenersAdded = true;
+    }
+}
+
+function parseCSV(csv) {
+    const lines = csv.split('\n');
+    const result = [];
+    const headers = [];
+    let current = '', inQuotes = false;
+
+    for (let i = 0; i < lines[0].length; i++) {
+        const char = lines[0][i];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) {
+            headers.push(current.trim().replace(/^"|"$/g, ''));
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    headers.push(current.trim().replace(/^"|"$/g, ''));
+
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const values = [], row = {};
+        current = ''; inQuotes = false;
+        for (let j = 0; j < lines[i].length; j++) {
+            const char = lines[i][j];
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) {
+                values.push(current.trim().replace(/^"|"$/g, ''));
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        values.push(current.trim().replace(/^"|"$/g, ''));
+        headers.forEach((header, idx) => row[header] = values[idx] || '');
+        if (row[headers[0]]) result.push(row);
+    }
+    return result;
+}
+
+function cleanSourceLabel(source) {
+    // Clean up common patterns in source names
+    if (!source) return source;
+
+    // Remove "https://", "http://", "www."
+    let cleaned = source.replace(/^https?:\/\/(www\.)?/i, '');
+
+    // Remove trailing slashes
+    cleaned = cleaned.replace(/\/+$/, '');
+
+    // Truncate if too long (keep first part of domain or name)
+    if (cleaned.length > 30) {
+        // Try to split by slash and take first meaningful part
+        const parts = cleaned.split('/');
+        cleaned = parts[0];
+        if (cleaned.length > 30) {
+            cleaned = cleaned.substring(0, 27) + '...';
+        }
+    }
+
+    return cleaned;
+}
+
+function renderWhereFound(data) {
+    const counts = {};
+    data.forEach(row => {
+        const source = row["Where Found"];
+        if (source) counts[source] = (counts[source] || 0) + 1;
+    });
+
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const totalWhereFound = entries.reduce((sum, [, c]) => sum + c, 0);
+    const top = entries.filter(([, count]) => count >= 5);
+    const shownTotal = top.reduce((sum, [, c]) => sum + c, 0);
+    const otherCount = totalWhereFound - shownTotal;
+
+    const container = document.getElementById('whereFoundChart');
+    container.innerHTML = '';
+
+    const wfSubtitle = document.querySelector('.chart-container:nth-of-type(2) .chart-subtitle');
+    if (wfSubtitle) {
+      wfSubtitle.textContent = `Sources with ≥5 artists — showing ${shownTotal} of ${totalWhereFound}`;
+    }
+
+    if (entries.length === 0) return;
+    const maxCount = Math.max(...top.map(([, count]) => count), otherCount || 0);
+
+    top.forEach(([source, count]) => {
+      const barItem = document.createElement('div');
+      barItem.className = 'bar-item';
+      const widthPercent = Math.round((count / maxCount) * 100);
+      const displayLabel = cleanSourceLabel(source);
+      barItem.innerHTML = `
+          <div class="bar-label" title="${source}">${displayLabel}</div>
+          <div class="bar" style="width: ${widthPercent}%;"></div>
+          <div class="bar-value">${count}</div>
+      `;
+      container.appendChild(barItem);
+    });
+
+    if (otherCount > 0) {
+      const barItem = document.createElement('div');
+      barItem.className = 'bar-item';
+      const widthPercent = Math.round((otherCount / maxCount) * 100);
+      barItem.innerHTML = `
+          <div class="bar-label">Other</div>
+          <div class="bar" style="width: ${widthPercent}%; background: #999;"></div>
+          <div class="bar-value">${otherCount}</div>
+      `;
+      container.appendChild(barItem);
+    }
+}
+
+function renderSourceQuality(data) {
+    const container = document.getElementById('sourceQualityChart');
+    if (!container) return;
+
+    // Filter artists who have been contacted
+    const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
+
+    if (contacted.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">No outreach data yet</p>';
+        return;
+    }
+
+    // Calculate response rates by source
+    const sourceStats = {};
+    contacted.forEach(row => {
+        const source = row["Where Found"] || "Unknown";
+        if (!sourceStats[source]) {
+            sourceStats[source] = { contacted: 0, responded: 0 };
+        }
+        sourceStats[source].contacted++;
+
+        const responseStatus = (row["Response Status"] || "").trim().toLowerCase();
+        const dateResponded = (row["Date Responded"] || "").trim();
+        if (responseStatus || dateResponded) {
+            sourceStats[source].responded++;
+        }
+    });
+
+    // Calculate percentages and filter sources with at least 3 contacts
+    const sourceQuality = Object.entries(sourceStats)
+        .filter(([source, stats]) => stats.contacted >= 3)
+        .map(([source, stats]) => ({
+            source,
+            responseRate: ((stats.responded / stats.contacted) * 100).toFixed(1),
+            contacted: stats.contacted,
+            responded: stats.responded
+        }))
+        .sort((a, b) => parseFloat(b.responseRate) - parseFloat(a.responseRate))
+        .slice(0, 8);
+
+    if (sourceQuality.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">Need at least 3 contacts per source</p>';
+        return;
+    }
+
+    const maxRate = Math.max(...sourceQuality.map(s => parseFloat(s.responseRate)));
+
+    container.innerHTML = sourceQuality.map(item => `
+        <div class="bar-item">
+            <div class="bar-label">${item.source} <span style="font-size: 0.75rem; color: #999;">(${item.responded}/${item.contacted})</span></div>
+            <div class="bar-wrapper">
+                <div class="bar" style="width: ${(parseFloat(item.responseRate) / maxRate) * 100}%; background: #10b981;"></div>
+                <span class="bar-count">${item.responseRate}%</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderGenres(data) {
+    const counts = {};
+    data.forEach(row => {
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        if (status === "spotlighted" || status === "featured" || status === "feature planned") {
+            const genre = row["Genre"];
+            if (genre) counts[genre] = (counts[genre] || 0) + 1;
+        }
+    });
+
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const container = document.getElementById('genresChart');
+    container.innerHTML = '';
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #666;">No featured artists yet</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...sorted.map(([, count]) => count));
+
+    sorted.forEach(([genre, count]) => {
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        const widthPercent = Math.round((count / maxCount) * 100);
+
+        barItem.innerHTML = `
+            <div class="bar-label">${genre}</div>
+            <div class="bar genre-bar" style="width: ${widthPercent}%;"></div>
+            <div class="bar-value">${count}</div>
+        `;
+        container.appendChild(barItem);
+    });
+}
+
+function renderArtistRanking(data) {
+    // Count artists by ranking (1-5)
+    const rankingCounts = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0
+    };
+
+    data.forEach(row => {
+        const ranking = (row["Ranking"] || "").trim();
+        if (ranking && rankingCounts.hasOwnProperty(ranking)) {
+            rankingCounts[ranking]++;
+        }
+    });
+
+    const container = document.getElementById('artistRankingChart');
+    container.innerHTML = '';
+
+    const totalRanked = Object.values(rankingCounts).reduce((sum, count) => sum + count, 0);
+
+    if (totalRanked === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #666;">No ranked artists yet</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...Object.values(rankingCounts));
+
+    // Update subtitle with total
+    const rankingSubtitle = document.querySelector('.chart-container:has(#artistRankingChart) .chart-subtitle');
+    if (rankingSubtitle) {
+        rankingSubtitle.textContent = `Distribution by potential (1 = highest, 5 = lowest) — ${totalRanked} ranked artists`;
+    }
+
+    // Color palette for rankings (warm sunset to earthy tones)
+    const rankingColors = {
+        '1': '#E8C48A', // Light warm gold - highest potential
+        '2': '#D6B370', // Primary gold
+        '3': '#B88B5D', // Warm brown
+        '4': '#A3674A', // Rich terracotta brown
+        '5': '#95392E'  // Deep terracotta - lowest ranking
+    };
+
+    // Always display rankings 1-5 in order
+    ['1', '2', '3', '4', '5'].forEach(ranking => {
+        const count = rankingCounts[ranking];
+        const percent = totalRanked > 0 ? Math.round((count / totalRanked) * 100) : 0;
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        const widthPercent = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+        const barColor = rankingColors[ranking];
+
+        barItem.innerHTML = `
+            <div class="bar-label">Ranking ${ranking}</div>
+            <div class="bar" style="width: ${widthPercent}%; background: ${barColor};"></div>
+            <div class="bar-value">${count} <span style="font-size: 0.85rem; color: #999;">(${percent}%)</span></div>
+        `;
+        container.appendChild(barItem);
+    });
+}
+
+function renderArtistRankingLast4Weeks(data) {
+    // Get artists added in the last 4 weeks
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+    fourWeeksAgo.setHours(0, 0, 0, 0); // Set to midnight for accurate comparison
+
+    // Filter for artists added in last 4 weeks
+    const recentArtists = data.filter(row => {
+        const dateAdded = row["When Added"];
+        if (!dateAdded) return false;
+        const addedDate = parseDate(dateAdded);
+        return addedDate && addedDate >= fourWeeksAgo;
+    });
+
+    // Count artists by ranking for last 4 weeks
+    const rankingCounts = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0
+    };
+
+    recentArtists.forEach(row => {
+        const ranking = (row["Ranking"] || "").trim();
+        if (ranking && rankingCounts.hasOwnProperty(ranking)) {
+            rankingCounts[ranking]++;
+        }
+    });
+
+    // Calculate all-time ranking counts for comparison
+    const allTimeRankingCounts = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0
+    };
+
+    data.forEach(row => {
+        const ranking = (row["Ranking"] || "").trim();
+        if (ranking && allTimeRankingCounts.hasOwnProperty(ranking)) {
+            allTimeRankingCounts[ranking]++;
+        }
+    });
+
+    const allTimeTotalRanked = Object.values(allTimeRankingCounts).reduce((sum, count) => sum + count, 0);
+
+    const container = document.getElementById('artistRankingLast4WeeksChart');
+    container.innerHTML = '';
+
+    const totalRanked = Object.values(rankingCounts).reduce((sum, count) => sum + count, 0);
+
+    if (totalRanked === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #666;">No ranked artists in last 4 weeks</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...Object.values(rankingCounts));
+
+    // Update subtitle with total
+    const rankingSubtitle = document.querySelector('.chart-container:has(#artistRankingLast4WeeksChart) .chart-subtitle');
+    if (rankingSubtitle) {
+        rankingSubtitle.textContent = `Distribution of recent additions — ${totalRanked} ranked artists`;
+    }
+
+    // Color palette for rankings (warm sunset to earthy tones)
+    const rankingColors = {
+        '1': '#E8C48A', // Light warm gold - highest potential
+        '2': '#D6B370', // Primary gold
+        '3': '#B88B5D', // Warm brown
+        '4': '#A3674A', // Rich terracotta brown
+        '5': '#95392E'  // Deep terracotta - lowest ranking
+    };
+
+    // Always display rankings 1-5 in order
+    ['1', '2', '3', '4', '5'].forEach(ranking => {
+        const count = rankingCounts[ranking];
+        const percent = totalRanked > 0 ? Math.round((count / totalRanked) * 100) : 0;
+        const allTimePercent = allTimeTotalRanked > 0 ? Math.round((allTimeRankingCounts[ranking] / allTimeTotalRanked) * 100) : 0;
+        const percentDiff = percent - allTimePercent;
+
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        const widthPercent = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+        const barColor = rankingColors[ranking];
+
+        // Determine trend arrow and color
+        let trendHtml = '';
+        if (percentDiff > 0) {
+            // For rankings 1-2, up is good (green). For 3-5, up is bad (red)
+            const isGoodTrend = (ranking === '1' || ranking === '2');
+            const trendColor = isGoodTrend ? '#A8B5A0' : '#B8503F';
+            trendHtml = `<span style="color: ${trendColor}; font-size: 0.75rem; margin-left: 0.25rem;">↑${percentDiff}pp</span>`;
+        } else if (percentDiff < 0) {
+            // For rankings 1-2, down is bad (red). For 3-5, down is good (green)
+            const isGoodTrend = (ranking === '3' || ranking === '4' || ranking === '5');
+            const trendColor = isGoodTrend ? '#A8B5A0' : '#B8503F';
+            trendHtml = `<span style="color: ${trendColor}; font-size: 0.75rem; margin-left: 0.25rem;">↓${Math.abs(percentDiff)}pp</span>`;
+        }
+
+        barItem.innerHTML = `
+            <div class="bar-label">Ranking ${ranking}</div>
+            <div class="bar" style="width: ${widthPercent}%; background: ${barColor};"></div>
+            <div class="bar-value">${count} <span style="font-size: 0.85rem; color: #999;">(${percent}%)</span>${trendHtml}</div>
+        `;
+        container.appendChild(barItem);
+    });
+}
+
+function renderFunnel(data) {
+    const canonicalLabels = {
+        prospect: null,
+        plannedOutreach: null,
+        outreach: null,
+        responded: null,
+        negotiating: null,
+        rejected: null,
+        featurePlanned: null,
+        showcased: null
+    };
+    const stageCounts = {
+        prospect: 0,
+        plannedOutreach: 0,
+        outreach: 0,
+        responded: 0,
+        negotiating: 0,
+        rejected: 0,
+        featurePlanned: 0,
+        showcased: 0
+    };
+    data.forEach(row => {
+        let rawStatus = (row["Current Status"] || "");
+        let status = rawStatus.toLowerCase().replace(/[–—-]/g, ' ')
+            .replace(/[:;,().]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        if (status.startsWith("prospect")) {
+            stageCounts.prospect++;
+            if (!canonicalLabels.prospect) canonicalLabels.prospect = rawStatus;
+        } else if (status.includes("planned") && status.includes("outreach")) {
+            stageCounts.plannedOutreach++;
+            if (!canonicalLabels.plannedOutreach) canonicalLabels.plannedOutreach = rawStatus;
+        } else if (status.includes("outreach")) {
+            stageCounts.outreach++;
+            if (!canonicalLabels.outreach) canonicalLabels.outreach = rawStatus;
+        } else if (status.startsWith("respond") || status.startsWith("reply")) {
+            stageCounts.responded++;
+            if (!canonicalLabels.responded) canonicalLabels.responded = rawStatus;
+        } else if (status.includes("negotiat")) {
+            stageCounts.negotiating++;
+            if (!canonicalLabels.negotiating) canonicalLabels.negotiating = rawStatus;
+        } else if (status.includes("reject")) {
+            stageCounts.rejected++;
+            if (!canonicalLabels.rejected) canonicalLabels.rejected = rawStatus;
+        } else if (status.includes("feature") && status.includes("planned")) {
+            stageCounts.featurePlanned++;
+            if (!canonicalLabels.featurePlanned) canonicalLabels.featurePlanned = rawStatus;
+        } else if (
+            status.includes("spotlight") ||
+            status.includes("featured") ||
+            status.includes("showcas")
+        ) {
+            stageCounts.showcased++;
+            if (!canonicalLabels.showcased) canonicalLabels.showcased = rawStatus;
+        }
+    });
+    const fallbackLabels = {
+        prospect: "Prospect",
+        plannedOutreach: "Planned Outreach",
+        outreach: "Outreach",
+        responded: "Responded",
+        negotiating: "Negotiating",
+        rejected: "Rejected",
+        featurePlanned: "Feature Planned",
+        showcased: "Showcased"
+    };
+    const funnelStages = [
+        { key: "prospect", label: canonicalLabels.prospect || fallbackLabels.prospect, count: stageCounts.prospect },
+        { key: "plannedOutreach", label: canonicalLabels.plannedOutreach || fallbackLabels.plannedOutreach, count: stageCounts.plannedOutreach },
+        { key: "outreach", label: canonicalLabels.outreach || fallbackLabels.outreach, count: stageCounts.outreach },
+        { key: "responded", label: canonicalLabels.responded || fallbackLabels.responded, count: stageCounts.responded },
+        { key: "negotiating", label: canonicalLabels.negotiating || fallbackLabels.negotiating, count: stageCounts.negotiating },
+        { key: "rejected", label: canonicalLabels.rejected || fallbackLabels.rejected, count: stageCounts.rejected },
+        { key: "featurePlanned", label: canonicalLabels.featurePlanned || fallbackLabels.featurePlanned, count: stageCounts.featurePlanned },
+        { key: "showcased", label: canonicalLabels.showcased || fallbackLabels.showcased, count: stageCounts.showcased }
+    ];
+    const total = data.length;
+    const funnelSubtitle = document.querySelector('.chart-container:has(#pipelineFunnel) .chart-subtitle');
+    if (funnelSubtitle) {
+        funnelSubtitle.innerText = `Total: ${total}`;
+    }
+
+    // Calculate widths for funnel effect (100%, 85%, 70%, 55%, 40%, 35%, 30%, 20%)
+    const funnelWidths = [100, 85, 70, 55, 40, 35, 30, 20];
+
+    let funnelHtml = "";
+    for (let i = 0; i < funnelStages.length; i++) {
+        const s = funnelStages[i];
+        const percent = total > 0 ? Math.round((s.count / total) * 100) : 0;
+        const width = funnelWidths[i];
+
+        funnelHtml += `
+            <div class="funnel-stage" style="width: ${width}%;">
+                <div class="funnel-content">
+                    <span class="funnel-label">${s.label}:</span>
+                    <span class="funnel-number">${s.count}</span>
+                    <span class="funnel-percentage">(${percent}%)</span>
+                </div>
+            </div>
+        `;
+    }
+    document.getElementById('pipelineFunnel').innerHTML = funnelHtml;
+}
+
+function parseDate(dateString) {
+    if (!dateString) return null;
+
+    const trimmed = String(dateString).trim();
+    if (!trimmed) return null;
+
+    // Handle DD/MM/YY, DD/MM/YYYY, DD.MM.YY, or DD.MM.YYYY formats
+    if (trimmed.includes("/") || trimmed.includes(".")) {
+        const parts = trimmed.split(/[\/\.]/); // Split by either / or .
+        if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // JavaScript months are 0-indexed
+            let year = parseInt(parts[2], 10);
+
+            // Validate parsed numbers
+            if (isNaN(day) || isNaN(month) || isNaN(year)) {
+                console.warn(`Invalid date parts: ${trimmed}`);
+                return null;
+            }
+
+            // Handle 2-digit years
+            if (year < 100) {
+                year = 2000 + year;
+            }
+
+            // Create date and validate it
+            const date = new Date(year, month, day, 0, 0, 0, 0);
+
+            // Safari validation: check if date is valid
+            if (isNaN(date.getTime())) {
+                console.warn(`Invalid date created: ${trimmed}`);
+                return null;
+            }
+
+            // Additional validation: ensure the date components match what we put in
+            // (handles cases like Feb 31st which JavaScript adjusts)
+            if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
+                console.warn(`Date components mismatch: ${trimmed} resulted in ${date}`);
+                return null;
+            }
+
+            return date;
+        }
+    }
+
+    // Try standard Date parsing for other formats
+    const date = new Date(trimmed);
+
+    // Validate the parsed date
+    if (isNaN(date.getTime())) {
+        console.warn(`Failed to parse date: ${trimmed}`);
+        return null;
+    }
+
+    return date;
+}
+
+function renderTopPerformers(artistData, postData) {
+    const container = document.getElementById('topPerformers');
+    if (!container) return;
+
+    if (!postData || postData.length === 0 || !artistData || artistData.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center;">No data available</p>';
+        return;
+    }
+
+    // Find best performing posts (by engagement rate)
+    const validPosts = postData.filter(row => row["Likes / Reach"] && row["Artist"]);
+    const sortedPosts = validPosts.sort((a, b) => {
+        const engagementA = parseFloat(a["Likes / Reach"]) || 0;
+        const engagementB = parseFloat(b["Likes / Reach"]) || 0;
+        return engagementB - engagementA;
+    });
+
+    const bestPost = sortedPosts[0];
+
+    const bestReachPost = [...validPosts].sort((a, b) => {
+        const reachA = parseInt(String(a["Reach"]).replace(/,/g, '')) || 0;
+        const reachB = parseInt(String(b["Reach"]).replace(/,/g, '')) || 0;
+        return reachB - reachA;
+    })[0];
+
+    const bestLikesPost = [...validPosts].sort((a, b) => {
+        const likesA = parseInt(String(a["Likes"]).replace(/,/g, '')) || 0;
+        const likesB = parseInt(String(b["Likes"]).replace(/,/g, '')) || 0;
+        return likesB - likesA;
+    })[0];
+
+    container.innerHTML = `
+        <div class="performer-card">
+            <div class="performer-name">Highest Engagement</div>
+            <div class="performer-stat-value">${parseFloat(bestPost["Likes / Reach"]).toFixed(2)}%</div>
+            <div class="performer-artist-name">${bestPost["Artist"] || "Unknown"}</div>
+            <div class="performer-stat">${bestPost["Post Title"] ? bestPost["Post Title"].substring(0, 40) + (bestPost["Post Title"].length > 40 ? '...' : '') : ''}</div>
+        </div>
+        <div class="performer-card">
+            <div class="performer-name">Most Reach</div>
+            <div class="performer-stat-value">${parseInt(String(bestReachPost["Reach"]).replace(/,/g, '')).toLocaleString()}</div>
+            <div class="performer-artist-name">${bestReachPost["Artist"] || "Unknown"}</div>
+            <div class="performer-stat">${bestReachPost["Post Title"] ? bestReachPost["Post Title"].substring(0, 40) + (bestReachPost["Post Title"].length > 40 ? '...' : '') : ''}</div>
+        </div>
+        <div class="performer-card">
+            <div class="performer-name">Most Likes</div>
+            <div class="performer-stat-value">${parseInt(String(bestLikesPost["Likes"]).replace(/,/g, '')).toLocaleString()}</div>
+            <div class="performer-artist-name">${bestLikesPost["Artist"] || "Unknown"}</div>
+            <div class="performer-stat">${bestLikesPost["Post Title"] ? bestLikesPost["Post Title"].substring(0, 40) + (bestLikesPost["Post Title"].length > 40 ? '...' : '') : ''}</div>
+        </div>
+    `;
+}
+
+function renderRecent(data) {
+    const recent = data
+        .filter(row => row["When Added"])
+        .map(row => ({
+            ...row,
+            parsedDate: parseDate(row["When Added"])
+        }))
+        .filter(row => row.parsedDate && !isNaN(row.parsedDate))
+        .sort((a, b) => b.parsedDate - a.parsedDate)
+        .slice(0, 20);
+
+    const container = document.getElementById('recentActivity');
+    container.innerHTML = '';
+
+    recent.forEach(row => {
+        const artistName = row["Artist"] || row["Instagram Name"] || "Unknown";
+        const whereFound = row["Where Found"] || "Unknown";
+        const avatarSrc = row["Image"] || "https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face";
+        const instaHandle = row["Insta Handle"] || "#";
+
+        // Create artist ID for linking to main page
+        const artistNameForId = artistName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const artistCardLink = `index.html#artist-${artistNameForId}`;
+
+        const daysAgo = Math.floor((new Date() - row.parsedDate) / (1000 * 60 * 60 * 24));
+        let dateText;
+        if (daysAgo === 0) dateText = "Today";
+        else if (daysAgo === 1) dateText = "Yesterday";
+        else if (daysAgo < 0) dateText = "Future date";
+        else dateText = `${daysAgo} days ago`;
+
+        const item = document.createElement('a');
+        item.className = 'activity-item';
+        item.href = artistCardLink;
+        item.innerHTML = `
+            <div class="activity-left">
+                <img src="${avatarSrc}" alt="${artistName}" class="activity-avatar" onerror="this.src='https://images.unsplash.com/photo-1494790108755-2616b612b740?w=80&h=80&fit=crop&crop=face'">
+                <div class="activity-info">
+                    <div class="activity-name">${artistName}</div>
+                    <div class="activity-source">${whereFound}</div>
+                </div>
+            </div>
+            <div class="activity-date">${dateText}</div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+function updateSummary(data, followerData = null, postData = null) {
+    // New Artists (last 2 weeks)
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    const newArtists = data.filter(row => {
+        const addedDate = parseDate(row["When Added"]);
+        return addedDate && addedDate >= twoWeeksAgo;
+    }).length;
+
+    // Calculate average new artists per week
+    let avgNewArtistsPerWeek = '-';
+    try {
+        const artistsWithDates = data
+            .filter(row => row["When Added"])
+            .map(row => ({ date: parseDate(row["When Added"]) }))
+            .filter(r => r.date && !isNaN(r.date))
+            .sort((a, b) => a.date - b.date);
+
+        if (artistsWithDates.length > 0) {
+            const weeklyAdds = {};
+            artistsWithDates.forEach(r => {
+                const week = `${r.date.getFullYear()}-W${getWeekNumber(r.date)}`;
+                if (!weeklyAdds[week]) weeklyAdds[week] = 0;
+                weeklyAdds[week]++;
+            });
+
+            const totalWeeks = Object.keys(weeklyAdds).length;
+            const totalArtists = artistsWithDates.length;
+            avgNewArtistsPerWeek = totalWeeks > 0 ? Math.round(totalArtists / totalWeeks) : '-';
+        }
+    } catch (error) {
+        console.error('Error calculating avg new artists per week:', error);
+        avgNewArtistsPerWeek = '-';
+    }
+
+    // Count Planned Outreach
+    const plannedOutreach = data.filter(row => {
+        const status = (row["Current Status"] || "").toLowerCase().trim();
+        return status === "planned outreach" || status.includes("planned") && status.includes("outreach");
+    }).length;
+
+    // Update basic stats
+    document.getElementById('summaryNewArtists').textContent = newArtists;
+    document.getElementById('summaryAvgNewArtists').textContent = avgNewArtistsPerWeek;
+    document.getElementById('summaryPlannedOutreach').textContent = plannedOutreach;
+
+    // Follower Growth (from follower data)
+    if (followerData && followerData.length > 0) {
+        const validData = followerData
+            .map(row => {
+                const dateColumn = Object.keys(row).find(key => key.toLowerCase().includes('date'));
+                const followerColumn = Object.keys(row).find(key => key.toLowerCase().includes('follower'));
+                if (!dateColumn || !followerColumn) return null;
+
+                const followerStr = String(row[followerColumn]).replace(/,/g, '').replace(/\s/g, '').trim();
+                const followers = parseInt(followerStr) || 0;
+                const date = parseDate(row[dateColumn]);
+
+                return { date, followers };
+            })
+            .filter(d => d && d.date && !isNaN(d.date) && d.followers > 0)
+            .sort((a, b) => a.date - b.date);
+
+        if (validData.length >= 2) {
+            const oldestFollowers = validData[0].followers;
+            const latestFollowers = validData[validData.length - 1].followers;
+            const growth = latestFollowers - oldestFollowers;
+
+            // Calculate time period
+            const oldestDate = validData[0].date;
+            const latestDate = validData[validData.length - 1].date;
+            const daysDiff = Math.floor((latestDate - oldestDate) / (1000 * 60 * 60 * 24));
+
+            let timePeriod;
+            if (daysDiff < 30) {
+                timePeriod = `${daysDiff} days`;
+            } else if (daysDiff < 60) {
+                timePeriod = '1 month';
+            } else if (daysDiff < 365) {
+                const months = Math.floor(daysDiff / 30);
+                timePeriod = `${months} months`;
+            } else {
+                const years = Math.floor(daysDiff / 365);
+                const remainingMonths = Math.floor((daysDiff % 365) / 30);
+                if (remainingMonths > 0) {
+                    timePeriod = `${years} year${years > 1 ? 's' : ''} ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                } else {
+                    timePeriod = `${years} year${years > 1 ? 's' : ''}`;
+                }
+            }
+
+            const growthText = growth > 0 ? `+${growth.toLocaleString()}` : growth.toLocaleString();
+            document.getElementById('summaryFollowerGrowth').textContent = growthText;
+            document.getElementById('summaryFollowerGrowthLabel').textContent = `Follower Growth (in ${timePeriod})`;
+        }
+    }
+
+    // Avg Spotlights per Week (from post data)
+    if (postData && postData.length > 0) {
+        const postsWithDates = postData.filter(row => row["Post Date"]);
+
+        if (postsWithDates.length > 0) {
+            // Parse all dates and find the earliest
+            const dates = postsWithDates
+                .map(row => parseDate(row["Post Date"]))
+                .filter(d => d && !isNaN(d));
+
+            if (dates.length > 0) {
+                dates.sort((a, b) => a - b);
+                const firstPostDate = dates[0];
+                const now = new Date();
+                const daysSinceFirst = Math.floor((now - firstPostDate) / (1000 * 60 * 60 * 24));
+                const weeksSinceFirst = daysSinceFirst / 7;
+
+                if (weeksSinceFirst > 0) {
+                    const avgSpotlightsPerWeek = (postsWithDates.length / weeksSinceFirst).toFixed(1);
+                    document.getElementById('summaryAvgSpotlights').textContent = avgSpotlightsPerWeek;
+                }
+            }
+        }
+    }
+
+    // Avg Engagement (from post data)
+    if (postData && postData.length > 0) {
+        const validPosts = postData.filter(row => row["Likes / Reach"]);
+        if (validPosts.length > 0) {
+            const totalEngagement = validPosts.reduce((sum, row) => {
+                return sum + (parseFloat(row["Likes / Reach"]) || 0);
+            }, 0);
+            const avgEngagement = (totalEngagement / validPosts.length).toFixed(2);
+            document.getElementById('summaryAvgEngagement').textContent = avgEngagement + '%';
+        }
+    }
+
+    // Easy Commerce percentage
+    const easyCommerceCount = data.filter(row => {
+        const easyCommerce = (row["Website with easy commerce"] || "").toString().trim();
+        return easyCommerce && easyCommerce.toLowerCase() !== 'no' && easyCommerce !== '';
+    }).length;
+    const easyCommercePercent = data.length > 0 ? ((easyCommerceCount / data.length) * 100).toFixed(0) : 0;
+    document.getElementById('summaryEasyCommerce').textContent = easyCommercePercent + '%';
+
+    // Gallery Representation percentage
+    const galleryRepCount = data.filter(row => {
+        const galleryRep = (row["Gallery Representation"] || "").toString().trim();
+        return galleryRep && galleryRep.toLowerCase() !== 'no' && galleryRep !== '';
+    }).length;
+    const galleryRepPercent = data.length > 0 ? ((galleryRepCount / data.length) * 100).toFixed(0) : 0;
+    document.getElementById('summaryGalleryRep').textContent = galleryRepPercent + '%';
+}
+
+function renderFollowerGrowth(data) {
+    console.log('=== FOLLOWER GROWTH DEBUG ===');
+    console.log('Raw follower data received:', data);
+    console.log('Data length:', data.length);
+    if (data.length > 0) {
+        console.log('First 3 rows:', data.slice(0, 3));
+        console.log('Column names:', Object.keys(data[0]));
+    }
+
+    // Try to find the right columns even if names don't match exactly
+    const dateColumn = Object.keys(data[0] || {}).find(key =>
+        key.trim().toLowerCase().includes('date')
+    );
+    const followerColumn = Object.keys(data[0] || {}).find(key =>
+        key.trim().toLowerCase().includes('follower')
+    );
+
+    console.log('Detected date column:', dateColumn);
+    console.log('Detected follower column:', followerColumn);
+
+    if (!dateColumn || !followerColumn) {
+        const container = document.getElementById('followerGrowthContainer');
+        if (container) {
+            container.innerHTML = `<div style="text-align: center; color: #666; padding: 2rem;">
+                Cannot find required columns.<br>
+                Available columns: ${Object.keys(data[0] || {}).join(', ')}<br>
+                Looking for: "Date" and "# Followers"
+            </div>`;
+        }
+        return;
+    }
+
+    const followerData = data
+        .filter(row => row[dateColumn] && row[followerColumn])
+        .map(row => {
+            const followerStr = String(row[followerColumn]).replace(/,/g, '').replace(/\s/g, '').trim();
+            const followers = parseInt(followerStr) || 0;
+            const parsedDate = parseDate(row[dateColumn]);
+
+            console.log('Processing row:', {
+                rawDate: row[dateColumn],
+                rawFollowers: row[followerColumn],
+                parsedDate: parsedDate,
+                parsedFollowers: followers,
+                isValidDate: parsedDate && !isNaN(parsedDate),
+                isValidFollowers: followers > 0
+            });
+
+            return {
+                date: parsedDate,
+                followers: followers,
+                rawDate: row[dateColumn],
+                rawFollowers: row[followerColumn]
+            };
+        })
+        .filter(row => {
+            const valid = row.date && !isNaN(row.date) && row.followers > 0;
+            if (!valid) {
+                console.log('❌ Filtered out row:', row, 'Reason:', {
+                    noDate: !row.date,
+                    invalidDate: row.date && isNaN(row.date),
+                    noFollowers: row.followers <= 0
+                });
+            } else {
+                console.log('✓ Valid row:', row);
+            }
+            return valid;
+        })
+        .sort((a, b) => a.date - b.date);
+
+    console.log('Processed follower data:', followerData);
+    console.log('Valid data points:', followerData.length);
+
+    const container = document.getElementById('followerGrowthContainer');
+
+    if (followerData.length === 0) {
+        if (container) {
+            container.innerHTML = `<div style="text-align: center; color: #666; padding: 2rem;">
+                No valid follower data found.<br>
+                Rows received: ${data.length}<br>
+                Check browser console (F12) for details.
+            </div>`;
+        }
+        return;
+    }
+
+    const totalDataPoints = followerData.length;
+    const startFollowers = followerData[0].followers;
+    const endFollowers = followerData[followerData.length - 1].followers;
+    const totalGrowth = endFollowers - startFollowers;
+    const growthPercentage = startFollowers > 0 ? ((totalGrowth / startFollowers) * 100).toFixed(1) : 0;
+
+    // Calculate time span and average weekly growth
+    const startDate = followerData[0].date;
+    const endDate = followerData[followerData.length - 1].date;
+    const daysDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const weeksDiff = daysDiff / 7;
+    const avgWeeklyGrowth = weeksDiff > 0 ? Math.round(totalGrowth / weeksDiff) : 0;
+
+    // Format start date
+    const startDateStr = `${startDate.getDate()} ${startDate.toLocaleString('default', { month: 'short' })} ${startDate.getFullYear()}`;
+
+    const subtitle = document.getElementById('followerGrowthSubtitle');
+    if (subtitle) {
+        subtitle.textContent = `+${totalGrowth.toLocaleString()} followers (+${growthPercentage}% since ${startDateStr}) — Avg weekly growth: ${avgWeeklyGrowth.toLocaleString()} followers/week`;
+    }
+
+    const labels = followerData.map(d => {
+        const month = d.date.toLocaleString('default', { month: 'short' });
+        const day = d.date.getDate();
+        return `${day} ${month}`;
+    });
+
+    const ctx = document.getElementById('followerGrowthChart').getContext('2d');
+    const isDarkModeFollower = document.body.classList.contains('dark-mode');
+    const followerLineColor = isDarkModeFollower ? '#C4D4BE' : '#A8B5A0';
+    const followerFillColor = isDarkModeFollower ? 'rgba(168, 181, 160, 0.15)' : 'rgba(168, 181, 160, 0.12)';
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Followers',
+                data: followerData.map(d => d.followers),
+                borderColor: followerLineColor,
+                backgroundColor: followerFillColor,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: followerLineColor,
+                pointBorderColor: isDarkModeFollower ? '#2C2C2C' : '#F3EFE9',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Followers: ${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderResponseAnalytics(data) {
+    // Filter artists who have been contacted
+    const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
+
+    // Count those who responded with interest
+    const respondedInterested = contacted.filter(row => {
+        const status = (row["Response Status"] || "").trim();
+        return status === "Responded - Interested";
+    });
+
+    // Count those who made it to featured/spotlighted
+    const featured = respondedInterested.filter(row => {
+        const currentStatus = (row["Current Status"] || "").toLowerCase().trim();
+        return currentStatus.includes("spotlight") ||
+               currentStatus.includes("featured") ||
+               currentStatus.includes("showcas");
+    });
+
+    // Calculate response times for those who responded (anyone with a Date Responded)
+    const responseTimes = contacted
+        .filter(row => row["Date Responded"] && row["Date Responded"].trim())
+        .map(row => {
+            const contacted = parseDate(row["Date Contacted"]);
+            const responded = parseDate(row["Date Responded"]);
+            if (contacted && responded && !isNaN(contacted) && !isNaN(responded)) {
+                return Math.floor((responded - contacted) / (1000 * 60 * 60 * 24));
+            }
+            return null;
+        })
+        .filter(days => days !== null && days >= 0);
+
+    const avgResponseTime = responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((sum, days) => sum + days, 0) / responseTimes.length)
+        : 0;
+
+    // Calculate time from response to feature for featured artists
+    console.log('=== RESPONSE TO FEATURE DEBUG ===');
+    console.log('Featured artists count:', featured.length);
+
+    const responseToFeatureTimes = featured
+        .filter(row => row["Date Responded"] && row["Date Responded"].trim() && row["Spotlighted"])
+        .map(row => {
+            const respondedStr = row["Date Responded"];
+            const featuredStr = row["Spotlighted"];
+            const responded = parseDate(respondedStr);
+            const featuredDate = parseDate(featuredStr);
+
+            console.log(`Artist: ${row["Artist"]}`);
+            console.log(`  Responded date string: "${respondedStr}"`);
+            console.log(`  Featured date string: "${featuredStr}"`);
+            console.log(`  Responded parsed:`, responded);
+            console.log(`  Featured parsed:`, featuredDate);
+            console.log(`  Responded valid:`, responded && !isNaN(responded.getTime()));
+            console.log(`  Featured valid:`, featuredDate && !isNaN(featuredDate.getTime()));
+
+            // Use getTime() for Safari compatibility
+            if (responded && featuredDate &&
+                !isNaN(responded.getTime()) && !isNaN(featuredDate.getTime())) {
+                const days = Math.floor((featuredDate.getTime() - responded.getTime()) / (1000 * 60 * 60 * 24));
+                console.log('Calculated days:', days);
+                return days;
+            }
+            return null;
+        })
+        .filter(days => days !== null && days >= 0);
+
+    console.log('Valid response→feature times:', responseToFeatureTimes);
+    console.log('Count:', responseToFeatureTimes.length);
+
+    const avgResponseToFeature = responseToFeatureTimes.length > 0
+        ? Math.round(responseToFeatureTimes.reduce((sum, days) => sum + days, 0) / responseToFeatureTimes.length)
+        : 0;
+
+    console.log('Average response→feature time:', avgResponseToFeature);
+
+    // Response rate by source WITH response times
+    const sourceStats = {};
+    contacted.forEach(row => {
+        const source = row["Where Found"] || "Unknown";
+        if (!sourceStats[source]) {
+            sourceStats[source] = { contacted: 0, responded: 0, responseTimes: [] };
+        }
+        sourceStats[source].contacted++;
+
+        const respStatus = (row["Response Status"] || "").trim();
+        if (respStatus === "Responded - Interested") {
+            sourceStats[source].responded++;
+        }
+
+        // Track response times for this source
+        if (row["Date Responded"] && row["Date Responded"].trim()) {
+            const contactedDate = parseDate(row["Date Contacted"]);
+            const respondedDate = parseDate(row["Date Responded"]);
+            if (contactedDate && respondedDate && !isNaN(contactedDate) && !isNaN(respondedDate)) {
+                const days = Math.floor((respondedDate - contactedDate) / (1000 * 60 * 60 * 24));
+                if (days >= 0) {
+                    sourceStats[source].responseTimes.push(days);
+                }
+            }
+        }
+    });
+
+    const sourceRates = Object.entries(sourceStats)
+        .map(([source, stats]) => ({
+            source,
+            rate: stats.contacted > 0 ? (stats.responded / stats.contacted * 100) : 0,
+            contacted: stats.contacted,
+            avgResponseTime: stats.responseTimes.length > 0
+                ? Math.round(stats.responseTimes.reduce((sum, days) => sum + days, 0) / stats.responseTimes.length)
+                : null
+        }))
+        .filter(s => s.contacted >= 3) // Only show sources with 3+ contacts
+        .sort((a, b) => b.rate - a.rate);
+
+    // Find fastest responding source (minimum average response time)
+    const fastestSource = sourceRates
+        .filter(s => s.avgResponseTime !== null)
+        .sort((a, b) => a.avgResponseTime - b.avgResponseTime)[0];
+
+    // Analyze response patterns by day of week contacted
+    const dayOfWeekStats = {
+        0: { name: 'Sunday', contacted: 0, responded: 0 },
+        1: { name: 'Monday', contacted: 0, responded: 0 },
+        2: { name: 'Tuesday', contacted: 0, responded: 0 },
+        3: { name: 'Wednesday', contacted: 0, responded: 0 },
+        4: { name: 'Thursday', contacted: 0, responded: 0 },
+        5: { name: 'Friday', contacted: 0, responded: 0 },
+        6: { name: 'Saturday', contacted: 0, responded: 0 }
+    };
+
+    contacted.forEach(row => {
+        const contactedDate = parseDate(row["Date Contacted"]);
+        if (contactedDate && !isNaN(contactedDate)) {
+            const dayOfWeek = contactedDate.getDay();
+            dayOfWeekStats[dayOfWeek].contacted++;
+
+            if (row["Date Responded"] && row["Date Responded"].trim()) {
+                dayOfWeekStats[dayOfWeek].responded++;
+            }
+        }
+    });
+
+    const dayOfWeekRates = Object.values(dayOfWeekStats)
+        .map(day => ({
+            name: day.name,
+            contacted: day.contacted,
+            responded: day.responded,
+            rate: day.contacted > 0 ? ((day.responded / day.contacted) * 100).toFixed(1) : 0
+        }))
+        .filter(day => day.contacted > 0); // Only show days with contacts
+
+    // Response rate by genre
+    const genreStats = {};
+    contacted.forEach(row => {
+        const genre = row["Genre"] || "Unknown";
+        if (!genreStats[genre]) {
+            genreStats[genre] = { contacted: 0, responded: 0 };
+        }
+        genreStats[genre].contacted++;
+
+        const respStatus = (row["Response Status"] || "").trim();
+        if (respStatus === "Responded - Interested") {
+            genreStats[genre].responded++;
+        }
+    });
+
+    const genreRates = Object.entries(genreStats)
+        .map(([genre, stats]) => ({
+            genre,
+            rate: stats.contacted > 0 ? (stats.responded / stats.contacted * 100) : 0,
+            contacted: stats.contacted
+        }))
+        .filter(g => g.contacted >= 3) // Only show genres with 3+ contacts
+        .sort((a, b) => b.rate - a.rate);
+
+    // Render funnel
+    const funnelContainer = document.getElementById('responseFunnel');
+    const totalContacted = contacted.length;
+    const totalResponded = respondedInterested.length;
+    const totalFeatured = featured.length;
+
+    const responseRate = totalContacted > 0 ? Math.round((totalResponded / totalContacted) * 100) : 0;
+    const conversionRate = totalResponded > 0 ? Math.round((totalFeatured / totalResponded) * 100) : 0;
+
+    if (totalContacted === 0) {
+        funnelContainer.innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">No outreach data yet. Start adding Date Contacted to artists!</div>';
+        document.getElementById('responseInsights').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Insights will appear once you have outreach data.</div>';
+        return;
+    }
+
+    const funnelHtml = `
+        <div class="funnel-stage" style="width: 100%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Contacted:</span>
+                <span class="funnel-number">${totalContacted}</span>
+                <span class="funnel-percentage">(100%)</span>
+            </div>
+        </div>
+        <div class="funnel-stage" style="width: 70%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Responded:</span>
+                <span class="funnel-number">${totalResponded}</span>
+                <span class="funnel-percentage">(${responseRate}%)</span>
+            </div>
+        </div>
+        <div class="funnel-stage" style="width: 40%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Featured:</span>
+                <span class="funnel-number">${totalFeatured}</span>
+                <span class="funnel-percentage">(${conversionRate}% of responded)</span>
+            </div>
+        </div>
+    `;
+    funnelContainer.innerHTML = funnelHtml;
+
+    // Render insights
+    const insightsContainer = document.getElementById('responseInsights');
+    let insightsHtml = '';
+
+    // Overall response rate
+    insightsHtml += `
+        <div class="insight-item">
+            <div class="insight-label">Overall Response Rate</div>
+            <div class="insight-value">${responseRate}%</div>
+            <div class="insight-detail">${totalResponded} of ${totalContacted} artists responded</div>
+        </div>
+    `;
+
+    // Average response time
+    if (avgResponseTime > 0) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Average Response Time</div>
+                <div class="insight-value">${avgResponseTime} days</div>
+                <div class="insight-detail">Based on ${responseTimes.length} response${responseTimes.length !== 1 ? 's' : ''}</div>
+            </div>
+        `;
+    }
+
+    // Best performing source
+    if (sourceRates.length > 0) {
+        const topSource = sourceRates[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Best Discovery Source (by response rate)</div>
+                <div class="insight-value">${topSource.source}</div>
+                <div class="insight-detail">${Math.round(topSource.rate)}% of ${topSource.source}-discovered artists responded when contacted (${topSource.contacted} contacted)</div>
+            </div>
+        `;
+    }
+
+    // Best performing genre
+    if (genreRates.length > 0) {
+        const topGenre = genreRates[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Most Responsive Genre</div>
+                <div class="insight-value">${topGenre.genre}</div>
+                <div class="insight-detail">${Math.round(topGenre.rate)}% response rate (${topGenre.contacted} contacted)</div>
+            </div>
+        `;
+    }
+
+    // Fastest responding source
+    if (fastestSource) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Fastest Response Source</div>
+                <div class="insight-value">${fastestSource.source}</div>
+                <div class="insight-detail">Artists respond in ~${fastestSource.avgResponseTime} days on average</div>
+            </div>
+        `;
+    }
+
+    // Best day of week to contact
+    if (dayOfWeekRates.length > 0) {
+        const bestDay = dayOfWeekRates.sort((a, b) => parseFloat(b.rate) - parseFloat(a.rate))[0];
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Best Day to Contact</div>
+                <div class="insight-value">${bestDay.name}</div>
+                <div class="insight-detail">${bestDay.rate}% response rate (${bestDay.responded}/${bestDay.contacted} responded)</div>
+            </div>
+        `;
+    }
+
+    // Conversion to featured
+    if (totalResponded > 0) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Interested → Featured Rate</div>
+                <div class="insight-value">${conversionRate}%</div>
+                <div class="insight-detail">${totalFeatured} of ${totalResponded} interested artists featured</div>
+            </div>
+        `;
+    }
+
+    // Time from response to feature
+    if (avgResponseToFeature > 0) {
+        insightsHtml += `
+            <div class="insight-item">
+                <div class="insight-label">Response → Feature Time</div>
+                <div class="insight-value">${avgResponseToFeature} days</div>
+                <div class="insight-detail">Average time from interest to going live (${responseToFeatureTimes.length} featured)</div>
+            </div>
+        `;
+    }
+
+    insightsContainer.innerHTML = insightsHtml;
+
+    // Update subtitle with total contacted
+    const subtitle = document.getElementById('responseAnalyticsSubtitle');
+    if (subtitle) {
+        subtitle.textContent = `${totalContacted} artists contacted — ${responseRate}% response rate — ${avgResponseTime} days avg response time`;
+    }
+}
+
+function renderSourcePerformance(data) {
+    // Filter artists who have been contacted
+    const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
+
+    if (contacted.length === 0) {
+        document.getElementById('contactMethodPerformance').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">No outreach data yet.</div>';
+        return;
+    }
+
+    // Calculate stats by contact method
+    const methodStats = {};
+    contacted.forEach(row => {
+        const method = (row["Contact Method"] || "Not Specified").trim();
+        if (!methodStats[method]) {
+            methodStats[method] = { contacted: 0, responded: 0, positiveResponse: 0, spotlighted: 0, noResponse: 0 };
+        }
+        methodStats[method].contacted++;
+
+        const respStatus = (row["Response Status"] || "").trim();
+        const dateResponded = (row["Date Responded"] || "").trim();
+
+        // Only count as responded if they actually responded (has Date Responded or specific status)
+        if (respStatus === "Responded - Interested") {
+            methodStats[method].responded++;
+            methodStats[method].positiveResponse++;
+        } else if (dateResponded || respStatus.toLowerCase().includes("responded")) {
+            methodStats[method].responded++;
+        } else if (!dateResponded && !respStatus.toLowerCase().includes("responded")) {
+            // No response if no date responded and status doesn't indicate a response
+            methodStats[method].noResponse++;
+        }
+
+        // Check if spotlighted (has a date in Spotlighted column)
+        const spotlightedDate = (row["Spotlighted"] || "").trim();
+        if (spotlightedDate) {
+            methodStats[method].spotlighted++;
+        }
+    });
+
+    // Calculate response rates
+    const methodPerformance = Object.keys(methodStats)
+        .map(method => ({
+            method,
+            contacted: methodStats[method].contacted,
+            responded: methodStats[method].responded,
+            positiveResponse: methodStats[method].positiveResponse,
+            spotlighted: methodStats[method].spotlighted,
+            noResponse: methodStats[method].noResponse,
+            responseRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].responded / methodStats[method].contacted) * 100)
+                : 0,
+            positiveRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].positiveResponse / methodStats[method].contacted) * 100)
+                : 0,
+            spotlightedRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].spotlighted / methodStats[method].contacted) * 100)
+                : 0,
+            noResponseRate: methodStats[method].contacted > 0
+                ? Math.round((methodStats[method].noResponse / methodStats[method].contacted) * 100)
+                : 0
+        }))
+        .filter(m => m.contacted >= 2) // Only show methods with 2+ contacts
+        .sort((a, b) => b.positiveRate - a.positiveRate);
+
+    // Render contact method performance table
+    const performanceContainer = document.getElementById('contactMethodPerformance');
+    let performanceHtml = '';
+
+    // Check for dark mode
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const headerColor = isDarkMode ? '#F3EFE9' : '#0D0D0D';
+    const secondaryColor = isDarkMode ? 'rgba(243, 239, 233, 0.7)' : '#999';
+    const borderColor = isDarkMode ? 'rgba(149, 57, 46, 0.25)' : 'rgba(149, 57, 46, 0.12)';
+
+    if (methodPerformance.length === 0) {
+        performanceHtml = `<div style="text-align: center; color: ${secondaryColor}; padding: 2rem;">Not enough data yet. Need at least 2 contacts per method.</div>`;
+    } else {
+        performanceHtml = `
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #95392E;">
+                        <th style="text-align: left; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Method</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Contacts</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Response</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">No Response</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Positive</th>
+                        <th style="text-align: center; padding: 0.75rem 0.5rem; font-weight: 400; color: ${headerColor};">Featured</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        methodPerformance.forEach((m, index) => {
+            const rowBg = index % 2 === 0
+                ? (isDarkMode ? 'rgba(149, 57, 46, 0.08)' : 'rgba(149, 57, 46, 0.04)')
+                : 'transparent';
+            performanceHtml += `
+                <tr style="background: ${rowBg}; border-bottom: 1px solid ${borderColor};">
+                    <td style="padding: 0.75rem 0.5rem; font-weight: 500; color: ${headerColor};">${m.method}</td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center; color: ${headerColor};">${m.contacted}</td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#A8B5A0' : m.responseRate >= 30 ? '#D6B370' : '#8A8580'};">
+                            ${m.responseRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.responded}/${m.contacted})</span>
+                    </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.noResponseRate >= 60 ? '#B8503F' : m.noResponseRate >= 40 ? '#D6B370' : '#8A8580'};">
+                            ${m.noResponseRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.noResponse}/${m.contacted})</span>
+                    </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#A8B5A0' : m.positiveRate >= 20 ? '#D6B370' : '#8A8580'};">
+                            ${m.positiveRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.positiveResponse}/${m.contacted})</span>
+                    </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#A8B5A0' : m.spotlightedRate >= 15 ? '#D6B370' : '#8A8580'};">
+                            ${m.spotlightedRate}%
+                        </span>
+                        <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.spotlighted}/${m.contacted})</span>
+                    </td>
+                </tr>
+            `;
+        });
+
+        performanceHtml += `
+                </tbody>
+            </table>
+        `;
+    }
+
+    performanceContainer.innerHTML = performanceHtml;
+
+    // Update subtitle
+    const totalContacted = contacted.length;
+    const totalResponded = contacted.filter(row => {
+        const status = (row["Response Status"] || "").trim();
+        return status === "Responded - Interested";
+    }).length;
+    const totalPositive = contacted.filter(row => {
+        const status = (row["Response Status"] || "").trim();
+        return status === "Responded - Interested";
+    }).length;
+    const overallRate = totalContacted > 0 ? Math.round((totalResponded / totalContacted) * 100) : 0;
+    const positiveRate = totalContacted > 0 ? Math.round((totalPositive / totalContacted) * 100) : 0;
+
+    const subtitle = document.getElementById('sourcePerformanceSubtitle');
+    if (subtitle) {
+        subtitle.textContent = `${methodPerformance.length} contact methods tracked — ${totalContacted} total contacts — ${overallRate}% response rate (${positiveRate}% positive)`;
+    }
+}
+
+// Store data globally for summary updates
+let artistData = [];
+let postPerformanceData = [];
+let followerGrowthData = [];
+
+fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=636920357&timestamp=${Date.now()}`)
+    .then(res => res.text())
+    .then(csvData => {
+        artistData = parseCSV(csvData);
+        updateSummary(artistData, followerGrowthData, postPerformanceData);
+        renderWhereFound(artistData);
+        renderGenres(artistData);
+        renderArtistRanking(artistData);
+        renderArtistRankingLast4Weeks(artistData);
+        renderPipelineTimeline(artistData);
+        renderFunnel(artistData);
+        renderRecent(artistData);
+        renderResponseAnalytics(artistData);
+        renderSourcePerformance(artistData);
+
+        return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
+    })
+    .then(res => res.text())
+    .then(igCsvData => {
+        postPerformanceData = parseCSV(igCsvData);
+        renderPostPerformance(postPerformanceData);
+        updateSummary(artistData, followerGrowthData, postPerformanceData);
+
+        // Render spotlight calendar (always show last 2 months)
+        spotlightCalendarData = postPerformanceData;
+        renderSpotlightCalendar(spotlightCalendarData);
+
+        return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1441529947&timestamp=${Date.now()}`);
+    })
+    .then(res => res.text())
+    .then(followerCsvData => {
+        console.log('Raw follower CSV (first 800 chars):', followerCsvData.substring(0, 800));
+
+        // Clean up CSV - remove empty rows at the beginning
+        const lines = followerCsvData.split('\n').filter(line => line.trim());
+        const cleanedCsv = lines.join('\n');
+
+        followerGrowthData = parseCSV(cleanedCsv);
+        console.log('Parsed follower data rows:', followerGrowthData.length);
+        renderFollowerGrowth(followerGrowthData);
+        renderTopPerformers(artistData, postPerformanceData);
+        updateSummary(artistData, followerGrowthData, postPerformanceData);
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        document.getElementById('whereFoundChart').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('genresChart').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('pipelineFunnel').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('recentActivity').innerHTML = '<div style="color: red;">Error loading data</div>';
+        document.getElementById('postPerformanceChart').getContext('2d').fillText('Error loading post data', 50, 50);
+        const followerCanvas = document.getElementById('followerGrowthChart');
+        if (followerCanvas && followerCanvas.getContext) {
+            followerCanvas.getContext('2d').fillText('Error loading follower data', 50, 50);
+        }
+    });
+
+// Dark mode functionality
+function initDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    // Check for saved preference in localStorage
+    const savedDarkMode = localStorage.getItem('darkMode');
+
+    // If user has a saved preference, use it; otherwise check system preference
+    if (savedDarkMode === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+    } else if (savedDarkMode === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // Auto-detect system preference if no saved preference
+        body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        // Light mode - show moon icon
+        darkModeToggle.textContent = '🌙';
+    }
+
+    // Toggle dark mode on button click
+    darkModeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            darkModeToggle.textContent = '☀️';
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            darkModeToggle.textContent = '🌙';
+            localStorage.setItem('darkMode', 'disabled');
+        }
+
+        // Re-render post performance chart to update colors
+        if (postPerformanceChart && postPerformanceRawData.length > 0) {
+            const activeSort = document.querySelector('.sort-btn.active');
+            const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
+            renderPostPerformance(postPerformanceRawData, sortType);
+        }
+
+        // Re-render Source Performance table to update colors
+        if (artistData && artistData.length > 0) {
+            renderSourcePerformance(artistData);
+        }
+
+        // Re-render Follower Growth chart to update colors
+        if (followerGrowthData && followerGrowthData.length > 0) {
+            const followerCanvas = document.getElementById('followerGrowthChart');
+            if (followerCanvas) {
+                const existingChart = Chart.getChart(followerCanvas);
+                if (existingChart) existingChart.destroy();
+            }
+            renderFollowerGrowth(followerGrowthData);
+        }
+    });
+}
+
+// Initialize dark mode on page load
+initDarkMode();
+
+// ============================================
+// SPOTLIGHT ACTIVITY CALENDAR
+// ============================================
+
+let spotlightCalendarData = [];
+let currentCalendarPeriod = 4; // Default to 4 weeks
+let currentCalendarIndex = 0;
+let calendarMonths = [];
+
+function renderSpotlightCalendar(postData, weeksToShow = 4) {
+    const container = document.getElementById('spotlightCalendar');
+    if (!container) return;
+
+    // Extract dates from post data
+    const spotlightDates = {};
+    postData.forEach(row => {
+        const dateStr = row["Post Date"];
+        if (dateStr && dateStr.trim()) {
+            const date = parseDate(dateStr);
+            if (date && !isNaN(date.getTime())) {
+                const dateKey = date.toISOString().split('T')[0];
+                if (!spotlightDates[dateKey]) {
+                    spotlightDates[dateKey] = [];
+                }
+                spotlightDates[dateKey].push({
+                    artist: row["Artist"] || "Unknown",
+                    reach: row["Reach"] || 0,
+                    views: row["Views"] || 0
+                });
+            }
+        }
+    });
+
+    // Show only last 2 calendar months
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Generate last 2 months (current month and previous month)
+    calendarMonths = [];
+
+    // Current month
+    calendarMonths.push({
+        key: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`,
+        year: today.getFullYear(),
+        month: today.getMonth(),
+        monthName: today.toLocaleString('default', { month: 'long' })
+    });
+
+    // Previous month
+    const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    calendarMonths.push({
+        key: `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`,
+        year: prevMonth.getFullYear(),
+        month: prevMonth.getMonth(),
+        monthName: prevMonth.toLocaleString('default', { month: 'long' })
+    });
+
+    // Months are in reverse chronological order (newest to oldest, left to right)
+
+    // Build calendar HTML
+    let html = '';
+
+    calendarMonths.forEach((monthData, index) => {
+        const firstDayOfMonth = new Date(monthData.year, monthData.month, 1);
+        const lastDayOfMonth = new Date(monthData.year, monthData.month + 1, 0);
+
+        // Count spotlights in this month
+        let monthSpotlights = 0;
+        for (let d = 1; d <= lastDayOfMonth.getDate(); d++) {
+            const checkDate = new Date(monthData.year, monthData.month, d);
+            const dateKey = checkDate.toISOString().split('T')[0];
+            if (spotlightDates[dateKey]) {
+                monthSpotlights += spotlightDates[dateKey].length;
+            }
+        }
+
+        // Calculate average per week for this month
+        const daysInMonth = lastDayOfMonth.getDate();
+        const weeksInMonth = daysInMonth / 7;
+        const avgPerWeek = weeksInMonth > 0 ? (monthSpotlights / weeksInMonth).toFixed(1) : '0.0';
+
+        html += '<div class="calendar-month">';
+        html += '<div class="calendar-header">';
+        html += `<span class="calendar-month-name">${monthData.monthName}</span>`;
+        html += `<span class="calendar-year">${monthData.year}</span>`;
+        html += '<div class="calendar-stats">';
+        html += '<div class="calendar-stat">';
+        html += '<span class="calendar-stat-label">Spotlights:</span>';
+        html += `<span class="calendar-stat-value">${monthSpotlights}</span>`;
+        html += '</div>';
+        html += '<div class="calendar-stat">';
+        html += '<span class="calendar-stat-label">Avg/Week:</span>';
+        html += `<span class="calendar-stat-value">${avgPerWeek}</span>`;
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        // Weekday headers
+        html += '<div class="calendar-weekdays">';
+        ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach(day => {
+            html += `<div class="calendar-weekday">${day}</div>`;
+        });
+        html += '</div>';
+
+        // Calendar grid
+        html += '<div class="calendar-grid">';
+
+        // Add empty cells for days before month starts
+        const firstDayWeekday = firstDayOfMonth.getDay();
+        const emptyCellsBefore = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+        for (let i = 0; i < emptyCellsBefore; i++) {
+            html += '<div class="calendar-day empty"></div>';
+        }
+
+        // Add days of month
+        for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+            const date = new Date(monthData.year, monthData.month, day);
+            const dateKey = date.toISOString().split('T')[0];
+            const hasActivity = spotlightDates[dateKey];
+            const isToday = dateKey === today.toISOString().split('T')[0];
+            const isFuture = date > today;
+
+            let classes = 'calendar-day';
+            if (hasActivity) classes += ' has-activity';
+            if (isToday) classes += ' today';
+            if (isFuture) classes += ' future';
+
+            const title = hasActivity
+                ? `${hasActivity.length} spotlight${hasActivity.length > 1 ? 's' : ''}: ${hasActivity.map(a => a.artist).join(', ')}`
+                : '';
+
+            html += `<div class="${classes}" title="${title}" data-date="${dateKey}">${day}</div>`;
+        }
+
+        html += '</div>'; // End calendar-grid
+        html += '</div>'; // End calendar-month
+    });
+
+    container.innerHTML = html;
+
+    // Add click handlers for days with activity
+    container.querySelectorAll('.calendar-day.has-activity').forEach(dayEl => {
+        dayEl.addEventListener('click', function() {
+            const dateKey = this.getAttribute('data-date');
+            const posts = spotlightDates[dateKey];
+            if (posts && posts.length > 0) {
+                let message = `Spotlights on ${new Date(dateKey).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}:\n\n`;
+                posts.forEach((post, i) => {
+                    message += `${i + 1}. ${post.artist}\n`;
+                    message += `   Reach: ${post.reach.toLocaleString()}, Views: ${post.views.toLocaleString()}\n`;
+                });
+                alert(message);
+            }
+        });
+    });
+}
+
+// Carousel navigation functions removed - now using grid layout to show all months
+
+function initSpotlightCalendar() {
+    // No period buttons needed - always show last 2 months
+}
+
+// Initialize calendar when data is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initSpotlightCalendar();
+});

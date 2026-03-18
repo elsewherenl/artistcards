@@ -36,11 +36,13 @@ function handleRequest(e) {
     // Extract parameters (try both GET and POST methods)
     let artistName = null;
     let newStatus = null;
+    let newRanking = null;
 
     // Method 1: URL parameters (GET)
     if (e.parameter) {
       artistName = e.parameter.artistName;
       newStatus = e.parameter.newStatus;
+      newRanking = e.parameter.newRanking;
       Logger.log('Got params from e.parameter (GET)');
     }
 
@@ -48,16 +50,21 @@ function handleRequest(e) {
     if (!artistName && e.parameters) {
       artistName = e.parameters.artistName ? e.parameters.artistName[0] : null;
       newStatus = e.parameters.newStatus ? e.parameters.newStatus[0] : null;
+      newRanking = e.parameters.newRanking ? e.parameters.newRanking[0] : null;
       Logger.log('Got params from e.parameters (POST)');
     }
 
     Logger.log('Artist: "' + artistName + '"');
     Logger.log('Status: "' + newStatus + '"');
+    Logger.log('Ranking: "' + newRanking + '"');
 
-    // Validate
-    if (!artistName || !newStatus) {
+    // Validate - need at least artist name and one update field
+    if (!artistName || (!newStatus && !newRanking)) {
       Logger.log('ERROR: Missing parameters');
-      return createResponse(false, 'Missing artistName or newStatus');
+      Logger.log('artistName: ' + artistName);
+      Logger.log('newStatus: ' + newStatus);
+      Logger.log('newRanking: ' + newRanking);
+      return createResponse(false, 'Missing required parameters. artistName=' + artistName + ', newStatus=' + newStatus + ', newRanking=' + newRanking);
     }
 
     // Open spreadsheet
@@ -76,7 +83,7 @@ function handleRequest(e) {
     const data = sheet.getDataRange().getValues();
     Logger.log('Total rows: ' + data.length);
 
-    // Find artist in Column C (index 2)
+    // Find artist by matching against Column C (Artist) - index 2
     let foundRow = -1;
     const searchName = artistName.toString().trim().toLowerCase();
     Logger.log('Searching for (lowercase): "' + searchName + '"');
@@ -84,18 +91,21 @@ function handleRequest(e) {
     // Log first 5 artist names for debugging
     Logger.log('First 5 artists in Column C:');
     for (let i = 1; i < Math.min(6, data.length); i++) {
-      Logger.log('  Row ' + (i + 1) + ': "' + data[i][2] + '"');
+      Logger.log('  Row ' + (i + 1) + ': Column C="' + data[i][2] + '"');
     }
 
+    // Search for artist - try Column C (Artist name)
     for (let i = 1; i < data.length; i++) {
-      const cellValue = data[i][2]; // Column C
-      if (cellValue) {
-        const cellName = cellValue.toString().trim().toLowerCase();
+      const artistCol = data[i][2]; // Column C - Artist
+
+      if (artistCol) {
+        const cellName = artistCol.toString().trim().toLowerCase();
         if (cellName === searchName) {
           foundRow = i + 1; // Convert to 1-based row number
-          Logger.log('FOUND at row ' + foundRow);
-          Logger.log('Matched: "' + cellValue + '" === "' + artistName + '"');
-          Logger.log('Current value in Column N: ' + data[i][13]);
+          Logger.log('FOUND at row ' + foundRow + ' in Column C');
+          Logger.log('Matched: "' + artistCol + '" === "' + artistName + '"');
+          if (newStatus) Logger.log('Current value in Column N: ' + data[i][13]);
+          if (newRanking) Logger.log('Current value in Column O: ' + data[i][14]);
           break;
         }
       }
@@ -108,16 +118,77 @@ function handleRequest(e) {
       return createResponse(false, 'Artist "' + artistName + '" not found in spreadsheet');
     }
 
-    // Update Column N (column 14 in 1-based indexing)
-    Logger.log('Updating cell N' + foundRow + ' to: ' + newStatus);
-    sheet.getRange(foundRow, 14).setValue(newStatus);
+    const responseData = {
+      artist: artistName,
+      row: foundRow
+    };
+
+    // Update Column N (column 14 in 1-based indexing) for Status
+    if (newStatus) {
+      // Get the old status before updating
+      const oldStatus = data[foundRow - 1][13] ? data[foundRow - 1][13].toString().trim() : '';
+      Logger.log('Old status: "' + oldStatus + '"');
+      Logger.log('Old status (lowercase): "' + oldStatus.toLowerCase() + '"');
+      Logger.log('New status: "' + newStatus + '"');
+      Logger.log('New status (lowercase): "' + newStatus.toLowerCase() + '"');
+      Logger.log('Updating cell N' + foundRow + ' to: ' + newStatus);
+      sheet.getRange(foundRow, 14).setValue(newStatus);
+      responseData.newStatus = newStatus;
+
+      // If changing from Prospect/Planned Outreach to Awaiting Response, update Outreach Date (Column W)
+      const oldStatusLower = oldStatus.toLowerCase();
+      const newStatusLower = newStatus.toLowerCase();
+
+      Logger.log('Checking condition for outreach date update...');
+      Logger.log('Is old status "prospect"? ' + (oldStatusLower === 'prospect'));
+      Logger.log('Is old status "planned outreach"? ' + (oldStatusLower === 'planned outreach'));
+      Logger.log('Is new status "awaiting response"? ' + (newStatusLower === 'awaiting response'));
+
+      // Condition 1: Prospect/Planned Outreach → Awaiting Response = Update Outreach Date (Column W)
+      if ((oldStatusLower === 'prospect' || oldStatusLower === 'planned outreach') &&
+          newStatusLower === 'awaiting response') {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = String(today.getFullYear()).slice(-2);
+        const dateString = day + '.' + month + '.' + year;
+
+        Logger.log('✓ CONDITION 1 MET! Status changed from "' + oldStatus + '" to "Awaiting Response"');
+        Logger.log('Updating cell W' + foundRow + ' (Outreach Date) to: ' + dateString);
+        sheet.getRange(foundRow, 23).setValue(dateString); // Column W = 23
+        responseData.outreachDate = dateString;
+      }
+
+      // Condition 2: Awaiting Response → Feature Planned = Update Date Responded (Column Y)
+      if (oldStatusLower === 'awaiting response' && newStatusLower === 'feature planned') {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = String(today.getFullYear()).slice(-2);
+        const dateString = day + '.' + month + '.' + year;
+
+        Logger.log('✓ CONDITION 2 MET! Status changed from "Awaiting Response" to "Feature Planned"');
+        Logger.log('Updating cell Y' + foundRow + ' (Date Responded) to: ' + dateString);
+        sheet.getRange(foundRow, 25).setValue(dateString); // Column Y = 25
+        responseData.dateResponded = dateString;
+      }
+
+      if ((oldStatusLower !== 'prospect' && oldStatusLower !== 'planned outreach' || newStatusLower !== 'awaiting response') &&
+          (oldStatusLower !== 'awaiting response' || newStatusLower !== 'feature planned')) {
+        Logger.log('✗ No date update conditions met');
+      }
+    }
+
+    // Update Column O (column 15 in 1-based indexing) for Ranking
+    if (newRanking) {
+      Logger.log('Updating cell O' + foundRow + ' to: ' + newRanking);
+      sheet.getRange(foundRow, 15).setValue(newRanking);
+      responseData.newRanking = newRanking;
+    }
+
     Logger.log('✓ SUCCESS');
 
-    return createResponse(true, 'Updated successfully', {
-      artist: artistName,
-      newStatus: newStatus,
-      row: foundRow
-    });
+    return createResponse(true, 'Updated successfully', responseData);
 
   } catch (error) {
     Logger.log('EXCEPTION: ' + error.toString());
