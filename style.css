@@ -2601,6 +2601,47 @@ a.activity-item:hover {
     }
 }
 
+/* Pipeline Over Time - scrollable chart */
+.pipeline-chart-container {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 15px;
+}
+
+.pipeline-chart-container::-webkit-scrollbar {
+    height: 14px;
+}
+
+.pipeline-chart-container::-webkit-scrollbar-track {
+    background: rgba(214, 179, 112, 0.15);
+    border-radius: 8px;
+    margin: 0 10px;
+}
+
+.pipeline-chart-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right, #D6B370, #C4A563);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.pipeline-chart-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #C4A563, #B8965A);
+    background-clip: padding-box;
+}
+
+.pipeline-chart-wrapper {
+    height: 100%;
+    min-width: fit-content;
+}
+
+.pipeline-chart-wrapper canvas {
+    height: 100% !important;
+}
+
 .scroll-hint {
     position: absolute;
     top: 50%;
