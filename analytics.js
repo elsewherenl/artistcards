@@ -15,13 +15,33 @@ function renderPipelineTimeline(data) {
         .filter(r => r.date && !isNaN(r.date))
         .sort((a, b) => a.date - b.date);
 
-    let cumulative = 0;
     sorted.forEach(r => {
-        const week = `${r.date.getFullYear()}-W${getWeekNumber(r.date)}`;
+        const week = `${r.date.getFullYear()}-W${String(getWeekNumber(r.date)).padStart(2, '0')}`;
         if (!weeklyAdds[week]) weeklyAdds[week] = 0;
         weeklyAdds[week]++;
     });
 
+    // Fill all weeks from first add to current week so chart always reaches today
+    const allKeys = Object.keys(weeklyAdds).sort();
+    if (allKeys.length > 0) {
+        // Parse first week's Monday as start date
+        const [startYr, startWk] = allKeys[0].split('-W').map(Number);
+        const jan4Start = new Date(Date.UTC(startYr, 0, 4));
+        const dow = jan4Start.getUTCDay() || 7;
+        const firstMonday = new Date(jan4Start.getTime() - (dow - 1) * 86400000 + (startWk - 1) * 7 * 86400000);
+
+        const today = new Date();
+        let cursor = new Date(firstMonday);
+        let iterations = 0;
+        while (cursor <= today && iterations < 600) {
+            iterations++;
+            const key = `${cursor.getUTCFullYear()}-W${String(getWeekNumber(cursor)).padStart(2, '0')}`;
+            if (!weeklyAdds[key]) weeklyAdds[key] = 0;
+            cursor = new Date(cursor.getTime() + 7 * 86400000);
+        }
+    }
+
+    let cumulative = 0;
     const labels = Object.keys(weeklyAdds).sort();
     const adds = labels.map(week => weeklyAdds[week]);
     const cumulativeTotals = [];
@@ -40,7 +60,7 @@ function renderPipelineTimeline(data) {
         const daysToAdd = (parseInt(week) - 1) * 7;
         const weekStart = new Date(jan1.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
         const day = weekStart.getDate();
-        const month = weekStart.toLocaleString('default', { month: 'long' });
+        const month = weekStart.toLocaleString('default', { month: 'short' });
         return `w/c ${day} ${month}`;
     });
 
