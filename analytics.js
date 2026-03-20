@@ -6,6 +6,14 @@ function getWeekNumber(d) {
     return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
 }
 
+function getISOWeekStart(year, week) {
+    // Returns the Monday of a given ISO year+week
+    const jan4 = new Date(Date.UTC(year, 0, 4)); // Jan 4 is always in week 1
+    const dayOfWeek = jan4.getUTCDay() || 7; // Mon=1 ... Sun=7
+    const week1Monday = new Date(jan4.getTime() - (dayOfWeek - 1) * 86400000);
+    return new Date(week1Monday.getTime() + (week - 1) * 7 * 86400000);
+}
+
 function renderPipelineTimeline(data) {
     const weeklyAdds = {};
     const sorted = data
@@ -14,16 +22,32 @@ function renderPipelineTimeline(data) {
         .filter(r => r.date && !isNaN(r.date))
         .sort((a, b) => a.date - b.date);
 
-    let cumulative = 0;
     sorted.forEach(r => {
-        const week = `${r.date.getFullYear()}-W${getWeekNumber(r.date)}`;
+        const week = `${r.date.getFullYear()}-W${String(getWeekNumber(r.date)).padStart(2, '0')}`;
         if (!weeklyAdds[week]) weeklyAdds[week] = 0;
         weeklyAdds[week]++;
     });
 
+    // Fill in all weeks from first add through current week (so chart always reaches today)
+    const today = new Date();
+    const currentWeekKey = `${today.getFullYear()}-W${String(getWeekNumber(today)).padStart(2, '0')}`;
+    const allKeys = Object.keys(weeklyAdds).sort();
+    if (allKeys.length > 0) {
+        let cursor = allKeys[0];
+        while (cursor <= currentWeekKey) {
+            if (!weeklyAdds[cursor]) weeklyAdds[cursor] = 0;
+            const [yr, wk] = cursor.split('-W').map(Number);
+            const nextDate = getISOWeekStart(yr, wk);
+            nextDate.setUTCDate(nextDate.getUTCDate() + 7);
+            const nextWk = getWeekNumber(nextDate);
+            cursor = `${nextDate.getUTCFullYear()}-W${String(nextWk).padStart(2, '0')}`;
+        }
+    }
+
     const labels = Object.keys(weeklyAdds).sort();
     const adds = labels.map(week => weeklyAdds[week]);
     const cumulativeTotals = [];
+    let cumulative = 0;
     adds.forEach(a => {
         cumulative += a;
         cumulativeTotals.push(cumulative);
@@ -34,12 +58,10 @@ function renderPipelineTimeline(data) {
     const avgAddsPerWeek = totalWeeks > 0 ? Math.ceil(totalArtists / totalWeeks) : 0;
 
     const readableLabels = labels.map(weekLabel => {
-        const [year, week] = weekLabel.split('-W');
-        const jan1 = new Date(parseInt(year), 0, 1);
-        const daysToAdd = (parseInt(week) - 1) * 7;
-        const weekStart = new Date(jan1.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
-        const day = weekStart.getDate();
-        const month = weekStart.toLocaleString('default', { month: 'long' });
+        const [year, week] = weekLabel.split('-W').map(Number);
+        const weekStart = getISOWeekStart(year, week);
+        const day = weekStart.getUTCDate();
+        const month = weekStart.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
         return `w/c ${day} ${month}`;
     });
 
@@ -54,7 +76,15 @@ function renderPipelineTimeline(data) {
     // Detect mobile for responsive font sizes
     const isMobile = window.innerWidth <= 600;
 
-    const ctx = document.getElementById("pipelineTimeline").getContext("2d");
+    // Set canvas width so all weeks fit and container scrolls
+    const canvas = document.getElementById("pipelineTimeline");
+    const wrapper = canvas.parentElement;
+    const barWidth = isMobile ? 50 : 70;
+    const totalWidth = Math.max(labels.length * barWidth, 600);
+    canvas.style.width = totalWidth + 'px';
+    wrapper.style.width = totalWidth + 'px';
+
+    const ctx = canvas.getContext("2d");
     new Chart(ctx, {
         type: "bar",
         data: {
@@ -145,6 +175,10 @@ function renderPipelineTimeline(data) {
             }
         }
     });
+
+    // Scroll to the right so most recent weeks are visible
+    const container = canvas.closest('.pipeline-chart-container');
+    if (container) container.scrollLeft = container.scrollWidth;
 }
 
 let postPerformanceRawData = [];
