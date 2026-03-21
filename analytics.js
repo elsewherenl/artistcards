@@ -55,12 +55,12 @@ function renderPipelineTimeline(data) {
     const avgAddsPerWeek = totalWeeks > 0 ? Math.ceil(totalArtists / totalWeeks) : 0;
 
     const readableLabels = labels.map(weekLabel => {
-        const [year, week] = weekLabel.split('-W');
-        const jan1 = new Date(parseInt(year), 0, 1);
-        const daysToAdd = (parseInt(week) - 1) * 7;
-        const weekStart = new Date(jan1.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
-        const day = weekStart.getDate();
-        const month = weekStart.toLocaleString('default', { month: 'short' });
+        const [yr, wk] = weekLabel.split('-W').map(Number);
+        const jan4 = new Date(Date.UTC(yr, 0, 4));
+        const dow = jan4.getUTCDay() || 7;
+        const monday = new Date(jan4.getTime() - (dow - 1) * 86400000 + (wk - 1) * 7 * 86400000);
+        const day = monday.getUTCDate();
+        const month = monday.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
         return `w/c ${day} ${month}`;
     });
 
