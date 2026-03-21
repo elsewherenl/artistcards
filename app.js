@@ -1640,6 +1640,32 @@
         updateFeaturedSortOptions(); // Update sort options visibility based on initial status
         refreshUI(); // Initial render
 
+        // Handle hash navigation (from analytics page links) — defined here so it
+        // can be called right after the initial render when cards are in the DOM.
+        function handleHashNavigation() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#artist-')) {
+                const targetId = hash.substring(1);
+                const tryScroll = (attemptsLeft) => {
+                    const targetCard = document.getElementById(targetId);
+                    if (targetCard) {
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetCard.style.boxShadow = '0 0 20px rgba(149, 57, 46, 0.6)';
+                        setTimeout(() => {
+                            targetCard.style.boxShadow = '';
+                        }, 2000);
+                    } else if (attemptsLeft > 0) {
+                        setTimeout(() => tryScroll(attemptsLeft - 1), 200);
+                    }
+                };
+                setTimeout(() => tryScroll(5), 100);
+            }
+        }
+
+        // Call immediately after initial render (cards are in DOM)
+        handleHashNavigation();
+        window.addEventListener('hashchange', handleHashNavigation);
+
         // Back to Top button visibility
         const backToTopBtn = document.getElementById('backToTop');
         window.addEventListener('scroll', function() {
@@ -1649,31 +1675,6 @@
                 backToTopBtn.classList.remove('visible');
             }
         });
-
-        // Handle hash navigation (from analytics page links)
-        function handleHashNavigation() {
-            const hash = window.location.hash;
-            if (hash && hash.startsWith('#artist-')) {
-                setTimeout(() => {
-                    const targetCard = document.getElementById(hash.substring(1));
-                    if (targetCard) {
-                        targetCard.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                        // Add highlight effect
-                        targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
-                        setTimeout(() => {
-                            targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
-                        }, 2000);
-                    }
-                }, 500); // Wait for cards to render
-            }
-        }
-
-        // Call on load and on hash change
-        handleHashNavigation();
-        window.addEventListener('hashchange', handleHashNavigation);
 
         // Reset Filters button
         document.getElementById("resetFilters").addEventListener("click", () => {
