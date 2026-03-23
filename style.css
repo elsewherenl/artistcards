@@ -33,6 +33,7 @@
         padding: 2rem;
         color: #2C2C2C;
         position: relative;
+        overscroll-behavior-y: none;
         }
         
         .header {
@@ -298,6 +299,8 @@
         transition: all 0.3s ease;
         text-transform: capitalize;
         white-space: nowrap;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .clear-btn:hover {
@@ -327,6 +330,8 @@
         font-weight: 500;
         transition: all 0.3s ease;
         text-transform: capitalize;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .status-btn.active {
@@ -1296,20 +1301,21 @@
         #filters {
         display: none;
         position: fixed;
-        bottom: 60px;
+        bottom: calc(60px + env(safe-area-inset-bottom));
         right: 1rem;
-        background-color: #0D0D0D;
+        background-color: #F3EFE9;
         padding: 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(214, 179, 112, 0.4);
         border-radius: 10px;
         z-index: 1000;
         max-width: 90vw;
         flex-direction: column;
         row-gap: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
         .filter-toggle {
         position: fixed;
-        bottom: 1rem;
+        bottom: calc(1rem + env(safe-area-inset-bottom));
         right: 1rem;
         background-color: #95392E;
         color: #fff;
@@ -1324,6 +1330,8 @@
         justify-content: center;
         z-index: 1001;
         box-shadow: 0 2px 8px rgba(149, 57, 46, 0.3);
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
         }
     }
     @media (min-width: 768px) {
@@ -1337,7 +1345,7 @@
         border: none !important;
         padding: 0 !important;
         box-shadow: none !important;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
         }
     }
     /* Back to Top button */
@@ -1359,6 +1367,8 @@
         box-shadow: 0 4px 12px rgba(149, 57, 46, 0.3);
         transition: all 0.3s ease;
         z-index: 999;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .back-to-top.visible {
@@ -1383,7 +1393,7 @@
 
     @media (max-width: 768px) {
         .back-to-top {
-            bottom: 5rem;
+            bottom: calc(5rem + env(safe-area-inset-bottom));
             right: 1rem;
             width: 45px;
             height: 45px;
@@ -3388,6 +3398,13 @@ body.dark-mode .nav-title:not(.active) {
 body.dark-mode .summary {
     background: rgba(40, 40, 40, 0.8);
     border-color: rgba(214, 179, 112, 0.25);
+}
+
+@media (max-width: 768px) {
+    body.dark-mode #filters {
+        background-color: #1e1e1e;
+        border-color: rgba(214, 179, 112, 0.3);
+    }
 }
 
 body.dark-mode .section-navigation .nav-label {
