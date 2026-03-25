@@ -2319,15 +2319,7 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
     // Generate last 2 months (current month and previous month)
     calendarMonths = [];
 
-    // Current month
-    calendarMonths.push({
-        key: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`,
-        year: today.getFullYear(),
-        month: today.getMonth(),
-        monthName: today.toLocaleString('default', { month: 'long' })
-    });
-
-    // Previous month
+    // Previous month (oldest, left)
     const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     calendarMonths.push({
         key: `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`,
@@ -2336,7 +2328,15 @@ function renderSpotlightCalendar(postData, weeksToShow = 4) {
         monthName: prevMonth.toLocaleString('default', { month: 'long' })
     });
 
-    // Months are in reverse chronological order (newest to oldest, left to right)
+    // Current month (newest, right)
+    calendarMonths.push({
+        key: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`,
+        year: today.getFullYear(),
+        month: today.getMonth(),
+        monthName: today.toLocaleString('default', { month: 'long' })
+    });
+
+    // Months are in chronological order (oldest to newest, left to right)
 
     // Build calendar HTML
     let html = '';
