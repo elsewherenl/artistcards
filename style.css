@@ -2304,6 +2304,7 @@ body.dark-mode .post-controls-bar {
     align-items: center;
     justify-content: center;
     height: 50px;
+    min-width: fit-content;
     background: linear-gradient(to right, rgba(149, 57, 46, 0.12), rgba(149, 57, 46, 0.05));
     border-left: 2px solid rgba(149, 57, 46, 0.25);
     border-right: 2px solid rgba(149, 57, 46, 0.25);
@@ -2329,6 +2330,7 @@ body.dark-mode .post-controls-bar {
     align-items: center;
     gap: 0.5rem;
     z-index: 1;
+    white-space: nowrap;
 }
 
 .funnel-label {
