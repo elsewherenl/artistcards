@@ -24,11 +24,10 @@ function renderPipelineTimeline(data) {
     // Fill all weeks from first add to current week so chart always reaches today
     const allKeys = Object.keys(weeklyAdds).sort();
     if (allKeys.length > 0) {
-        // Parse first week's Monday as start date
-        const [startYr, startWk] = allKeys[0].split('-W').map(Number);
-        const jan4Start = new Date(Date.UTC(startYr, 0, 4));
-        const dow = jan4Start.getUTCDay() || 7;
-        const firstMonday = new Date(jan4Start.getTime() - (dow - 1) * 86400000 + (startWk - 1) * 7 * 86400000);
+        // Use the actual earliest date in the data to find the true first Monday
+        const earliestDate = sorted[0].date;
+        const earliestDay = earliestDate.getDay() || 7; // 1=Mon ... 7=Sun (local time)
+        const firstMonday = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), earliestDate.getDate() - (earliestDay - 1));
 
         const today = new Date();
         let cursor = new Date(firstMonday);
@@ -1689,6 +1688,13 @@ function renderResponseAnalytics(data) {
     // Filter artists who have been contacted
     const contacted = data.filter(row => row["Date Contacted"] && row["Date Contacted"].trim());
 
+    // Count those who responded at all (any response)
+    const respondedAny = contacted.filter(row => {
+        const status = (row["Response Status"] || "").toLowerCase().trim();
+        const dateResponded = (row["Date Responded"] || "").trim();
+        return dateResponded || status.includes("responded");
+    });
+
     // Count those who responded with interest
     const respondedInterested = contacted.filter(row => {
         const status = (row["Response Status"] || "").trim();
@@ -1863,10 +1869,11 @@ function renderResponseAnalytics(data) {
     // Render funnel
     const funnelContainer = document.getElementById('responseFunnel');
     const totalContacted = contacted.length;
+    const totalAnyResponse = respondedAny.length;
     const totalResponded = respondedInterested.length;
     const totalFeatured = featured.length;
 
-    const responseRate = totalContacted > 0 ? Math.round((totalResponded / totalContacted) * 100) : 0;
+    const positiveResponseRate = totalAnyResponse > 0 ? Math.round((totalResponded / totalAnyResponse) * 100) : 0;
     const conversionRate = totalResponded > 0 ? Math.round((totalFeatured / totalResponded) * 100) : 0;
 
     if (totalContacted === 0) {
@@ -1874,6 +1881,8 @@ function renderResponseAnalytics(data) {
         document.getElementById('responseInsights').innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Insights will appear once you have outreach data.</div>';
         return;
     }
+
+    const anyResponseRateOfContacted = totalContacted > 0 ? Math.round((totalAnyResponse / totalContacted) * 100) : 0;
 
     const funnelHtml = `
         <div class="funnel-stage" style="width: 100%;">
@@ -1885,16 +1894,23 @@ function renderResponseAnalytics(data) {
         </div>
         <div class="funnel-stage" style="width: 70%;">
             <div class="funnel-content">
-                <span class="funnel-label">Responded:</span>
-                <span class="funnel-number">${totalResponded}</span>
-                <span class="funnel-percentage">(${responseRate}%)</span>
+                <span class="funnel-label">Any Response:</span>
+                <span class="funnel-number">${totalAnyResponse}</span>
+                <span class="funnel-percentage">(${anyResponseRateOfContacted}%)</span>
             </div>
         </div>
-        <div class="funnel-stage" style="width: 40%;">
+        <div class="funnel-stage" style="width: 50%;">
+            <div class="funnel-content">
+                <span class="funnel-label">Positive Response:</span>
+                <span class="funnel-number">${totalResponded}</span>
+                <span class="funnel-percentage">(${positiveResponseRate}% of responses)</span>
+            </div>
+        </div>
+        <div class="funnel-stage" style="width: 30%;">
             <div class="funnel-content">
                 <span class="funnel-label">Featured:</span>
                 <span class="funnel-number">${totalFeatured}</span>
-                <span class="funnel-percentage">(${conversionRate}% of responded)</span>
+                <span class="funnel-percentage">(${conversionRate}% of positive)</span>
             </div>
         </div>
     `;
@@ -1908,8 +1924,17 @@ function renderResponseAnalytics(data) {
     insightsHtml += `
         <div class="insight-item">
             <div class="insight-label">Overall Response Rate</div>
-            <div class="insight-value">${responseRate}%</div>
-            <div class="insight-detail">${totalResponded} of ${totalContacted} artists responded</div>
+            <div class="insight-value">${anyResponseRateOfContacted}%</div>
+            <div class="insight-detail">${totalAnyResponse} of ${totalContacted} artists responded</div>
+        </div>
+    `;
+
+    // Positive response rate
+    insightsHtml += `
+        <div class="insight-item">
+            <div class="insight-label">Positive Response Rate</div>
+            <div class="insight-value">${positiveResponseRate}%</div>
+            <div class="insight-detail">${totalResponded} of ${totalAnyResponse} responses were positive</div>
         </div>
     `;
 
@@ -1998,7 +2023,7 @@ function renderResponseAnalytics(data) {
     // Update subtitle with total contacted
     const subtitle = document.getElementById('responseAnalyticsSubtitle');
     if (subtitle) {
-        subtitle.textContent = `${totalContacted} artists contacted — ${responseRate}% response rate — ${avgResponseTime} days avg response time`;
+        subtitle.textContent = `${totalContacted} artists contacted — ${anyResponseRateOfContacted}% response rate — ${positiveResponseRate}% positive — ${avgResponseTime} days avg response time`;
     }
 }
 
