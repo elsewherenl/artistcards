@@ -182,6 +182,7 @@ function renderPipelineTimeline(data) {
 let postPerformanceRawData = [];
 let postPerformanceChart = null;
 let currentFilterMode = 'total'; // Track current filter mode: 'total', 'with-artist', 'without-artist'
+let currentChartMode = 'absolute'; // 'absolute' or 'index'
 
 function showPostDetail(post) {
     const card = document.getElementById('postDetailCard');
@@ -227,7 +228,7 @@ function showPostDetail(post) {
     }, 100);
 }
 
-function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
+function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
     // Update current filter mode if provided
     if (filterMode !== null) {
         currentFilterMode = filterMode;
@@ -346,8 +347,8 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
         });
         console.log('Featured-oldest sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
     } else {
-        // Default: sort by date
-        sortedData = [...processedData].sort((a, b) => new Date(a.date) - new Date(b.date));
+        // No sort selected — preserve original order
+        sortedData = [...processedData];
     }
 
     const totalPosts = sortedData.length;
@@ -442,56 +443,209 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
 
     const ctx = canvas.getContext('2d');
 
+    const isIndexMode = currentChartMode === 'index';
+
+    // Compute averages for index mode
+    const avgReachAll = displayData.length > 0 ? displayData.reduce((s, p) => s + p.reach, 0) / displayData.length : 1;
+    const avgViewsAll = displayData.length > 0 ? displayData.reduce((s, p) => s + p.views, 0) / displayData.length : 1;
+    const avgEngAll = displayData.length > 0 ? displayData.reduce((s, p) => s + p.engagementRate, 0) / displayData.length : 1;
+
+    const commonBarOpts = { barPercentage: 0.85, categoryPercentage: 0.9, borderRadius: 0 };
+
+    let datasets;
+    if (isIndexMode) {
+        datasets = [
+            {
+                label: 'Reach Index',
+                data: displayData.map(p => avgReachAll > 0 ? Math.round((p.reach / avgReachAll) * 100) : 0),
+                backgroundColor: displayData.map(p => {
+                    const idx = avgReachAll > 0 ? (p.reach / avgReachAll) * 100 : 0;
+                    return idx >= 100
+                        ? (isDarkMode ? '#B8503F' : '#95392E')
+                        : (isDarkMode ? 'rgba(184,80,63,0.35)' : 'rgba(149,57,46,0.35)');
+                }),
+                yAxisID: 'y',
+                ...commonBarOpts
+            },
+            {
+                label: 'Views Index',
+                data: displayData.map(p => avgViewsAll > 0 ? Math.round((p.views / avgViewsAll) * 100) : 0),
+                backgroundColor: displayData.map(p => {
+                    const idx = avgViewsAll > 0 ? (p.views / avgViewsAll) * 100 : 0;
+                    return idx >= 100
+                        ? (isDarkMode ? 'rgba(184,80,63,0.65)' : 'rgba(149,57,46,0.6)')
+                        : (isDarkMode ? 'rgba(184,80,63,0.2)' : 'rgba(149,57,46,0.2)');
+                }),
+                yAxisID: 'y',
+                ...commonBarOpts
+            },
+            {
+                label: 'Engagement Index',
+                data: displayData.map(p => avgEngAll > 0 ? Math.round((p.engagementRate / avgEngAll) * 100) : 0),
+                type: 'line',
+                borderColor: isDarkMode ? '#E8C882' : '#D6B370',
+                backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                borderWidth: isMobile ? 2 : 2.5,
+                fill: false,
+                tension: 0.1,
+                yAxisID: 'y',
+                pointRadius: isMobile ? 4 : 5,
+                pointHoverRadius: isMobile ? 6 : 7,
+                pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
+                pointBorderWidth: 2,
+                pointHoverBorderWidth: 2.5
+            }
+        ];
+    } else {
+        datasets = [
+            {
+                label: 'Reach',
+                data: displayData.map(post => post.reach),
+                backgroundColor: isDarkMode ? '#B8503F' : '#95392E',
+                yAxisID: 'y',
+                ...commonBarOpts
+            },
+            {
+                label: 'Views',
+                data: displayData.map(post => post.views),
+                backgroundColor: isDarkMode ? 'rgba(184, 80, 63, 0.5)' : 'rgba(149, 57, 46, 0.5)',
+                yAxisID: 'y',
+                ...commonBarOpts
+            },
+            {
+                label: 'Engagement %',
+                data: displayData.map(post => post.engagementRate),
+                type: 'line',
+                borderColor: isDarkMode ? '#E8C882' : '#D6B370',
+                backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                borderWidth: isMobile ? 2 : 2.5,
+                fill: false,
+                tension: 0.1,
+                yAxisID: 'y1',
+                pointRadius: isMobile ? 4 : 5,
+                pointHoverRadius: isMobile ? 6 : 7,
+                pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
+                pointBorderWidth: 2,
+                pointHoverBorderWidth: 2.5
+            }
+        ];
+    }
+
+    const scalesConfig = isIndexMode ? {
+        y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: {
+                display: true,
+                text: 'Index (100 = average)',
+                font: { size: isMobile ? 10 : 13, weight: '500', family: "'Suisse Intl', sans-serif" },
+                color: '#D6B370',
+                padding: { top: 0, bottom: isMobile ? 5 : 8 }
+            },
+            ticks: {
+                font: { size: isMobile ? 9 : 12, family: "'Suisse Intl', sans-serif", weight: '400' },
+                color: '#666',
+                padding: isMobile ? 4 : 6,
+                callback: value => value
+            },
+            grid: {
+                color: function(context) {
+                    if (context.tick.value === 100) {
+                        return isDarkMode ? 'rgba(232,200,130,0.5)' : 'rgba(214,179,112,0.6)';
+                    }
+                    return isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(214,179,112,0.15)';
+                },
+                lineWidth: function(context) {
+                    return context.tick.value === 100 ? 2 : 1;
+                }
+            },
+            beginAtZero: true
+        },
+        x: {
+            ticks: {
+                font: { size: isMobile ? 8 : 11, family: "'Suisse Intl', sans-serif", weight: '400' },
+                color: '#666',
+                maxRotation: 45,
+                minRotation: 45,
+                autoSkip: false,
+                padding: isMobile ? 6 : 8
+            },
+            grid: { display: false }
+        }
+    } : {
+        y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: {
+                display: true,
+                text: 'Reach / Views',
+                font: { size: isMobile ? 10 : 13, weight: '500', family: "'Suisse Intl', sans-serif" },
+                color: '#D6B370',
+                padding: { top: 0, bottom: isMobile ? 5 : 8 }
+            },
+            ticks: {
+                font: { size: isMobile ? 9 : 12, family: "'Suisse Intl', sans-serif", weight: '400' },
+                color: '#666',
+                padding: isMobile ? 4 : 6,
+                callback: function(value) {
+                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                    if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
+                    return value;
+                }
+            },
+            grid: {
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(214, 179, 112, 0.15)',
+                lineWidth: 1
+            },
+            beginAtZero: true
+        },
+        y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            title: {
+                display: true,
+                text: 'Engagement %',
+                font: { size: isMobile ? 10 : 13, weight: '500', family: "'Suisse Intl', sans-serif" },
+                color: '#D6B370',
+                padding: { top: 0, bottom: isMobile ? 5 : 8 }
+            },
+            ticks: {
+                font: { size: isMobile ? 9 : 12, family: "'Suisse Intl', sans-serif", weight: '400' },
+                color: '#666',
+                padding: isMobile ? 4 : 6,
+                callback: value => value.toFixed(1) + '%'
+            },
+            grid: { drawOnChartArea: true, color: 'rgba(214, 179, 112, 0.1)' },
+            beginAtZero: true
+        },
+        x: {
+            ticks: {
+                font: { size: isMobile ? 8 : 11, family: "'Suisse Intl', sans-serif", weight: '400' },
+                color: '#666',
+                maxRotation: 45,
+                minRotation: 45,
+                autoSkip: false,
+                padding: isMobile ? 6 : 8
+            },
+            grid: { display: false }
+        }
+    };
+
     postPerformanceChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Reach',
-                    data: displayData.map(post => post.reach),
-                    backgroundColor: isDarkMode ? '#B8503F' : '#95392E',
-                    yAxisID: 'y',
-                    barPercentage: 0.85,
-                    categoryPercentage: 0.9,
-                    borderRadius: 0
-                },
-                {
-                    label: 'Views',
-                    data: displayData.map(post => post.views),
-                    backgroundColor: isDarkMode ? 'rgba(184, 80, 63, 0.5)' : 'rgba(149, 57, 46, 0.5)',
-                    yAxisID: 'y',
-                    barPercentage: 0.85,
-                    categoryPercentage: 0.9,
-                    borderRadius: 0
-                },
-                {
-                    label: 'Engagement %',
-                    data: displayData.map(post => post.engagementRate),
-                    type: 'line',
-                    borderColor: isDarkMode ? '#E8C882' : '#D6B370',
-                    backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
-                    borderWidth: isMobile ? 2 : 2.5,
-                    fill: false,
-                    tension: 0.1,
-                    yAxisID: 'y1',
-                    pointRadius: isMobile ? 4 : 5,
-                    pointHoverRadius: isMobile ? 6 : 7,
-                    pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
-                    pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
-                    pointBorderWidth: 2,
-                    pointHoverBorderWidth: 2.5
-                }
-            ]
-        },
+        data: { labels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             onClick: !isMobile ? function(event, activeElements) {
                 if (activeElements.length > 0) {
                     const index = activeElements[0].index;
-                    const post = displayData[index];
-                    showPostDetail(post);
+                    showPostDetail(displayData[index]);
                 }
             } : null,
             layout: {
@@ -502,107 +656,13 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     bottom: isMobile ? 5 : 80
                 }
             },
-            scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Reach / Views',
-                        font: {
-                            size: isMobile ? 10 : 13,
-                            weight: '500',
-                            family: "'Suisse Intl', sans-serif"
-                        },
-                        color: '#D6B370',
-                        padding: { top: 0, bottom: isMobile ? 5 : 8 }
-                    },
-                    ticks: {
-                        font: {
-                            size: isMobile ? 9 : 12,
-                            family: "'Suisse Intl', sans-serif",
-                            weight: '400'
-                        },
-                        color: '#666',
-                        padding: isMobile ? 4 : 6,
-                        callback: function(value) {
-                            if (value >= 1000000) {
-                                return (value / 1000000).toFixed(1) + 'M';
-                            }
-                            if (value >= 1000) {
-                                return (value / 1000).toFixed(1) + 'k';
-                            }
-                            return value;
-                        }
-                    },
-                    grid: {
-                        color: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(214, 179, 112, 0.15)',
-                        lineWidth: 1
-                    },
-                    beginAtZero: true
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Engagement %',
-                        font: {
-                            size: isMobile ? 10 : 13,
-                            weight: '500',
-                            family: "'Suisse Intl', sans-serif"
-                        },
-                        color: '#D6B370',
-                        padding: { top: 0, bottom: isMobile ? 5 : 8 }
-                    },
-                    ticks: {
-                        font: {
-                            size: isMobile ? 9 : 12,
-                            family: "'Suisse Intl', sans-serif",
-                            weight: '400'
-                        },
-                        color: '#666',
-                        padding: isMobile ? 4 : 6,
-                        callback: function(value) {
-                            return value.toFixed(1) + '%';
-                        }
-                    },
-                    grid: {
-                        drawOnChartArea: true,
-                        color: 'rgba(214, 179, 112, 0.1)'
-                    },
-                    beginAtZero: true
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            size: isMobile ? 8 : 11,
-                            family: "'Suisse Intl', sans-serif",
-                            weight: '400'
-                        },
-                        color: '#666',
-                        maxRotation: 45,
-                        minRotation: 45,
-                        autoSkip: false,
-                        padding: isMobile ? 6 : 8
-                    },
-                    grid: {
-                        display: false
-                    }
-                }
-            },
+            scales: scalesConfig,
             plugins: {
                 legend: {
                     position: 'top',
                     align: 'start',
                     labels: {
-                        font: {
-                            size: isMobile ? 10 : 13,
-                            family: "'Suisse Intl', sans-serif",
-                            weight: '500'
-                        },
+                        font: { size: isMobile ? 10 : 13, family: "'Suisse Intl', sans-serif", weight: '500' },
                         color: '#666',
                         padding: isMobile ? 8 : 15,
                         boxWidth: isMobile ? 30 : 38,
@@ -611,11 +671,8 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                         generateLabels: function(chart) {
                             const original = Chart.defaults.plugins.legend.labels.generateLabels;
                             const labels = original.call(this, chart);
-                            // Make legend items more distinct
                             labels.forEach((label, index) => {
-                                if (index === 2) { // Engagement % line
-                                    label.lineWidth = 2.5;
-                                }
+                                if (index === 2) label.lineWidth = 2.5;
                             });
                             return labels;
                         }
@@ -629,16 +686,8 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     borderColor: isDarkMode ? 'rgba(232, 200, 130, 0.3)' : 'rgba(214, 179, 112, 0.4)',
                     borderWidth: 1,
                     padding: isMobile ? 10 : 14,
-                    titleFont: {
-                        size: isMobile ? 12 : 15,
-                        family: "'Suisse Intl', sans-serif",
-                        weight: '500'
-                    },
-                    bodyFont: {
-                        size: isMobile ? 10 : 13,
-                        family: "'Suisse Intl', sans-serif",
-                        weight: '400'
-                    },
+                    titleFont: { size: isMobile ? 12 : 15, family: "'Suisse Intl', sans-serif", weight: '500' },
+                    bodyFont: { size: isMobile ? 10 : 13, family: "'Suisse Intl', sans-serif", weight: '400' },
                     displayColors: true,
                     boxWidth: 12,
                     boxHeight: 12,
@@ -647,34 +696,37 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
                     titleSpacing: 6,
                     callbacks: {
                         title: function(context) {
-                            const dataIndex = context[0].dataIndex;
-                            const post = displayData[dataIndex];
+                            const post = displayData[context[0].dataIndex];
                             return post.title;
                         },
                         label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.dataset.type === 'line') {
-                                label += context.parsed.y.toFixed(2) + '%';
+                            const post = displayData[context.dataIndex];
+                            let label = context.dataset.label + ': ';
+                            if (isIndexMode) {
+                                const idx = context.parsed.y;
+                                const diff = idx - 100;
+                                const sign = diff >= 0 ? '+' : '';
+                                // Show index and real value
+                                if (context.dataset.label === 'Reach Index') {
+                                    label += `${idx} (${sign}${diff}%) — ${post.reach.toLocaleString()} reach`;
+                                } else if (context.dataset.label === 'Views Index') {
+                                    label += `${idx} (${sign}${diff}%) — ${post.views.toLocaleString()} views`;
+                                } else {
+                                    label += `${idx} (${sign}${diff}%) — ${post.engagementRate.toFixed(2)}% eng.`;
+                                }
                             } else {
-                                label += context.parsed.y.toLocaleString();
+                                if (context.dataset.type === 'line') {
+                                    label += context.parsed.y.toFixed(2) + '%';
+                                } else {
+                                    label += context.parsed.y.toLocaleString();
+                                }
                             }
                             return label;
                         },
                         afterBody: function(context) {
-                            const dataIndex = context[0].dataIndex;
-                            const post = displayData[dataIndex];
-                            const extra = [];
-                            extra.push('');
-                            extra.push(`Artist: ${post.artist}`);
-                            extra.push(`Date: ${post.date}`);
-                            extra.push(`Likes: ${post.likes.toLocaleString()}`);
-                            if (post.notes && post.notes.trim()) {
-                                extra.push('');
-                                extra.push(`Notes: ${post.notes}`);
-                            }
+                            const post = displayData[context[0].dataIndex];
+                            const extra = ['', `Artist: ${post.artist}`, `Date: ${post.date}`, `Likes: ${post.likes.toLocaleString()}`];
+                            if (post.notes && post.notes.trim()) extra.push('', `Notes: ${post.notes}`);
                             return extra;
                         }
                     }
@@ -709,7 +761,7 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
 
                 // Get current sort type
                 const activeSort = document.querySelector('.sort-btn.active');
-                const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
+                const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'none';
 
                 // Re-render with new filter
                 const filterType = this.getAttribute('data-filter');
@@ -717,6 +769,21 @@ function renderPostPerformance(data, sortBy = 'date', filterMode = null) {
             });
         });
         window.postFilterListenersAdded = true;
+    }
+
+    // Setup chart mode button listeners (only once)
+    if (!window.postChartModeListenersAdded) {
+        document.querySelectorAll('.chart-mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.chart-mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentChartMode = this.getAttribute('data-mode');
+                const activeSort = document.querySelector('.sort-btn.active');
+                const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'none';
+                renderPostPerformance(postPerformanceRawData, sortType);
+            });
+        });
+        window.postChartModeListenersAdded = true;
     }
 }
 
@@ -2280,7 +2347,7 @@ function initDarkMode() {
         // Re-render post performance chart to update colors
         if (postPerformanceChart && postPerformanceRawData.length > 0) {
             const activeSort = document.querySelector('.sort-btn.active');
-            const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'date';
+            const sortType = activeSort ? activeSort.getAttribute('data-sort') : 'none';
             renderPostPerformance(postPerformanceRawData, sortType);
         }
 
