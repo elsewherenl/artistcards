@@ -2803,30 +2803,6 @@ a.activity-item:hover {
 }
 
 .sort-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(214, 179, 112, 0.1);
-    border: 1px solid rgba(214, 179, 112, 0.3);
-    border-radius: 6px;
-    font-family: 'Suisse Intl', sans-serif;
-    font-size: 0.85rem;
-    color: #2C2C2C;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.sort-btn:hover {
-    background: rgba(214, 179, 112, 0.2);
-    border-color: rgba(214, 179, 112, 0.5);
-}
-
-.sort-btn.active {
-    background: #D6B370;
-    border-color: #D6B370;
-    color: #FFF;
-    font-weight: 500;
-}
-
-.filter-btn {
     padding: 0.35rem 0.75rem;
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(149, 57, 46, 0.3);
@@ -2840,12 +2816,41 @@ a.activity-item:hover {
     font-weight: 500;
 }
 
-.filter-btn:hover {
+.sort-btn:hover {
     background: rgba(149, 57, 46, 0.15);
     border-color: rgba(149, 57, 46, 0.4);
 }
 
-.filter-btn.active {
+.sort-btn.active {
+    background: #95392E;
+    border-color: #95392E;
+    color: #FFF;
+    font-weight: 500;
+}
+
+.filter-btn,
+.chart-mode-btn {
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(149, 57, 46, 0.3);
+    border-radius: 6px;
+    font-family: 'Suisse Intl', sans-serif;
+    font-size: 0.75rem;
+    color: #4A4A4A;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.filter-btn:hover,
+.chart-mode-btn:hover {
+    background: rgba(149, 57, 46, 0.15);
+    border-color: rgba(149, 57, 46, 0.4);
+}
+
+.filter-btn.active,
+.chart-mode-btn.active {
     background: #95392E;
     border-color: #95392E;
     color: #FFF;
@@ -3504,34 +3509,37 @@ body.dark-mode .activity-date {
 }
 
 body.dark-mode .sort-btn {
-    background: rgba(214, 179, 112, 0.15);
-    border-color: rgba(214, 179, 112, 0.3);
-    color: #F3EFE9;
-}
-
-body.dark-mode .sort-btn:hover {
-    background: rgba(214, 179, 112, 0.25);
-    border-color: rgba(214, 179, 112, 0.5);
-}
-
-body.dark-mode .sort-btn.active {
-    background: #D6B370;
-    border-color: #D6B370;
-    color: #2C2C2C;
-}
-
-body.dark-mode .filter-btn {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(149, 57, 46, 0.4);
     color: #c0c0c0;
 }
 
-body.dark-mode .filter-btn:hover {
+body.dark-mode .sort-btn:hover {
     background: rgba(149, 57, 46, 0.25);
     border-color: rgba(149, 57, 46, 0.55);
 }
 
-body.dark-mode .filter-btn.active {
+body.dark-mode .sort-btn.active {
+    background: #B8503F;
+    border-color: #B8503F;
+    color: #FFF;
+}
+
+body.dark-mode .filter-btn,
+body.dark-mode .chart-mode-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(149, 57, 46, 0.4);
+    color: #c0c0c0;
+}
+
+body.dark-mode .filter-btn:hover,
+body.dark-mode .chart-mode-btn:hover {
+    background: rgba(149, 57, 46, 0.25);
+    border-color: rgba(149, 57, 46, 0.55);
+}
+
+body.dark-mode .filter-btn.active,
+body.dark-mode .chart-mode-btn.active {
     background: #B8503F;
     border-color: #B8503F;
     color: #FFF;
