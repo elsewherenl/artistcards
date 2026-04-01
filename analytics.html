@@ -157,13 +157,22 @@
                 </div>
                 <div id="postSummaryStats" style="margin: 0; padding: 0;">Loading...</div>
             </div>
-            <div class="post-sort-controls" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <span style="font-size: 0.85rem; color: #8A8580; margin-right: 0.5rem; align-self: center;">Sort by:</span>
-                <button class="sort-btn active" data-sort="featured-recent">Date (Newest to Oldest)</button>
-                <button class="sort-btn" data-sort="featured-oldest">Date (Oldest to Newest)</button>
-                <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
-                <button class="sort-btn" data-sort="views">Views (High to Low)</button>
-                <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
+            <div class="post-controls-bar post-sort-controls">
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">Sort by:</span>
+                    <button class="sort-btn" data-sort="featured-recent">Date (Newest to Oldest)</button>
+                    <button class="sort-btn" data-sort="featured-oldest">Date (Oldest to Newest)</button>
+                    <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
+                    <button class="sort-btn" data-sort="views">Views (High to Low)</button>
+                    <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
+                </div>
+            </div>
+            <div class="post-controls-bar" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">Chart mode:</span>
+                    <button class="chart-mode-btn active" data-mode="absolute">Absolute</button>
+                    <button class="chart-mode-btn" data-mode="index">Index vs Average</button>
+                </div>
             </div>
             <div class="post-performance-container">
                 <div class="post-chart-wrapper">
