@@ -1346,12 +1346,14 @@
         }
         #filters {
         display: grid !important;
-        position: static !important;
+        position: relative !important;
+        z-index: 100 !important;
         background-color: inherit !important;
         border: none !important;
         padding: 0 !important;
         box-shadow: none !important;
         grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        overflow: visible !important;
         }
     }
     /* Back to Top button */
@@ -3821,13 +3823,6 @@ body.dark-mode .source-performance-wrapper::-webkit-scrollbar-thumb:hover {
     color: #C8C3BC;
 }
 
-.calendar-day.today {
-    /* No special styling for today */
-}
-
-.calendar-day.today.has-activity {
-    /* No special styling for today */
-}
 
 /* Dark Mode Styles */
 body.dark-mode .calendar-period-btn {
@@ -3884,13 +3879,6 @@ body.dark-mode .calendar-day.future {
     color: #5A5550;
 }
 
-body.dark-mode .calendar-day.today {
-    /* No special styling for today */
-}
-
-body.dark-mode .calendar-day.today.has-activity {
-    /* No special styling for today */
-}
 
 body.dark-mode .calendar-nav-btn {
     border-color: rgba(214, 179, 112, 0.4);
