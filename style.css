@@ -1697,30 +1697,32 @@
     @media (max-width: 600px) {
     /* Reduce excessive padding on mobile */
     body {
-        padding: 1rem;
+        padding: 0.75rem;
     }
 
     /* Reduce header spacing */
     .header {
-        margin-bottom: 2rem;
+        margin-bottom: 0.75rem;
     }
 
     /* Navigation fixes */
     .nav-section {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         text-align: center;
-        gap: 0.25rem;
+        gap: 1rem;
         margin: 0;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     .nav-title {
-        font-size: 1.2rem !important;
+        font-size: 1rem !important;
     }
     .logo {
         position: static !important;
         transform: none !important;
-        margin: 0 auto 1.5rem auto !important;
-        font-size: 2.75rem !important;
+        margin: 0 auto 0.5rem auto !important;
+        font-size: 1.6rem !important;
         text-align: center !important;
         width: 100% !important;
         font-weight: 500 !important;
@@ -1730,37 +1732,38 @@
     /* Enhanced search bar & filters for mobile */
     .search-container {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
         width: 100%;
         max-width: 100%;
-        margin: 0 auto 1rem auto;
+        margin: 0 auto 0.5rem auto;
         gap: 0.5rem;
     }
     .search-input {
         font-size: 0.8rem;
         padding: 0.35rem 0.8rem;
-        width: 90%;
-        max-width: 90%;
+        flex: 1;
+        min-width: 0;
         box-sizing: border-box;
         background-image: none !important;
         padding-right: 0.8rem !important;
     }
     .clear-btn {
-        font-size: 0.8rem;
-        padding: 0.35rem 0.8rem;
-        width: 90%;
-        max-width: 90%;
-        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.7rem;
+        width: auto;
+        margin-top: 0;
         box-sizing: border-box;
         display: block;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
     .dark-mode-toggle {
-        width: 35px !important;
-        height: 35px !important;
-        font-size: 1.1rem !important;
-        margin: 0.5rem auto !important;
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 1rem !important;
+        margin: 0 !important;
     }
     /* Horizontal scrollable status filters - Instagram stories style */
     .status-filters {
@@ -1768,9 +1771,9 @@
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
-        gap: 0.5rem !important;
-        margin-bottom: 1rem !important;
-        padding: 0.5rem 0 !important;
+        gap: 0.4rem !important;
+        margin-bottom: 0.5rem !important;
+        padding: 0.25rem 0 !important;
         -webkit-overflow-scrolling: touch !important;
         scroll-behavior: smooth !important;
         align-items: flex-start !important;
@@ -1819,12 +1822,34 @@
 
     /* Adjust card grid for smaller screens */
     .grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: 1fr;
     }
 
     /* Reduce card image height on mobile */
     .image {
-        max-height: 240px;
+        max-height: 200px;
+    }
+
+    .card {
+        min-height: unset !important;
+        padding: 1rem !important;
+    }
+
+    /* Artist name: reduce padding-right so long names don't collide with badge */
+    .artist-name {
+        padding-right: 80px !important;
+    }
+
+    /* Bigger touch targets on status filter buttons */
+    .status-btn {
+        padding: 0.55rem 1rem !important;
+    }
+
+    /* Filter selects in popover: readable size */
+    .filter-select {
+        font-size: 0.8rem !important;
+        padding: 0.35rem 0.5rem !important;
+        width: 100% !important;
     }
 
     /* Status badge - improved mobile handling */
@@ -3001,7 +3026,7 @@ a.activity-item:hover {
 @media only screen and (max-width: 600px) {
   /* Reduce body padding for mobile */
   body {
-    padding: 1rem !important;
+    padding: 0.75rem !important;
   }
 
   /* Header improvements */
@@ -3010,37 +3035,37 @@ a.activity-item:hover {
     flex-direction: column !important;
     align-items: center !important;
     text-align: center !important;
-    margin-bottom: 2rem !important;
+    margin-bottom: 0.75rem !important;
   }
 
   /* Summary bar - mobile */
   .summary {
-    padding: 1rem !important;
-    gap: 1rem !important;
-    margin-bottom: 1.5rem !important;
+    padding: 0.75rem 1rem !important;
+    gap: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* Keep filters on one row even on mobile */
+  /* Filters popover on mobile - stack into readable columns */
   #filters.summary {
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-    gap: 0.4rem !important;
-    padding: 0.75rem !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
   }
 
   .summary-number {
-    font-size: 1.3rem !important;
+    font-size: 1.2rem !important;
   }
 
   .summary-label {
-    font-size: 0.7rem !important;
+    font-size: 0.65rem !important;
   }
 
   .logo {
     position: static !important;
     transform: none !important;
-    margin: 0 auto 1.5rem auto !important;
-    font-size: 2.75rem !important;
+    margin: 0 auto 0.4rem auto !important;
+    font-size: 1.6rem !important;
     text-align: center !important;
     width: 100% !important;
     font-weight: 500 !important;
@@ -3048,22 +3073,24 @@ a.activity-item:hover {
   }
 
   .nav-section {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     align-items: center !important;
-    gap: 0.25rem !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
     margin: 0 auto !important;
     text-align: center !important;
   }
 
   .nav-title {
-    font-size: 1.2rem !important;
+    font-size: 1rem !important;
   }
 
   .dark-mode-toggle {
-    width: 35px !important;
-    height: 35px !important;
-    font-size: 1.1rem !important;
-    margin: 0.5rem auto 0 auto !important;
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 1rem !important;
+    margin: 0 !important;
   }
 
   /* Analytics grid - centrally aligned */
