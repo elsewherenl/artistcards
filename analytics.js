@@ -2249,6 +2249,95 @@ function renderSourcePerformance(data) {
     }
 }
 
+function renderRankingEffectiveness(data) {
+    const container = document.getElementById('rankingEffectiveness');
+    if (!container) return;
+
+    function classifyStatus(row) {
+        const s = (row["Current Status"] || "").toLowerCase().trim();
+        if (s.includes("spotlight") || s.includes("featured") || s.includes("showcas")) return "yes";
+        if (s.includes("negotiat")) return "yes";
+        if (s.includes("feature") && s.includes("planned")) return "yes";
+        if (s.includes("reject")) return "no";
+        if (s.includes("no response")) return "no_response";
+        if (s.includes("awaiting")) return "awaiting";
+        return null;
+    }
+
+    // Brand colours: header bg → text colour follows the brand rule
+    // Rank 1 = gold (#D6B370) → black text
+    // Rank 2 = peach-gold → black text
+    // Rank 3 = mid-brown → off-white text
+    // Rank 4 = dark brown → off-white text
+    // Rank 5 = terracotta (#95392E) → off-white text
+    const rankingStyle = {
+        '1': { bg: '#D6B370', text: '#1A1A1A', bodyTint: 'rgba(214,179,112,0.06)' },
+        '2': { bg: '#C4956A', text: '#1A1A1A', bodyTint: 'rgba(196,149,106,0.06)' },
+        '3': { bg: '#9B7040', text: '#F3EFE9', bodyTint: 'rgba(155,112,64,0.06)'  },
+        '4': { bg: '#6B4F35', text: '#F3EFE9', bodyTint: 'rgba(107,79,53,0.06)'   },
+        '5': { bg: '#95392E', text: '#F3EFE9', bodyTint: 'rgba(149,57,46,0.06)'   }
+    };
+
+    // Yes Rate badge colour: semantic, not ranking colour
+    // ≥70% → sage green tint, 40-69% → gold tint, <40% → terracotta tint
+    function yesRateBadge(rate) {
+        if (rate === null) return { bg: 'rgba(0,0,0,0.03)', bar: '#ccc' };
+        if (rate >= 70) return { bg: 'rgba(168,181,160,0.2)', bar: '#A8B5A0' }; // sage green
+        if (rate >= 40) return { bg: 'rgba(214,179,112,0.2)', bar: '#D6B370' }; // gold
+        return { bg: 'rgba(149,57,46,0.15)', bar: '#95392E' };                  // terracotta
+    }
+
+    let html = '<div class="ranking-effectiveness-grid">';
+
+    ['1', '2', '3', '4', '5'].forEach(rank => {
+        const ranked = data.filter(row => (row["Ranking"] || "").trim() === rank);
+
+        let contacted = 0, awaiting = 0, responded = 0, yes = 0;
+        ranked.forEach(row => {
+            const c = classifyStatus(row);
+            if (c === null) return;
+            contacted++;
+            if (c === 'awaiting') awaiting++;
+            else if (c === 'yes') { responded++; yes++; }
+            else if (c === 'no') responded++;
+        });
+
+        const decided = contacted - awaiting;
+        const responseRate = contacted > 0 ? Math.round((responded / contacted) * 100) : null;
+        const positiveRate = decided > 0 ? Math.round((yes / decided) * 100) : null;
+
+        const { bg, text, bodyTint } = rankingStyle[rank];
+        const badge = yesRateBadge(positiveRate);
+        const awaitingNote = awaiting > 0 ? ` <span class="ranking-eff-awaiting">(${awaiting} awaiting)</span>` : '';
+        const barWidth = positiveRate !== null ? positiveRate : 0;
+
+        html += `
+            <div class="ranking-eff-card">
+                <div class="ranking-eff-header" style="background:${bg}; color:${text};">Ranking ${rank}</div>
+                <div class="ranking-eff-body" style="background:${bodyTint};">
+                    <div class="ranking-eff-row">
+                        <span class="ranking-eff-label">Contacted</span>
+                        <span class="ranking-eff-value">${contacted}${awaitingNote}</span>
+                    </div>
+                    <div class="ranking-eff-row">
+                        <span class="ranking-eff-label">Response Rate</span>
+                        <span class="ranking-eff-value">${responseRate !== null ? responseRate + '%' : '—'} <span class="ranking-eff-sub">${responded}/${contacted}</span></span>
+                    </div>
+                    <div class="ranking-eff-row ranking-eff-highlight" style="background:${badge.bg};">
+                        <span class="ranking-eff-label">Yes Rate</span>
+                        <span class="ranking-eff-value">${positiveRate !== null ? positiveRate + '%' : '—'} <span class="ranking-eff-sub">${yes}/${decided}</span></span>
+                    </div>
+                    <div class="ranking-eff-bar-track">
+                        <div class="ranking-eff-bar-fill" style="width:${barWidth}%; background:${badge.bar};"></div>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
 // Store data globally for summary updates
 let artistData = [];
 let postPerformanceData = [];
@@ -2267,6 +2356,7 @@ fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OG
         renderFunnel(artistData);
         renderRecent(artistData);
         renderResponseAnalytics(artistData);
+        renderRankingEffectiveness(artistData);
         renderSourcePerformance(artistData);
 
         return fetch(`https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&gid=1480669807&timestamp=${Date.now()}`);
