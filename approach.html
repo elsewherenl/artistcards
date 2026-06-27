@@ -106,7 +106,7 @@
         border-radius: 10px;
         padding: 16px 20px;
         display: grid;
-        grid-template-columns: 52px 1fr auto;
+        grid-template-columns: 52px 1fr;
         gap: 16px;
         align-items: center;
         transition: box-shadow 0.2s;
@@ -179,17 +179,17 @@
     }
 
     .approach-readiness {
-        font-size: 0.65rem;
+        font-size: 1rem;
+        font-weight: 500;
         color: var(--warm-gray);
-        letter-spacing: 0.03em;
-        margin-left: auto;
+        letter-spacing: 0.01em;
         white-space: nowrap;
     }
 
     /* Score rows */
     .approach-scores {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: 12px;
     }
 
@@ -607,6 +607,9 @@ function renderList() {
         });
     });
 
+    // Also update badge reference in updateSalesStatus
+
+
     // Attach status option handlers
     list.querySelectorAll('.sales-status-option').forEach(opt => {
         opt.addEventListener('click', (e) => {
@@ -631,6 +634,11 @@ function buildCard(artist) {
         ? `<img class="approach-avatar" src="${artist.image}" alt="${artist.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
         + `<div class="approach-avatar-placeholder" style="display:none"></div>`
         : `<div class="approach-avatar-placeholder"></div>`;
+
+    const readinessBlock = `<div class="score-block">
+        <span class="score-label">Readiness</span>
+        <span class="approach-readiness" id="readiness-${slugify(artist.name)}">${readinessDisplay}</span>
+    </div>`;
 
     const scoresHtml = SCORE_KEYS.map((key, i) => {
         const val = artist[key] || 0;
@@ -659,13 +667,12 @@ function buildCard(artist) {
             <div class="approach-name-row">
                 <span class="approach-name">${escHtml(artist.name)}</span>
                 <span class="approach-genre-badge">${escHtml(artist.genre)}</span>
-                <span class="approach-readiness">${readinessDisplay}</span>
             </div>
-            <div class="approach-scores">${scoresHtml}</div>
-        </div>
-        <div class="approach-status-wrap">
-            <span class="sales-status-badge ${statusClass}">${artist.salesStatus}</span>
-            <span class="saving-indicator" id="saving-${slugify(artist.name)}">Saving…</span>
+            <div class="approach-scores">${scoresHtml}${readinessBlock}<div class="score-block" style="display:flex;flex-direction:column;gap:5px;justify-content:flex-end">
+                <span class="score-label">&nbsp;</span>
+                <span class="sales-status-badge ${statusClass}">${artist.salesStatus}</span>
+                <span class="saving-indicator" id="saving-${slugify(artist.name)}">Saving…</span>
+            </div></div>
         </div>
         <div class="sales-status-dropdown">
             ${statusOptionsHtml}
@@ -674,7 +681,7 @@ function buildCard(artist) {
 }
 
 function colForKey(key) {
-    return { curatorial: 34, warm: 35, commercial: 36, wall: 37 }[key];
+    return { curatorial: 34, warm: 35, commercial: 36, wall: 37 }[key]; // AH=34, AI=35, AJ=36, AK=37
 }
 
 function escHtml(str) {
@@ -711,7 +718,7 @@ async function handleDotClick(dot) {
     });
 
     // Update readiness display
-    const readinessEl = card.querySelector('.approach-readiness');
+    const readinessEl = document.getElementById(`readiness-${slugify(artistName)}`);
     if (readinessEl) readinessEl.textContent = artist.readiness > 0 ? `${artist.readiness}/20` : '—';
 
     // Save to sheet
