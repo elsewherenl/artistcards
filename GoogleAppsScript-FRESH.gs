@@ -17,7 +17,48 @@ function doGet(e) {
   if (e && e.parameter && e.parameter.action === 'syncInstagram') {
     return syncInstagramToSheet();
   }
+  if (e && e.parameter && e.parameter.action === 'updateApproach') {
+    return updateApproachCell(e);
+  }
   return handleRequest(e);
+}
+
+function updateApproachCell(e) {
+  try {
+    const artistName = e.parameter.artistName;
+    const col = parseInt(e.parameter.col);
+    const value = e.parameter.value;
+
+    if (!artistName || !col) {
+      return createResponse(false, 'Missing artistName or col');
+    }
+
+    const ss = SpreadsheetApp.openById('1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc');
+    const sheet = ss.getSheetByName('Live Longlist');
+    if (!sheet) return createResponse(false, 'Sheet not found');
+
+    const data = sheet.getDataRange().getValues();
+    const searchName = artistName.toString().trim().toLowerCase();
+    let foundRow = -1;
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][2] && data[i][2].toString().trim().toLowerCase() === searchName) {
+        foundRow = i + 1;
+        break;
+      }
+    }
+
+    if (foundRow === -1) {
+      return createResponse(false, 'Artist "' + artistName + '" not found');
+    }
+
+    sheet.getRange(foundRow, col).setValue(value);
+    Logger.log('Updated row ' + foundRow + ' col ' + col + ' = ' + value);
+    return createResponse(true, 'Updated', { row: foundRow, col, value });
+
+  } catch (err) {
+    return createResponse(false, 'Error: ' + err.toString());
+  }
 }
 
 function doPost(e) {
@@ -29,7 +70,7 @@ function doPost(e) {
 // Instagram Sync
 // ------------------------------------------------
 
-const INSTAGRAM_ACCESS_TOKEN = 'EAAXk5I8jmXABR1gpYirsvk5jD0sN9DXnknA0L6oCu50iHcZA22fYE1l0im0yZAldJdE6BgrBJfrPlAuxb2HMtYVIJIPjfCGRdM34AUhEf7ZCcUh7ZCGG6b12A00ZCGUAOPe8PxzkbVZCwQArihDn9aUwtYe4PMk0czuDoPnq2wVMeJxYom6eltdPdRK12gMtVW';
+const INSTAGRAM_ACCESS_TOKEN = 'EAAXk5I8jmXABR1nTKki0wLOdI6i2mYe1vWmeXxnZCCSvrqcYwlUbPRRKiT10GrDk3PPnwffZC88jZCBy8Sbtd4D2OOHSAEc64GoEJThPiaMrwt0OPYei5BVeEVeloJMTX5pd5Ae2vP939JzqPmbeGZA7iZCXxQHZBlMY9dCYfKqtuBxepGLZB9K3IWw9GVhwtRH';
 const INSTAGRAM_BUSINESS_ID = '17841474859984348';
 
 function syncInstagramToSheet() {
@@ -91,6 +132,24 @@ function syncInstagramToSheet() {
       } else {
         skipped++;
       }
+    }
+
+    // Append follower count to IG Followers sheet
+    try {
+      const profileUrl = `https://graph.facebook.com/v24.0/${INSTAGRAM_BUSINESS_ID}?fields=followers_count&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
+      const profile = JSON.parse(UrlFetchApp.fetch(profileUrl).getContentText());
+      const followersSheet = ss.getSheetByName('IG Followers');
+      if (followersSheet && profile.followers_count !== undefined) {
+        const today = new Date();
+        const d = String(today.getDate()).padStart(2, '0');
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const y = String(today.getFullYear()).slice(-2);
+        const dateStr = `${d}/${m}/${y}`;
+        followersSheet.appendRow([dateStr, profile.followers_count]);
+        Logger.log(`Appended follower count: ${dateStr} = ${profile.followers_count}`);
+      }
+    } catch (e) {
+      Logger.log('Follower sync error: ' + e.toString());
     }
 
     return createResponse(true, `Sync complete. ${updated} rows updated, ${skipped} rows skipped.`, { updated, skipped });
@@ -350,6 +409,65 @@ function createWeeklyTrigger() {
     .create();
 
   Logger.log('Weekly trigger created.');
+}
+
+// ------------------------------------------------
+// Token Expiry Check
+// ------------------------------------------------
+
+const TOKEN_EXPIRY_DATE = new Date('2026-08-26'); // 60 days from 27/06/26
+const ALERT_EMAIL = 'alexwillmartin@gmail.com';
+
+function checkTokenExpiry() {
+  const today = new Date();
+  const daysUntilExpiry = Math.floor((TOKEN_EXPIRY_DATE - today) / (1000 * 60 * 60 * 24));
+
+  Logger.log('Days until token expiry: ' + daysUntilExpiry);
+
+  if (daysUntilExpiry <= 7 && daysUntilExpiry >= 0) {
+    const subject = `⚠️ Elsewhere Dashboard: Instagram token expires in ${daysUntilExpiry} days`;
+    const body = `Your Instagram API access token will expire on 25/08/26 (in ${daysUntilExpiry} days).
+
+To refresh it, follow these steps:
+
+1. Go to developers.facebook.com/tools/explorer
+2. Select your "elsewhere dashboard" app
+3. Click "Generate Access Token" and log in with Instagram
+4. Make sure these permissions are checked:
+   - instagram_basic
+   - instagram_manage_insights
+   - pages_show_list
+   - pages_read_engagement
+5. Copy the short-lived token
+6. Run this in terminal to get a 60-day token:
+
+curl "https://graph.facebook.com/v24.0/oauth/access_token?grant_type=fb_exchange_token&client_id=1659045188704624&client_secret=4fd4c1e515f442708c4a4d26b7d76c18&fb_exchange_token=YOUR_SHORT_LIVED_TOKEN"
+
+7. Copy the new access_token value
+8. Paste it into instagram.js (line 13) and GoogleAppsScript-FRESH.gs (line 34)
+9. Redeploy the Apps Script
+
+— Elsewhere Dashboard`;
+
+    MailApp.sendEmail(ALERT_EMAIL, subject, body);
+    Logger.log('Token expiry warning email sent.');
+  }
+}
+
+function createTokenExpiryTrigger() {
+  ScriptApp.getProjectTriggers().forEach(t => {
+    if (t.getHandlerFunction() === 'checkTokenExpiry') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+
+  ScriptApp.newTrigger('checkTokenExpiry')
+    .timeBased()
+    .everyDays(1)
+    .atHour(9)
+    .create();
+
+  Logger.log('Token expiry daily trigger created.');
 }
 
 function testUpdate() {
