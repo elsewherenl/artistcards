@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <!-- Favicon -->
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -13,13 +13,15 @@
 <title>Artist Prospecting - Elsewhere Collective</title>
 <link rel="stylesheet" href="style.css">
 <script src="auth.js"></script>
+<script src="instagram.js"></script>
 </head>
-<body>
+<body class="page-prospecting">
 <div class="header">
     <a href="index.html" class="logo">elsewhere collective</a>
 <div class="nav-section">
 <div class="nav-title active"><a href="index.html">Artist Prospecting</a></div>
-<div class="nav-title"><a href="analytics.html">Analytics</a></div>
+<div class="nav-title"><a href="analytics.html">Pipeline</a></div>
+<div class="nav-title"><a href="instagram.html">Instagram</a></div>
     <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
     </div>
 </div>
@@ -78,6 +80,12 @@
 </select>
 </div>
 <div class="summary-item">
+<label for="themeFilter" class="summary-label">Theme</label><br>
+<select id="themeFilter" class="filter-select">
+<option value="All">All</option>
+</select>
+</div>
+<div class="summary-item">
 <label for="followersFilter" class="summary-label">Followers</label><br>
 <select id="followersFilter" class="filter-select">
 <option value="All">All</option>
@@ -87,35 +95,15 @@
 </select>
 </div>
 <div class="summary-item">
-<label for="rankingFilter" class="summary-label">Ranking</label><br>
-<div class="custom-dropdown" id="rankingDropdown">
-<div class="custom-dropdown-trigger filter-select" id="rankingTrigger">
-<span id="rankingDisplay">All</span>
-<span class="dropdown-arrow">▼</span>
-</div>
-<div class="custom-dropdown-menu" id="rankingMenu">
-<label class="dropdown-option">
-<input type="checkbox" value="1" class="ranking-checkbox">
-<span>1</span>
-</label>
-<label class="dropdown-option">
-<input type="checkbox" value="2" class="ranking-checkbox">
-<span>2</span>
-</label>
-<label class="dropdown-option">
-<input type="checkbox" value="3" class="ranking-checkbox">
-<span>3</span>
-</label>
-<label class="dropdown-option">
-<input type="checkbox" value="4" class="ranking-checkbox">
-<span>4</span>
-</label>
-<label class="dropdown-option">
-<input type="checkbox" value="5" class="ranking-checkbox">
-<span>5</span>
-</label>
-</div>
-</div>
+<label for="rankingFilter" class="summary-label">Ranking</label>
+<span class="ranking-label-hint" id="rankingHint"></span>
+<select id="rankingFilter" class="filter-select ranking-multi-select" multiple>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+</select>
 </div>
 <div class="summary-item">
 <label for="sortByFilter" class="summary-label">Sort By</label><br>

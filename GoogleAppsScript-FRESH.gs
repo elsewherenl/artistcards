@@ -14,11 +14,114 @@
  */
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'syncInstagram') {
+    return syncInstagramToSheet();
+  }
   return handleRequest(e);
 }
 
 function doPost(e) {
   return handleRequest(e);
+}
+
+
+// ------------------------------------------------
+// Instagram Sync
+// ------------------------------------------------
+
+const INSTAGRAM_ACCESS_TOKEN = 'EAAXk5I8jmXABR1gpYirsvk5jD0sN9DXnknA0L6oCu50iHcZA22fYE1l0im0yZAldJdE6BgrBJfrPlAuxb2HMtYVIJIPjfCGRdM34AUhEf7ZCcUh7ZCGG6b12A00ZCGUAOPe8PxzkbVZCwQArihDn9aUwtYe4PMk0czuDoPnq2wVMeJxYom6eltdPdRK12gMtVW';
+const INSTAGRAM_BUSINESS_ID = '17841474859984348';
+
+function syncInstagramToSheet() {
+  try {
+    const ss = SpreadsheetApp.openById('1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc');
+    const sheet = ss.getSheetByName('IG Analytics');
+
+    if (!sheet) {
+      return createResponse(false, 'Sheet "IG Analytics" not found');
+    }
+
+    // Fetch posts from Instagram API
+    const mediaUrl = `https://graph.facebook.com/v24.0/${INSTAGRAM_BUSINESS_ID}/media?fields=id,media_type,timestamp,like_count,comments_count&limit=50&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
+    const mediaRes = JSON.parse(UrlFetchApp.fetch(mediaUrl).getContentText());
+
+    if (!mediaRes.data) {
+      return createResponse(false, 'No media returned from Instagram API');
+    }
+
+    // Fetch insights for each post
+    const posts = mediaRes.data.map(post => {
+      try {
+        const insightUrl = `https://graph.facebook.com/v24.0/${post.id}/insights?metric=reach,saved,views&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
+        const insights = JSON.parse(UrlFetchApp.fetch(insightUrl).getContentText());
+        const metrics = {};
+        if (insights.data) {
+          insights.data.forEach(m => { metrics[m.name] = m.values[0]?.value ?? null; });
+        }
+        return { ...post, ...metrics };
+      } catch (e) {
+        return post;
+      }
+    });
+
+    // Read sheet data (row 1 = headers)
+    // Columns: A=Post Date, B=Post Title, C=Artist, D=Post Type, E=Reach, F=Views, G=Likes, H=Likes/Reach, I=Notes
+    const data = sheet.getDataRange().getValues();
+    let updated = 0;
+    let skipped = 0;
+
+    for (let i = 1; i < data.length; i++) {
+      const rowDate = data[i][0]; // Column A
+
+      if (!rowDate) continue;
+
+      // Normalise sheet date to dd/mm/yy
+      const sheetDateStr = formatSheetDate(rowDate);
+      if (!sheetDateStr) continue;
+
+      // Match on date only — never post twice in one day
+      const match = posts.find(post => formatApiDate(post.timestamp) === sheetDateStr);
+
+      if (match) {
+        // Write Reach (E), Views (F), Likes (G)
+        if (match.reach !== undefined && match.reach !== null) sheet.getRange(i + 1, 5).setValue(match.reach);
+        if (match.views !== undefined && match.views !== null) sheet.getRange(i + 1, 6).setValue(match.views);
+        if (match.like_count !== undefined && match.like_count !== null) sheet.getRange(i + 1, 7).setValue(match.like_count);
+        updated++;
+      } else {
+        skipped++;
+      }
+    }
+
+    return createResponse(true, `Sync complete. ${updated} rows updated, ${skipped} rows skipped.`, { updated, skipped });
+
+  } catch (err) {
+    Logger.log('syncInstagramToSheet error: ' + err.toString());
+    return createResponse(false, 'Error: ' + err.toString());
+  }
+}
+
+function formatSheetDate(val) {
+  // Handles Date objects or strings like "21/05/26"
+  if (val instanceof Date) {
+    const d = String(val.getDate()).padStart(2, '0');
+    const m = String(val.getMonth() + 1).padStart(2, '0');
+    const y = String(val.getFullYear()).slice(-2);
+    return `${d}/${m}/${y}`;
+  }
+  const str = val.toString().trim();
+  // Already in dd/mm/yy format
+  if (/^\d{2}\/\d{2}\/\d{2}$/.test(str)) return str;
+  return null;
+}
+
+function formatApiDate(isoTimestamp) {
+  // "2026-05-21T10:00:00+0000" → "21/05/26"
+  const d = new Date(isoTimestamp);
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = String(d.getUTCFullYear()).slice(-2);
+  return `${day}/${month}/${year}`;
 }
 
 function handleRequest(e) {
@@ -213,6 +316,42 @@ function createResponse(success, message, data) {
 }
 
 // Test function - run this to verify it works
+function debugInstagramSync() {
+  const ss = SpreadsheetApp.openById('1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc');
+  const sheet = ss.getSheetByName('IG Analytics');
+  const data = sheet.getDataRange().getValues();
+
+  Logger.log('=== SHEET DATES (first 5 rows) ===');
+  for (let i = 1; i < Math.min(6, data.length); i++) {
+    const val = data[i][0];
+    Logger.log('Row ' + (i+1) + ': raw=' + JSON.stringify(val) + ' type=' + typeof val + ' formatted=' + formatSheetDate(val));
+  }
+
+  const mediaUrl = `https://graph.facebook.com/v24.0/${INSTAGRAM_BUSINESS_ID}/media?fields=id,timestamp&limit=50&access_token=${INSTAGRAM_ACCESS_TOKEN}`;
+  const mediaRes = JSON.parse(UrlFetchApp.fetch(mediaUrl).getContentText());
+
+  Logger.log('=== API DATES (all posts) ===');
+  mediaRes.data.forEach(p => {
+    Logger.log('ID=' + p.id + ' timestamp=' + p.timestamp + ' formatted=' + formatApiDate(p.timestamp));
+  });
+}
+
+function createWeeklyTrigger() {
+  ScriptApp.getProjectTriggers().forEach(t => {
+    if (t.getHandlerFunction() === 'syncInstagramToSheet') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+
+  ScriptApp.newTrigger('syncInstagramToSheet')
+    .timeBased()
+    .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    .atHour(8)
+    .create();
+
+  Logger.log('Weekly trigger created.');
+}
+
 function testUpdate() {
   const testEvent = {
     parameter: {

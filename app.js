@@ -27,6 +27,12 @@
             searchInput.style.paddingRight = '4rem';
         }
 
+        // Ranking multi-select hint
+        const rankingHint = document.getElementById('rankingHint');
+        if (rankingHint) {
+            rankingHint.textContent = isMac ? '⌘ multi-select' : 'Ctrl multi-select';
+        }
+
         // Dark mode initialization
         initDarkMode();
     });
@@ -242,6 +248,7 @@
         const searchInput = document.getElementById("searchInput");
         const genreSelect = document.getElementById("genreFilter");
         const whereFoundSelect = document.getElementById("whereFoundFilter");
+        const themeSelectEsc = document.getElementById("themeFilter");
         const followersSelect = document.getElementById("followersFilter");
         const sortBySelect = document.getElementById("sortByFilter");
 
@@ -272,10 +279,10 @@
             return;
         }
 
-        // 3. Tag filter
-        if (currentTagFilter !== null) {
-            console.log('Clearing tag filter');
-            currentTagFilter = null;
+        // 3. Theme dropdown filter
+        if (themeSelectEsc && themeSelectEsc.value !== "All") {
+            console.log('Clearing theme filter');
+            themeSelectEsc.value = "All";
             refreshUI();
             return;
         }
@@ -317,11 +324,8 @@
         }
 
         // 8. Ranking filter
-        if (selectedRankings.length > 0) {
-            console.log('Clearing ranking filter');
-            rankingCheckboxes.forEach(cb => cb.checked = false);
-            selectedRankings = [];
-            rankingDisplay.textContent = "All";
+        if (rankingSelect.selectedOptions.length > 0) {
+            Array.from(rankingSelect.options).forEach(o => o.selected = false);
             refreshUI();
             return;
         }
@@ -704,50 +708,24 @@
         const data = parseCSV(csvData);
         const genreSelect = document.getElementById("genreFilter");
         const whereFoundSelect = document.getElementById("whereFoundFilter");
+        const themeSelect = document.getElementById("themeFilter");
         const followersSelect = document.getElementById("followersFilter");
         const sortBySelect = document.getElementById("sortByFilter");
 
-        // Custom ranking dropdown elements
-        const rankingTrigger = document.getElementById("rankingTrigger");
-        const rankingMenu = document.getElementById("rankingMenu");
-        const rankingDisplay = document.getElementById("rankingDisplay");
-        const rankingCheckboxes = document.querySelectorAll(".ranking-checkbox");
-        let selectedRankings = [];
-
-        // Toggle dropdown
-        rankingTrigger.addEventListener("click", (e) => {
-            e.stopPropagation();
-            rankingTrigger.classList.toggle("active");
-            rankingMenu.classList.toggle("active");
+        // Populate themes dropdown (themes are comma-separated per artist)
+        const allThemes = [...new Set(
+            data.flatMap(row => (row["Themes"] || "").split(',').map(t => t.trim()).filter(Boolean))
+        )].sort();
+        allThemes.forEach(theme => {
+            const option = document.createElement("option");
+            option.value = theme;
+            option.textContent = theme;
+            themeSelect.appendChild(option);
         });
 
-        // Close dropdown when clicking outside
-        document.addEventListener("click", (e) => {
-            if (!document.getElementById("rankingDropdown").contains(e.target)) {
-                rankingTrigger.classList.remove("active");
-                rankingMenu.classList.remove("active");
-            }
-        });
-
-        // Handle checkbox changes
-        rankingCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener("change", () => {
-                selectedRankings = Array.from(rankingCheckboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
-
-                // Update display text
-                if (selectedRankings.length === 0) {
-                    rankingDisplay.textContent = "All";
-                } else if (selectedRankings.length === 1) {
-                    rankingDisplay.textContent = selectedRankings[0];
-                } else {
-                    rankingDisplay.textContent = selectedRankings.join(", ");
-                }
-
-                refreshUI();
-            });
-        });
+        // Ranking multi-select filter
+        const rankingSelect = document.getElementById("rankingFilter");
+        rankingSelect.addEventListener("change", refreshUI);
 
         // Store all data for re-filtering
         let fullData = data;
@@ -756,10 +734,12 @@
         console.log("First row of data:", data[0]);
         console.log("All column headers:", Object.keys(data[0] || {}));
 
-        // Populate genres
-        const genres = [...new Set(data.map(row => row["Genre"]).filter(Boolean))];
+        // Populate genres — split comma-separated values
+        const genres = [...new Set(
+            data.flatMap(row => (row["Genre"] || "").split(",").map(g => g.trim()).filter(Boolean))
+        )].sort();
         console.log("Found genres:", genres);
-        genres.sort().forEach(genre => {
+        genres.forEach(genre => {
             const option = document.createElement("option");
             option.value = genre;
             option.textContent = genre;
@@ -815,6 +795,7 @@
         function filterData() {
             const genre = genreSelect.value;
             const whereFound = whereFoundSelect.value;
+            const selectedTheme = themeSelect.value;
             const followersRange = followersSelect.value;
 
             return fullData.filter(row => {
@@ -837,19 +818,14 @@
                                   instagramHandle.includes(searchTerm) ||
                                   artistTags.includes(searchTerm);
 
-                const genreMatch = genre === "All" || row["Genre"] === genre;
+                const genreMatch = genre === "All" || (row["Genre"] || "").split(",").map(g => g.trim()).includes(genre);
                 const whereFoundMatch = whereFound === "All" || row["Where Found"] === whereFound;
 
-                // Theme filter
-                let tagMatch = true;
-                if (currentTagFilter) {
-                    const artistTags = (row["Themes"] || "").toString().trim();
-                    if (artistTags) {
-                        const tagsList = artistTags.split(',').map(tag => tag.trim());
-                        tagMatch = tagsList.includes(currentTagFilter);
-                    } else {
-                        tagMatch = false;
-                    }
+                // Theme dropdown filter
+                let themeDropdownMatch = true;
+                if (selectedTheme !== "All") {
+                    const rowThemes = (row["Themes"] || "").toString().split(',').map(t => t.trim());
+                    themeDropdownMatch = rowThemes.includes(selectedTheme);
                 }
 
                 // Followers filter
@@ -863,14 +839,15 @@
                 else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
                 else if (followersRange === "10kplus") followersMatch = followers > 10000;
 
-                // Ranking filter - multi-select
+                // Ranking filter (multi-select)
+                const selectedRankings = Array.from(rankingSelect.selectedOptions).map(o => o.value);
                 let rankingMatch = true;
                 if (selectedRankings.length > 0) {
                     const rowRanking = (row["Ranking"] || "").toString().trim();
                     rankingMatch = selectedRankings.includes(rowRanking);
                 }
 
-                return statusMatch && searchMatch && genreMatch && whereFoundMatch && tagMatch && followersMatch && rankingMatch;
+                return statusMatch && searchMatch && genreMatch && whereFoundMatch && themeDropdownMatch && followersMatch && rankingMatch;
             });
         }
 
@@ -994,8 +971,10 @@
             const card = document.createElement("div");
             card.className = "card";
             // Add unique ID to card based on artist name
-            const artistNameForId = (row["Artist"] || row["Instagram Name"] || "").toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const artistNameRaw = (row["Artist"] || row["Instagram Name"] || "");
+            const artistNameForId = artistNameRaw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
             card.id = `artist-${artistNameForId}`;
+            card.dataset.artistName = artistNameRaw.toLowerCase().trim();
 
             // Add badges container (positioned absolutely in top-right)
             const badgesContainer = document.createElement("div");
@@ -1266,16 +1245,15 @@
                 el.className = "field-item";
                 const similarArtistsText = row["Similar Artists"].toString().trim();
 
-                // Split by comma and make each artist name clickable
-                const artistNames = similarArtistsText.split(',').map(name => name.trim());
+                // Split by comma or newline
+                const artistNames = similarArtistsText.split(/[,\n]+/).map(name => name.trim()).filter(Boolean);
                 const clickableNames = artistNames.map(name => {
-                    const nameForId = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                    return `<span class="similar-artist-link" data-artist-id="artist-${nameForId}">${name}</span>`;
+                    return `<span class="similar-artist-link" data-artist-name="${name.toLowerCase().trim()}">${name}</span>`;
                 }).join(', ');
 
                 // Make the label clickable to show all similar artists
-                const artistIdsArray = artistNames.map(name => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
-                el.innerHTML = `<span class="label similar-artists-label-link" data-artist-ids='${JSON.stringify(artistIdsArray)}'>Similar Artists:</span> ${clickableNames}`;
+                const artistNamesArray = artistNames.map(name => name.toLowerCase().trim());
+                el.innerHTML = `<span class="label similar-artists-label-link" data-artist-names='${JSON.stringify(artistNamesArray)}'>Similar Artists:</span> ${clickableNames}`;
                 card.appendChild(el);
             }
 
@@ -1310,60 +1288,41 @@
             document.querySelectorAll('.similar-artist-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const targetId = this.getAttribute('data-artist-id');
-                    let targetCard = document.getElementById(targetId);
+                    const targetName = this.getAttribute('data-artist-name');
 
-                    // If the card is not currently visible (due to filters), clear filters first
+                    function findCardByName(name) {
+                        return document.querySelector(`.card[data-artist-name="${CSS.escape(name)}"]`);
+                    }
+
+                    let targetCard = findCardByName(targetName);
+
                     if (!targetCard) {
-                        // Clear search
+                        // Clear all filters so the card becomes visible
                         currentSearchTerm = '';
                         document.getElementById('searchInput').value = '';
-
-                        // Reset to "All" status
                         currentStatusFilter = ['all'];
                         document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
                         document.querySelector('.status-btn[data-status="all"]').classList.add('active');
-
-                        // Reset other filters
                         document.getElementById('genreFilter').value = 'All';
                         document.getElementById('whereFoundFilter').value = 'All';
+                        document.getElementById('themeFilter').value = 'All';
                         document.getElementById('followersFilter').value = 'All';
-
-                        // Clear tag filter
                         currentTagFilter = null;
-
-                        // Update featured sort options
                         updateFeaturedSortOptions();
-
-                        // Refresh the UI to show all artists
                         refreshUI();
 
-                        // Wait for DOM to update, then try again
                         setTimeout(() => {
-                            targetCard = document.getElementById(targetId);
+                            targetCard = findCardByName(targetName);
                             if (targetCard) {
-                                targetCard.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start'
-                                });
-                                // Add prominent highlight effect using the glow animation
+                                targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                 targetCard.classList.add('highlight-glow');
-                                setTimeout(() => {
-                                    targetCard.classList.remove('highlight-glow');
-                                }, 2000);
+                                setTimeout(() => targetCard.classList.remove('highlight-glow'), 2000);
                             }
                         }, 100);
                     } else {
-                        // Card is already visible, just scroll to it
-                        targetCard.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                        // Add prominent highlight effect using the glow animation
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         targetCard.classList.add('highlight-glow');
-                        setTimeout(() => {
-                            targetCard.classList.remove('highlight-glow');
-                        }, 2000);
+                        setTimeout(() => targetCard.classList.remove('highlight-glow'), 2000);
                     }
                 });
             });
@@ -1374,18 +1333,14 @@
                     e.preventDefault();
                     e.stopPropagation();
 
-                    // Parse the artist IDs from data attribute
-                    const artistIdsJson = this.getAttribute('data-artist-ids');
-                    const artistIds = JSON.parse(artistIdsJson);
+                    const artistNamesJson = this.getAttribute('data-artist-names');
+                    const similarNames = JSON.parse(artistNamesJson);
 
-                    // Get the current artist's card to find their name
                     const currentCard = this.closest('.card');
-                    const currentArtistId = currentCard.id.replace('artist-', '');
+                    const currentArtistName = currentCard.dataset.artistName;
 
-                    // Create an array of all artist IDs we want to show (current + similar)
-                    const allIdsToShow = [currentArtistId, ...artistIds];
+                    const allNamesToShow = [currentArtistName, ...similarNames];
 
-                    // Clear all other filters
                     currentSearchTerm = '';
                     document.getElementById('searchInput').value = '';
                     currentStatusFilter = ['all'];
@@ -1393,25 +1348,19 @@
                     document.querySelector('.status-btn[data-status="all"]').classList.add('active');
                     document.getElementById('genreFilter').value = 'All';
                     document.getElementById('whereFoundFilter').value = 'All';
+                    document.getElementById('themeFilter').value = 'All';
                     document.getElementById('followersFilter').value = 'All';
                     currentTagFilter = null;
-
-                    // Update featured sort options
                     updateFeaturedSortOptions();
-
-                    // Refresh UI first to show all artists
                     refreshUI();
 
-                    // Wait for DOM update, then hide non-matching cards and highlight the group
                     setTimeout(() => {
-                        // Hide all cards that are NOT in our group
                         document.querySelectorAll('.card').forEach(card => {
-                            const cardId = card.id.replace('artist-', '');
-                            if (!allIdsToShow.includes(cardId)) {
+                            const cardName = card.dataset.artistName;
+                            if (!allNamesToShow.includes(cardName)) {
                                 card.style.display = 'none';
                             } else {
                                 card.style.display = 'flex';
-                                // Highlight with gold color
                                 card.style.boxShadow = '0 0 20px rgba(214, 179, 112, 0.6)';
                                 setTimeout(() => {
                                     card.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
@@ -1419,13 +1368,9 @@
                             }
                         });
 
-                        // Scroll to the current artist's card (the one we clicked from)
-                        const currentCardElement = document.getElementById(`artist-${currentArtistId}`);
+                        const currentCardElement = document.querySelector(`.card[data-artist-name="${CSS.escape(currentArtistName)}"]`);
                         if (currentCardElement) {
-                            currentCardElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
+                            currentCardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     }, 100);
                 });
@@ -1437,8 +1382,9 @@
                     e.preventDefault();
                     const tag = this.getAttribute('data-tag');
 
-                    // Set the tag filter
-                    currentTagFilter = tag;
+                    // Set the tag filter and sync the dropdown
+                    currentTagFilter = null;
+                    themeSelect.value = tag;
 
                     // Scroll to cards section to see filtered results
                     const cardsContainer = document.getElementById('cards');
@@ -1499,7 +1445,7 @@
             ? Math.round(followersData.reduce((a, b) => a + b, 0) / followersData.length)
             : 0;
             
-            const genres = filtered.map(r => r["Genre"]).filter(Boolean)
+            const genres = filtered.flatMap(r => (r["Genre"] || "").split(",").map(g => g.trim()).filter(Boolean))
             .reduce((acc, g) => (acc[g] = (acc[g] || 0) + 1, acc), {});
             const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
 
@@ -1556,8 +1502,9 @@
             }
 
             // Add tag filter if present
-            if (currentTagFilter) {
-                params.set('tag', currentTagFilter);
+            const themeVal = themeSelect.value;
+            if (themeVal && themeVal !== 'All') {
+                params.set('tag', themeVal);
             }
 
             // Update URL without reloading the page
@@ -1618,7 +1565,8 @@
             // Load tag filter
             const tag = params.get('tag');
             if (tag) {
-                currentTagFilter = tag;
+                currentTagFilter = null;
+                themeSelect.value = tag;
             }
         }
 
@@ -1631,6 +1579,7 @@
 
         genreSelect.addEventListener("change", refreshUI);
         whereFoundSelect.addEventListener("change", refreshUI);
+        themeSelect.addEventListener("change", refreshUI);
         followersSelect.addEventListener("change", refreshUI);
         sortBySelect.addEventListener("change", refreshUI);
 
@@ -1639,6 +1588,32 @@
 
         updateFeaturedSortOptions(); // Update sort options visibility based on initial status
         refreshUI(); // Initial render
+
+        // Handle hash navigation (from analytics page links) — defined here so it
+        // can be called right after the initial render when cards are in the DOM.
+        function handleHashNavigation() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#artist-')) {
+                const targetId = hash.substring(1);
+                const tryScroll = (attemptsLeft) => {
+                    const targetCard = document.getElementById(targetId);
+                    if (targetCard) {
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetCard.style.boxShadow = '0 0 20px rgba(149, 57, 46, 0.6)';
+                        setTimeout(() => {
+                            targetCard.style.boxShadow = '';
+                        }, 2000);
+                    } else if (attemptsLeft > 0) {
+                        setTimeout(() => tryScroll(attemptsLeft - 1), 200);
+                    }
+                };
+                setTimeout(() => tryScroll(5), 100);
+            }
+        }
+
+        // Call immediately after initial render (cards are in DOM)
+        handleHashNavigation();
+        window.addEventListener('hashchange', handleHashNavigation);
 
         // Back to Top button visibility
         const backToTopBtn = document.getElementById('backToTop');
@@ -1650,39 +1625,13 @@
             }
         });
 
-        // Handle hash navigation (from analytics page links)
-        function handleHashNavigation() {
-            const hash = window.location.hash;
-            if (hash && hash.startsWith('#artist-')) {
-                setTimeout(() => {
-                    const targetCard = document.getElementById(hash.substring(1));
-                    if (targetCard) {
-                        targetCard.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                        // Add highlight effect
-                        targetCard.style.boxShadow = '0 0 20px rgba(37, 82, 255, 0.5)';
-                        setTimeout(() => {
-                            targetCard.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.05)';
-                        }, 2000);
-                    }
-                }, 500); // Wait for cards to render
-            }
-        }
-
-        // Call on load and on hash change
-        handleHashNavigation();
-        window.addEventListener('hashchange', handleHashNavigation);
-
         // Reset Filters button
         document.getElementById("resetFilters").addEventListener("click", () => {
         genreSelect.value = "All";
         whereFoundSelect.value = "All";
+        themeSelect.value = "All";
         followersSelect.value = "All";
-        rankingCheckboxes.forEach(cb => cb.checked = false);
-        selectedRankings = [];
-        rankingDisplay.textContent = "All";
+        Array.from(rankingSelect.options).forEach(o => o.selected = false);
         sortBySelect.value = "rankingHighLow";
         searchInput.value = "";
         currentSearchTerm = "";

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="shortcut icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
+<title>Instagram - Elsewhere Collective</title>
+<link rel="stylesheet" href="style.css">
+<script src="auth.js"></script>
+<script src="instagram.js"></script>
+<style>
+    .instagram-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        padding: 24px 32px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .post-card {
+        background: var(--card-bg, #fff);
+        border: 1px solid var(--border-color, #e5e5e5);
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow 0.2s;
+    }
+
+    .post-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+
+    .post-image-wrap {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        background: var(--border-color, #e5e5e5);
+        overflow: hidden;
+    }
+
+    .post-image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .post-type-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 10px;
+        font-family: 'Suisse Intl', sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 3px 7px;
+        border-radius: 4px;
+    }
+
+    .post-meta {
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .post-date {
+        font-size: 11px;
+        color: var(--text-muted, #999);
+        font-family: 'Suisse Intl', sans-serif;
+        letter-spacing: 0.04em;
+    }
+
+    .post-caption {
+        font-size: 13px;
+        color: var(--text-color, #222);
+        font-family: 'Suisse Intl', sans-serif;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .post-caption.expanded {
+        display: block;
+        overflow: visible;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+    }
+
+    .post-caption-toggle {
+        font-size: 11px;
+        color: var(--text-muted, #999);
+        font-family: 'Suisse Intl', sans-serif;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        letter-spacing: 0.03em;
+    }
+
+    .post-caption-toggle:hover {
+        color: var(--text-color, #222);
+    }
+
+    .post-stats {
+        display: flex;
+        gap: 14px;
+        margin-top: auto;
+        padding-top: 8px;
+        border-top: 1px solid var(--border-color, #e5e5e5);
+    }
+
+    .post-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .post-stat-value {
+        font-size: 14px;
+        font-family: 'Suisse Intl', sans-serif;
+        font-weight: 500;
+        color: var(--text-color, #222);
+    }
+
+    .post-stat-label {
+        font-size: 10px;
+        color: var(--text-muted, #999);
+        font-family: 'Suisse Intl', sans-serif;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .post-link {
+        display: block;
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-muted, #999);
+        font-family: 'Suisse Intl', sans-serif;
+        text-decoration: none;
+        padding: 6px 0 10px;
+        letter-spacing: 0.04em;
+    }
+
+    .post-link:hover {
+        color: var(--text-color, #222);
+    }
+
+    .ig-filters {
+        display: flex;
+        gap: 10px;
+        padding: 16px 32px 0;
+        max-width: 1400px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .ig-filter-btn {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border: 1px solid var(--border-color, #e5e5e5);
+        border-radius: 20px;
+        background: transparent;
+        color: var(--text-muted, #999);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .ig-filter-btn.active,
+    .ig-filter-btn:hover {
+        background: var(--text-color, #222);
+        color: #fff;
+        border-color: var(--text-color, #222);
+    }
+
+    .ig-sort-select {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        padding: 6px 14px;
+        border: 1px solid var(--border-color, #e5e5e5);
+        border-radius: 20px;
+        background: transparent;
+        color: var(--text-muted, #999);
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 28px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+    }
+
+    .ig-sort-select:focus {
+        outline: none;
+        border-color: var(--text-color, #222);
+        color: var(--text-color, #222);
+    }
+
+    .ig-loading, .ig-error {
+        text-align: center;
+        padding: 60px 32px;
+        font-family: 'Suisse Intl', sans-serif;
+        color: var(--text-muted, #999);
+        font-size: 14px;
+    }
+
+    .ig-error {
+        color: #c0392b;
+    }
+
+    .post-video-thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .ig-search-input {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 12px;
+        padding: 6px 14px;
+        border: 1px solid var(--border-color, #e5e5e5);
+        border-radius: 20px;
+        background: transparent;
+        color: var(--text-color, #222);
+        outline: none;
+        width: 220px;
+        transition: border-color 0.15s;
+    }
+
+    .ig-search-input:focus {
+        border-color: var(--text-color, #222);
+    }
+
+    .ig-search-input::placeholder {
+        color: var(--text-muted, #999);
+    }
+
+    @media (max-width: 600px) {
+        .instagram-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 16px;
+        }
+        .ig-filters {
+            padding: 12px 16px 0;
+        }
+        .ig-search-input {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<body class="page-instagram">
+    <div class="header">
+        <a href="index.html" class="logo">elsewhere collective</a>
+        <div class="nav-section">
+            <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
+            <div class="nav-title"><a href="analytics.html">Pipeline</a></div>
+            <div class="nav-title active"><a href="instagram.html">Instagram</a></div>
+            <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
+        </div>
+    </div>
+
+    <!-- Profile KPI Bar -->
+    <div class="summary-section-label">Account Overview</div>
+    <div class="summary" id="ig-summary">
+        <div class="summary-item">
+            <span class="summary-number" id="ig-followers">—</span>
+            <span class="summary-label">Followers</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="ig-media-count">—</span>
+            <span class="summary-label">Total Posts</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="ig-avg-reach">—</span>
+            <span class="summary-label">Avg Reach</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="ig-avg-views">—</span>
+            <span class="summary-label">Avg Views</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="ig-avg-eng">—</span>
+            <span class="summary-label">Avg Eng. Rate</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-number" id="ig-shown">—</span>
+            <span class="summary-label">Showing</span>
+        </div>
+    </div>
+
+    <!-- Section Navigation -->
+    <div class="section-navigation">
+        <span class="nav-label">Jump to:</span>
+        <a href="#posts" class="nav-link">Posts</a>
+        <a href="#performance" class="nav-link">Performance</a>
+        <a href="#spotlight" class="nav-link">Spotlight</a>
+        <a href="#genres" class="nav-link">Genres</a>
+        <a href="#growth" class="nav-link">Follower Growth</a>
+    </div>
+
+    <!-- Posts Section -->
+    <div id="posts" style="scroll-margin-top: 60px;">
+
+    <!-- Search + Filters + Sync -->
+    <div class="ig-filters">
+        <input type="text" id="igSearch" placeholder="Search by artist or caption…" class="ig-search-input">
+        <button class="ig-filter-btn active" data-type="ALL">All</button>
+        <button class="ig-filter-btn" data-type="IMAGE">Image</button>
+        <button class="ig-filter-btn" data-type="VIDEO">Videos</button>
+        <button class="ig-filter-btn" data-type="CAROUSEL_ALBUM">Carousels</button>
+        <select id="sortSelect" class="ig-sort-select">
+            <option value="date_desc">Newest First</option>
+            <option value="date_asc">Oldest First</option>
+            <option value="reach">Highest Reach</option>
+            <option value="views">Highest Views</option>
+            <option value="likes">Highest Likes</option>
+            <option value="engagement">Highest Engagement Rate</option>
+        </select>
+        <button class="ig-filter-btn" id="syncBtn" onclick="syncToSheet()" style="margin-left:auto;">Sync to Sheet</button>
+        <span id="syncStatus" style="font-family:'Suisse Intl',sans-serif;font-size:12px;color:var(--text-muted,#999);"></span>
+    </div>
+
+    <!-- Posts Grid -->
+    <div class="instagram-grid" id="instagram-grid">
+        <div class="ig-loading">Loading posts…</div>
+    </div>
+
+    </div><!-- end #posts -->
+
+    <!-- Performance Section -->
+    <div id="performance" class="analytics-grid" style="scroll-margin-top: 60px;">
+        <div class="chart-container post-performance-full">
+            <div class="chart-title">Post Performance</div>
+            <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
+            <div class="post-controls-bar">
+                <div class="post-filter-controls" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">View:</span>
+                    <button class="filter-btn active" data-filter="with-artist">With Artist Shares</button>
+                    <button class="filter-btn" data-filter="without-artist">Without Artist Shares</button>
+                </div>
+                <div id="postSummaryStats" style="margin: 0; padding: 0;">Loading...</div>
+            </div>
+            <div class="post-controls-bar post-sort-controls">
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">Sort by:</span>
+                    <button class="sort-btn" data-sort="featured-recent">Date (Newest to Oldest)</button>
+                    <button class="sort-btn" data-sort="featured-oldest">Date (Oldest to Newest)</button>
+                    <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
+                    <button class="sort-btn" data-sort="views">Views (High to Low)</button>
+                    <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
+                </div>
+            </div>
+            <div class="post-performance-container">
+                <div class="post-chart-wrapper">
+                    <canvas id="postPerformanceChart"></canvas>
+                </div>
+            </div>
+            <div id="postDetailCard" class="post-detail-card"></div>
+        </div>
+    </div>
+
+    <!-- Spotlight + Genres side by side -->
+    <div id="spotlight" class="analytics-grid" style="scroll-margin-top: 60px;">
+        <div id="genres" class="chart-container" style="scroll-margin-top: 60px;">
+            <div class="chart-title">Genres Spotlighted</div>
+            <div class="chart-subtitle">Art styles you're featuring</div>
+            <div class="bar-chart" id="genresChart">Loading...</div>
+        </div>
+        <div class="chart-container calendar-full-width">
+            <div class="chart-title">Spotlight Activity</div>
+            <div class="chart-subtitle" id="calendarSubtitle">Last 2 months of spotlight activity</div>
+            <div class="calendar-carousel-wrapper">
+                <button id="calendarPrev" class="calendar-nav-btn calendar-nav-prev" title="Previous month">&#8592;</button>
+                <div class="calendar-carousel">
+                    <div id="spotlightCalendar" class="spotlight-calendar">Loading...</div>
+                </div>
+                <button id="calendarNext" class="calendar-nav-btn calendar-nav-next" title="Next month">&#8594;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Follower Growth Section -->
+    <div id="growth" class="analytics-grid" style="scroll-margin-top: 60px;">
+        <div class="chart-container follower-growth-full">
+            <div class="chart-title">Follower Growth</div>
+            <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
+            <div class="follower-chart-scroll">
+                <div id="followerGrowthContainer">
+                    <canvas id="followerGrowthChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode
+        const toggle = document.getElementById('darkModeToggle');
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggle.textContent = '☀️';
+        }
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            toggle.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
+
+        let allPosts = [];
+        let activeFilter = 'ALL';
+        let activeSort = 'date_desc';
+
+        async function syncToSheet() {
+            const btn = document.getElementById('syncBtn');
+            const status = document.getElementById('syncStatus');
+            btn.disabled = true;
+            btn.textContent = 'Syncing…';
+            status.textContent = '';
+            try {
+                const res = await fetch(`${APPS_SCRIPT_URL}?action=syncInstagram`);
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = `✓ ${data.message}`;
+                    status.style.color = 'green';
+                } else {
+                    status.textContent = `✗ ${data.message}`;
+                    status.style.color = '#c0392b';
+                }
+            } catch (err) {
+                status.textContent = '✗ Failed to reach Apps Script';
+                status.style.color = '#c0392b';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sync to Sheet';
+            }
+        }
+
+        function toggleCaption(el) {
+            const expanded = el.classList.toggle('expanded');
+            const btn = el.nextElementSibling;
+            if (btn && btn.classList.contains('post-caption-toggle')) {
+                btn.textContent = expanded ? 'Show less' : 'Read more';
+            }
+        }
+
+        function formatDate(iso) {
+            const d = new Date(iso);
+            return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function renderPosts(posts) {
+            const grid = document.getElementById('instagram-grid');
+            document.getElementById('ig-shown').textContent = posts.length;
+
+            if (posts.length === 0) {
+                grid.innerHTML = '<div class="ig-loading">No posts match this filter.</div>';
+                return;
+            }
+
+            grid.innerHTML = posts.map(post => {
+                const imageUrl = post.media_type === 'VIDEO' ? (post.thumbnail_url || '') : (post.media_url || '');
+                const badge = post.media_type === 'VIDEO' ? 'Video' : post.media_type === 'CAROUSEL_ALBUM' ? 'Carousel' : 'Photo';
+                const caption = post.caption ? post.caption.replace(/</g, '&lt;') : '(no caption)';
+                const reach = post.reach ?? null;
+                const views = post.views ?? null;
+                const likes = post.like_count ?? null;
+                const engRate = (reach && likes) ? ((likes / reach) * 100).toFixed(1) + '%' : '—';
+
+                return `
+                <div class="post-card" data-type="${post.media_type}">
+                    <div class="post-image-wrap">
+                        ${imageUrl ? `<img src="${imageUrl}" alt="Post" loading="lazy">` : '<div style="width:100%;height:100%;background:#eee;"></div>'}
+                        <span class="post-type-badge">${badge}</span>
+                    </div>
+                    <div class="post-meta">
+                        <div class="post-date">${formatDate(post.timestamp)}</div>
+                        <div class="post-caption" onclick="toggleCaption(this)">${caption}</div>
+                        <button class="post-caption-toggle" onclick="toggleCaption(this.previousElementSibling)">Read more</button>
+                        <div class="post-stats">
+                            <div class="post-stat">
+                                <span class="post-stat-value">${likes !== null ? likes.toLocaleString() : '—'}</span>
+                                <span class="post-stat-label">Likes</span>
+                            </div>
+                            <div class="post-stat">
+                                <span class="post-stat-value">${post.comments_count !== null ? post.comments_count : '—'}</span>
+                                <span class="post-stat-label">Comments</span>
+                            </div>
+                            <div class="post-stat">
+                                <span class="post-stat-value">${reach !== null ? reach.toLocaleString() : '—'}</span>
+                                <span class="post-stat-label">Reach</span>
+                            </div>
+                            <div class="post-stat">
+                                <span class="post-stat-value">${views !== null ? views.toLocaleString() : '—'}</span>
+                                <span class="post-stat-label">Views</span>
+                            </div>
+                            <div class="post-stat">
+                                <span class="post-stat-value">${engRate}</span>
+                                <span class="post-stat-label">Eng. Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="post-link" href="${post.permalink}" target="_blank" rel="noopener">View on Instagram ↗</a>
+                </div>`;
+            }).join('');
+        }
+
+        function sortPosts(posts) {
+            const sorted = [...posts];
+            switch (activeSort) {
+                case 'date_asc':  return sorted.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                case 'date_desc': return sorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                case 'reach':     return sorted.sort((a, b) => (b.reach ?? 0) - (a.reach ?? 0));
+                case 'views':     return sorted.sort((a, b) => (b.views ?? 0) - (a.views ?? 0));
+                case 'likes':     return sorted.sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0));
+                case 'engagement':
+                    return sorted.sort((a, b) => {
+                        const rateA = a.reach ? (a.like_count ?? 0) / a.reach : 0;
+                        const rateB = b.reach ? (b.like_count ?? 0) / b.reach : 0;
+                        return rateB - rateA;
+                    });
+                default: return sorted;
+            }
+        }
+
+        function applyFilterAndSort() {
+            const query = document.getElementById('igSearch').value.trim().toLowerCase();
+            let posts = activeFilter === 'ALL' ? allPosts : allPosts.filter(p => p.media_type === activeFilter);
+            if (query) {
+                posts = posts.filter(p => (p.caption || '').toLowerCase().includes(query));
+            }
+            posts = sortPosts(posts);
+            renderPosts(posts);
+        }
+
+        function updateAvgStats() {
+            const withInsights = allPosts.filter(p => p.reach != null);
+            if (withInsights.length === 0) return;
+            const avgReach = Math.round(withInsights.reduce((s, p) => s + p.reach, 0) / withInsights.length);
+            const avgViews = Math.round(withInsights.filter(p => p.views != null).reduce((s, p) => s + (p.views || 0), 0) / withInsights.length);
+            const avgEng = (withInsights.reduce((s, p) => s + ((p.like_count || 0) / p.reach), 0) / withInsights.length * 100).toFixed(1) + '%';
+            document.getElementById('ig-avg-reach').textContent = avgReach.toLocaleString();
+            document.getElementById('ig-avg-views').textContent = avgViews.toLocaleString();
+            document.getElementById('ig-avg-eng').textContent = avgEng;
+        }
+
+        document.querySelectorAll('.ig-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ig-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.dataset.type;
+                applyFilterAndSort();
+            });
+        });
+
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            activeSort = e.target.value;
+            applyFilterAndSort();
+        });
+
+        document.getElementById('igSearch').addEventListener('input', () => {
+            applyFilterAndSort();
+        });
+
+        async function loadInstagram() {
+            const grid = document.getElementById('instagram-grid');
+            try {
+                const [profile, media] = await Promise.all([
+                    getProfile(),
+                    getMedia(50)
+                ]);
+
+                document.getElementById('ig-followers').textContent = profile.followers_count.toLocaleString();
+                document.getElementById('ig-media-count').textContent = profile.media_count;
+
+                allPosts = media.data || [];
+                applyFilterAndSort();
+
+                // Fetch insights for all posts in parallel, then re-render with data
+                const insightsResults = await Promise.allSettled(
+                    allPosts.map(post => getMediaInsights(post.id))
+                );
+
+                insightsResults.forEach((result, i) => {
+                    if (result.status === 'fulfilled' && result.value.data) {
+                        result.value.data.forEach(metric => {
+                            allPosts[i][metric.name] = metric.values[0]?.value ?? null;
+                        });
+                    }
+                });
+
+                applyFilterAndSort();
+                updateAvgStats();
+            } catch (err) {
+                grid.innerHTML = `<div class="ig-error">Failed to load posts: ${err.message}</div>`;
+                console.error(err);
+            }
+        }
+
+        loadInstagram();
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+Chart.defaults.font.size = 16;
+if (Chart.defaults.plugins?.legend?.labels) {
+    Chart.defaults.plugins.legend.labels.font = Chart.defaults.plugins.legend.labels.font || {};
+    Chart.defaults.plugins.legend.labels.font.size = 16;
+    Chart.defaults.plugins.legend.labels.padding = 15;
+}
+if (Chart.defaults.plugins?.tooltip) {
+    Chart.defaults.plugins.tooltip.titleFont = Chart.defaults.plugins.tooltip.titleFont || {};
+    Chart.defaults.plugins.tooltip.titleFont.size = 18;
+    Chart.defaults.plugins.tooltip.bodyFont = Chart.defaults.plugins.tooltip.bodyFont || {};
+    Chart.defaults.plugins.tooltip.bodyFont.size = 16;
+}
+</script>
+<script src="analytics.js"></script>
+</body>
+</html>

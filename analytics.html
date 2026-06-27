@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <!-- Favicon -->
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -10,53 +10,44 @@
 <link rel="shortcut icon" type="image/png" href="favicon.png">
 <!-- Apple Touch Icon -->
 <link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
-<title>Analytics - Elsewhere Collective</title>
+<title>Pipeline - Elsewhere Collective</title>
 <link rel="stylesheet" href="style.css">
 <script src="auth.js"></script>
+<script src="instagram.js"></script>
 </head>
-<body>
+<body class="page-analytics">
     <div class="header">
         <a href="index.html" class="logo">elsewhere collective</a>
         <div class="nav-section">
             <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
-            <div class="nav-title active"><a href="analytics.html">Analytics</a></div>
+            <div class="nav-title active"><a href="analytics.html">Pipeline</a></div>
+            <div class="nav-title"><a href="instagram.html">Instagram</a></div>
             <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
         </div>
     </div>
 
-    <!-- Summary Dashboard -->
+    <!-- Key Summary KPI Bar -->
+    <div class="summary-section-label">Key Summary</div>
     <div class="summary" id="summary">
         <div class="summary-item">
-            <span class="summary-number" id="summaryNewArtists">0</span>
-            <span class="summary-label">New Artists (Last 2 Weeks)</span>
-        </div>
-        <div class="summary-item">
             <span class="summary-number" id="summaryAvgNewArtists">-</span>
-            <span class="summary-label">Avg New Artists/Week</span>
+            <span class="summary-label">Discovery Pace</span>
+            <span class="summary-sublabel">new artists / week</span>
         </div>
         <div class="summary-item">
             <span class="summary-number" id="summaryPlannedOutreach">0</span>
             <span class="summary-label">Planned Outreach</span>
+            <span class="summary-sublabel">artists ready to contact</span>
         </div>
         <div class="summary-item">
-            <span class="summary-number" id="summaryFollowerGrowth">-</span>
-            <span class="summary-label" id="summaryFollowerGrowthLabel">Follower Growth</span>
+            <span class="summary-number" id="summaryNewArtists">0</span>
+            <span class="summary-label">New Artists</span>
+            <span class="summary-sublabel">last 2 weeks</span>
         </div>
         <div class="summary-item">
             <span class="summary-number" id="summaryAvgSpotlights">-</span>
-            <span class="summary-label">Avg Spotlights/Week</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-number" id="summaryAvgEngagement">-</span>
-            <span class="summary-label">Avg Engagement</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-number" id="summaryEasyCommerce">-</span>
-            <span class="summary-label">Easy Commerce</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-number" id="summaryGalleryRep">-</span>
-            <span class="summary-label">Gallery Representation</span>
+            <span class="summary-label">Feature Cadence</span>
+            <span class="summary-sublabel">spotlights / week</span>
         </div>
     </div>
 
@@ -66,8 +57,6 @@
         <a href="#pipeline" class="nav-link">Pipeline</a>
         <a href="#discovery" class="nav-link">Discovery</a>
         <a href="#outreach" class="nav-link">Outreach</a>
-        <a href="#performance" class="nav-link">Performance</a>
-        <a href="#calendar" class="nav-link">Calendar</a>
     </div>
 
     <div class="analytics-grid">
@@ -143,62 +132,13 @@
             <div id="responseInsights">Loading...</div>
         </div>
 
-        <!-- PERFORMANCE SECTION -->
-        <!-- Post Performance - Full Width -->
-        <div id="performance" class="chart-container post-performance-full">
-            <div class="chart-title">Post Performance</div>
-            <div class="chart-subtitle">Reach, views, and engagement rate per post — scroll to see all</div>
-            <div class="post-controls-bar">
-                <div class="post-filter-controls" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
-                    <span style="font-size: 0.75rem; color: #8A8580; margin-right: 0.3rem; font-weight: 500;">View:</span>
-                    <button class="filter-btn active" data-filter="total">Total</button>
-                    <button class="filter-btn" data-filter="with-artist">With Artist Shares</button>
-                    <button class="filter-btn" data-filter="without-artist">Without Artist Shares</button>
-                </div>
-                <div id="postSummaryStats" style="margin: 0; padding: 0;">Loading...</div>
-            </div>
-            <div class="post-sort-controls" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <span style="font-size: 0.85rem; color: #8A8580; margin-right: 0.5rem; align-self: center;">Sort by:</span>
-                <button class="sort-btn active" data-sort="featured-recent">Date (Newest to Oldest)</button>
-                <button class="sort-btn" data-sort="featured-oldest">Date (Oldest to Newest)</button>
-                <button class="sort-btn" data-sort="reach">Reach (High to Low)</button>
-                <button class="sort-btn" data-sort="views">Views (High to Low)</button>
-                <button class="sort-btn" data-sort="engagement">Engagement Rate (High to Low)</button>
-            </div>
-            <div class="post-performance-container">
-                <div class="post-chart-wrapper">
-                    <canvas id="postPerformanceChart"></canvas>
-                </div>
-            </div>
-            <div id="postDetailCard" class="post-detail-card"></div>
+        <!-- Ranking Effectiveness -->
+        <div class="chart-container response-analytics-full">
+            <div class="chart-title">Ranking Effectiveness</div>
+            <div class="chart-subtitle">How well your ranking predicts outcomes</div>
+            <div id="rankingEffectiveness">Loading...</div>
         </div>
 
-        <!-- Spotlight Activity Calendar - Full Width -->
-        <div id="calendar" class="chart-container calendar-full-width">
-            <div class="chart-title">Spotlight Activity</div>
-            <div class="chart-subtitle">Last 2 months of spotlight activity</div>
-            <div class="calendar-carousel-wrapper">
-                <div class="calendar-carousel">
-                    <div id="spotlightCalendar" class="spotlight-calendar">Loading...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Genres Spotlighted -->
-        <div class="chart-container">
-            <div class="chart-title">Genres Spotlighted</div>
-            <div class="chart-subtitle">Art styles you're featuring</div>
-            <div class="bar-chart" id="genresChart">Loading...</div>
-        </div>
-
-        <!-- Follower Growth - Full Width -->
-        <div class="chart-container follower-growth-full">
-            <div class="chart-title">Follower Growth</div>
-            <div class="chart-subtitle" id="followerGrowthSubtitle">Instagram account growth over time</div>
-            <div id="followerGrowthContainer">
-                <canvas id="followerGrowthChart"></canvas>
-            </div>
-        </div>
     </div>
 
 <div class="footer">
@@ -207,12 +147,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Set global Chart.js font defaults for larger text
+// Set global Chart.js font defaults — defensive checks for plugin availability
 Chart.defaults.font.size = 16;
-Chart.defaults.plugins.legend.labels.font.size = 16;
-Chart.defaults.plugins.legend.labels.padding = 15;
-Chart.defaults.plugins.tooltip.titleFont.size = 18;
-Chart.defaults.plugins.tooltip.bodyFont.size = 16;
+if (Chart.defaults.plugins?.legend?.labels) {
+    Chart.defaults.plugins.legend.labels.font = Chart.defaults.plugins.legend.labels.font || {};
+    Chart.defaults.plugins.legend.labels.font.size = 16;
+    Chart.defaults.plugins.legend.labels.padding = 15;
+}
+if (Chart.defaults.plugins?.tooltip) {
+    Chart.defaults.plugins.tooltip.titleFont = Chart.defaults.plugins.tooltip.titleFont || {};
+    Chart.defaults.plugins.tooltip.titleFont.size = 18;
+    Chart.defaults.plugins.tooltip.bodyFont = Chart.defaults.plugins.tooltip.bodyFont || {};
+    Chart.defaults.plugins.tooltip.bodyFont.size = 16;
+}
 </script>
 <script src="analytics.js"></script>
 </body>
