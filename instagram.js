@@ -10,7 +10,7 @@ const INSTAGRAM_BUSINESS_ID = "17841474859984348";
 
 // Replace this with your long-lived access token.
 // NEVER commit this to a public repository.
-const ACCESS_TOKEN = "EAAXk5I8jmXABR1gpYirsvk5jD0sN9DXnknA0L6oCu50iHcZA22fYE1l0im0yZAldJdE6BgrBJfrPlAuxb2HMtYVIJIPjfCGRdM34AUhEf7ZCcUh7ZCGG6b12A00ZCGUAOPe8PxzkbVZCwQArihDn9aUwtYe4PMk0czuDoPnq2wVMeJxYom6eltdPdRK12gMtVW";
+const ACCESS_TOKEN = "EAAXk5I8jmXABR1nTKki0wLOdI6i2mYe1vWmeXxnZCCSvrqcYwlUbPRRKiT10GrDk3PPnwffZC88jZCBy8Sbtd4D2OOHSAEc64GoEJThPiaMrwt0OPYei5BVeEVeloJMTX5pd5Ae2vP939JzqPmbeGZA7iZCXxQHZBlMY9dCYfKqtuBxepGLZB9K3IWw9GVhwtRH";
 
 const GRAPH_API_VERSION = "v24.0";
 const GRAPH_URL = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
