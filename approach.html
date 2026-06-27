@@ -524,6 +524,7 @@ async function loadApproach() {
                 image:         r['P'] || r['Image'] || r['Photo'] || '',
                 currentStatus: r['Status'] || r['Current Status'] || '',
                 ranking:       parseInt(r['Ranking'] || r['O'] || 0) || 0,
+                galleryRep:    r['Gallery Representation'] || r['K'] || '',
                 salesStatus:   r['AG'] || r['Sales Status'] || 'TBC',
                 curatorial:  parseInt(r['AH'] || r['Curatorial Fit'] || 0) || 0,
                 warm:        parseInt(r['AI'] || r['Warm Relationship'] || 0) || 0,
@@ -667,6 +668,7 @@ function buildCard(artist) {
             <div class="approach-name-row">
                 <span class="approach-name">${escHtml(artist.name)}</span>
                 <span class="approach-genre-badge">${escHtml(artist.genre)}</span>
+${(() => { const y = artist.galleryRep.trim().toLowerCase().startsWith('y'); return `<span class="approach-genre-badge" style="background:${y ? 'rgba(168,181,160,0.25)' : 'rgba(149,57,46,0.12)'};color:${y ? '#5a7052' : 'var(--terracotta)'}">Gallery Rep: ${y ? 'Y' : 'N'}</span>`; })()}
             </div>
             <div class="approach-scores">${scoresHtml}${readinessBlock}<div class="score-block" style="display:flex;flex-direction:column;gap:5px;justify-content:flex-end">
                 <span class="score-label">&nbsp;</span>
