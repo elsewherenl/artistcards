@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="shortcut icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="Stamp Logo 180 x 180.png">
+<title>First Sign-Ups - Elsewhere Collective</title>
+<link rel="stylesheet" href="style.css">
+<script src="auth.js"></script>
+<style>
+    /* ---- Page layout ---- */
+    .approach-header {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .approach-subtitle {
+        font-size: 0.8rem;
+        color: var(--warm-gray);
+        letter-spacing: 0.02em;
+    }
+
+    .approach-filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .pipeline-filter-btn {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        border: 1px solid var(--charcoal);
+        background: transparent;
+        color: var(--charcoal);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .pipeline-filter-btn.active,
+    .pipeline-filter-btn:hover {
+        background: var(--charcoal);
+        color: #fff;
+    }
+
+    .approach-filter-btn {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        border: 1px solid var(--biscuit-gold);
+        background: transparent;
+        color: var(--charcoal);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .approach-filter-btn.active,
+    .approach-filter-btn:hover {
+        background: var(--biscuit-gold);
+        color: #fff;
+    }
+
+    .approach-sort-label {
+        font-size: 0.7rem;
+        color: var(--warm-gray);
+        letter-spacing: 0.04em;
+        margin-left: auto;
+        margin-right: 4px;
+    }
+
+    .approach-sort-select {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 0.72rem;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid var(--biscuit-gold);
+        border-radius: 6px;
+        background: white;
+        color: var(--charcoal);
+        cursor: pointer;
+    }
+
+    /* ---- Artist rows ---- */
+    .approach-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .approach-card {
+        background: rgba(254, 251, 245, 0.98);
+        border: 1px solid rgba(214, 179, 112, 0.3);
+        border-radius: 10px;
+        padding: 16px 20px;
+        display: grid;
+        grid-template-columns: 52px 1fr auto;
+        gap: 16px;
+        align-items: center;
+        transition: box-shadow 0.2s;
+        position: relative;
+    }
+
+    .approach-card:hover {
+        box-shadow: 0 3px 14px rgba(0,0,0,0.07);
+    }
+
+    .approach-card.status-confirmed {
+        border-left: 3px solid var(--biscuit-gold);
+    }
+
+    .approach-card.status-rejected {
+        opacity: 0.45;
+    }
+
+    /* Artist image */
+    .approach-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: var(--warm-gray);
+        flex-shrink: 0;
+    }
+
+    .approach-avatar-placeholder {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: rgba(138, 133, 128, 0.25);
+        flex-shrink: 0;
+    }
+
+    /* Centre column: name + genre + scores */
+    .approach-body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .approach-name-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .approach-name {
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .approach-genre-badge {
+        font-size: 0.65rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: rgba(214, 179, 112, 0.18);
+        color: var(--charcoal);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .approach-readiness {
+        font-size: 0.65rem;
+        color: var(--warm-gray);
+        letter-spacing: 0.03em;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    /* Score rows */
+    .approach-scores {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+
+    .score-block {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .score-label {
+        font-size: 0.62rem;
+        color: var(--warm-gray);
+        letter-spacing: 0.03em;
+        text-transform: none;
+    }
+
+    .score-dots {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .score-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1.5px solid var(--biscuit-gold);
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    .score-dot.filled {
+        background: var(--biscuit-gold);
+    }
+
+    .score-dot:hover {
+        border-color: var(--gold-muted);
+        background: rgba(214, 179, 112, 0.35);
+    }
+
+    .score-dot.filled:hover {
+        background: var(--gold-muted);
+    }
+
+    /* Right column: Sales Status badge */
+    .approach-status-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .sales-status-badge {
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 0.68rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        padding: 5px 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s;
+        white-space: nowrap;
+        border: 1.5px solid transparent;
+    }
+
+    .sales-status-badge:hover {
+        transform: scale(1.04);
+    }
+
+    /* Status colours */
+    .ss-tbc          { background: rgba(138,133,128,0.12); color: var(--warm-gray); border-color: rgba(138,133,128,0.3); }
+    .ss-shortlisted  { background: rgba(214,179,112,0.15); color: #8a6a20; border-color: rgba(214,179,112,0.5); }
+    .ss-approached   { background: rgba(149,57,46,0.1);   color: var(--terracotta); border-color: rgba(149,57,46,0.3); }
+    .ss-confirmed    { background: var(--biscuit-gold);   color: #fff; border-color: var(--biscuit-gold); }
+    .ss-rejected     { background: rgba(44,44,44,0.08);   color: var(--charcoal); border-color: rgba(44,44,44,0.2); }
+
+    /* Status dropdown */
+    .sales-status-dropdown {
+        position: absolute;
+        top: 12px;
+        right: 20px;
+        background: white;
+        border: 1px solid var(--biscuit-gold);
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        z-index: 200;
+        min-width: 140px;
+        display: none;
+        overflow: hidden;
+    }
+
+    .sales-status-dropdown.open {
+        display: block;
+    }
+
+    .sales-status-option {
+        padding: 8px 14px;
+        font-family: 'Suisse Intl', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(214,179,112,0.2);
+        transition: background 0.15s;
+    }
+
+    .sales-status-option:last-child { border-bottom: none; }
+    .sales-status-option:hover { background: rgba(214,179,112,0.12); }
+
+    /* Saving indicator */
+    .saving-indicator {
+        font-size: 0.62rem;
+        color: var(--warm-gray);
+        letter-spacing: 0.03em;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .saving-indicator.visible { opacity: 1; }
+
+    /* Summary bar */
+    .approach-summary {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(254,251,245,0.98);
+        border: 1px solid rgba(214,179,112,0.25);
+        border-top: 2px solid rgba(214,179,112,0.4);
+    }
+
+    .approach-summary-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border-left: 2px solid rgba(214,179,112,0.5);
+        padding-left: 0.65rem;
+    }
+
+    .approach-summary-num {
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+
+    .approach-summary-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: var(--warm-gray);
+    }
+
+    .readiness-note {
+        font-size: 0.65rem;
+        color: var(--warm-gray);
+        letter-spacing: 0.02em;
+        margin-left: auto;
+        align-self: center;
+        font-style: italic;
+    }
+
+    /* Dark mode */
+    body.dark-mode .approach-card {
+        background: var(--card-dark);
+        border-color: rgba(214,179,112,0.2);
+    }
+
+    body.dark-mode .approach-card.status-confirmed {
+        border-left-color: var(--biscuit-gold);
+    }
+
+    body.dark-mode .approach-name { color: var(--cream); }
+    body.dark-mode .approach-genre-badge { background: rgba(214,179,112,0.12); color: var(--cream); }
+    body.dark-mode .sales-status-dropdown { background: var(--card-dark); border-color: var(--biscuit-gold); }
+    body.dark-mode .sales-status-option { color: var(--cream); }
+    body.dark-mode .sales-status-option:hover { background: rgba(214,179,112,0.15); }
+    body.dark-mode .ss-tbc { color: var(--warm-gray); }
+    body.dark-mode .approach-sort-select { background: var(--card-dark); color: var(--cream); }
+    body.dark-mode .approach-summary { background: var(--card-dark); }
+    body.dark-mode .approach-summary-num { color: var(--cream); }
+</style>
+</head>
+<body class="page-approach">
+
+<div class="header">
+    <a href="index.html" class="logo">elsewhere collective</a>
+    <div class="nav-section">
+        <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
+        <div class="nav-title"><a href="analytics.html">Pipeline</a></div>
+        <div class="nav-title"><a href="instagram.html">Instagram</a></div>
+        <div class="nav-title active"><a href="approach.html">First Sign-Ups</a></div>
+        <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
+    </div>
+</div>
+
+<!-- Summary bar -->
+<div class="approach-summary" id="approachSummary">
+    <div class="approach-summary-item">
+        <span class="approach-summary-num" id="sumTotal">—</span>
+        <span class="approach-summary-label">Total Artists</span>
+    </div>
+    <div class="approach-summary-item">
+        <span class="approach-summary-num" id="sumConfirmed">—</span>
+        <span class="approach-summary-label">Confirmed</span>
+    </div>
+    <div class="approach-summary-item">
+        <span class="approach-summary-num" id="sumShortlisted">—</span>
+        <span class="approach-summary-label">Shortlisted</span>
+    </div>
+    <div class="approach-summary-item">
+        <span class="approach-summary-num" id="sumApproached">—</span>
+        <span class="approach-summary-label">Approached</span>
+    </div>
+    <span class="readiness-note">Readiness score: lower = stronger &nbsp;·&nbsp; 1 = best, 5 = weakest per category</span>
+</div>
+
+<!-- Pipeline status filter -->
+<div class="approach-filters" style="margin-bottom: 0.75rem;">
+    <span class="approach-sort-label" style="margin-left:0; margin-right: 8px;">Pipeline status</span>
+    <button class="pipeline-filter-btn" data-pipeline="Planned Outreach">Planned Outreach</button>
+    <button class="pipeline-filter-btn" data-pipeline="Spotlighted">Spotlighted</button>
+    <button class="pipeline-filter-btn" data-pipeline="Feature Planned">Feature Planned</button>
+    <button class="pipeline-filter-btn" data-pipeline="Featured">Featured</button>
+    <button class="pipeline-filter-btn active" data-pipeline="all">All</button>
+</div>
+
+<!-- Sales status filter -->
+<div class="approach-filters">
+    <span class="approach-sort-label" style="margin-left:0; margin-right: 8px;">Sales status</span>
+    <button class="approach-filter-btn active" data-status="all">All</button>
+    <button class="approach-filter-btn" data-status="Shortlisted">Shortlisted</button>
+    <button class="approach-filter-btn" data-status="Approached">Approached</button>
+    <button class="approach-filter-btn" data-status="TBC">TBC</button>
+    <button class="approach-filter-btn" data-status="Rejected">Rejected</button>
+    <button class="approach-filter-btn" data-status="Confirmed">Confirmed</button>
+    <span class="approach-sort-label">Sort by</span>
+    <select class="approach-sort-select" id="approachSort">
+        <option value="readiness">Readiness score (lowest = best)</option>
+        <option value="ranking">Ranking (high to low)</option>
+        <option value="name">Name A–Z</option>
+        <option value="status">Sales Status</option>
+    </select>
+</div>
+
+<!-- Artist list -->
+<div class="approach-list" id="approachList">
+    <div style="color: var(--warm-gray); font-size: 0.85rem; padding: 2rem 0;">Loading artists…</div>
+</div>
+
+<div class="footer">
+    <div class="footer-brand" onclick="window.scrollTo({top:0,behavior:'smooth'})">elsewhere collective</div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&sheet=Live%20Longlist';
+
+const SALES_STATUSES = ['TBC', 'Shortlisted', 'Approached', 'Confirmed', 'Rejected'];
+const STATUS_CLASS = { 'TBC': 'ss-tbc', 'Shortlisted': 'ss-shortlisted', 'Approached': 'ss-approached', 'Confirmed': 'ss-confirmed', 'Rejected': 'ss-rejected' };
+const SCORE_LABELS = ['Curatorial fit', 'Warm relationship', 'Commercial readiness', 'Wall-worthy'];
+const SCORE_KEYS = ['curatorial', 'warm', 'commercial', 'wall'];
+
+let allArtists = [];
+let activeFilter = 'all';
+let activePipelineFilter = 'all';
+
+// ---- CSV parse ----
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '"') {
+            if (inQuotes && text[i+1] === '"') { field += '"'; i++; }
+            else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+            row.push(field); field = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (ch === '\r' && text[i+1] === '\n') i++;
+            row.push(field); field = '';
+            rows.push(row); row = [];
+        } else {
+            field += ch;
+        }
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    return rows;
+}
+
+function rowsToObjects(rows) {
+    const headers = rows[0];
+    return rows.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => { obj[h.trim()] = (r[i] || '').trim(); });
+        return obj;
+    });
+}
+
+// ---- Load data ----
+async function loadApproach() {
+    try {
+        const res = await fetch(SHEET_CSV_URL);
+        const text = await res.text();
+        const rows = parseCSV(text);
+        const data = rowsToObjects(rows);
+
+        allArtists = data
+            .filter(r => r['Artist'] && r['Artist'].trim())
+            .map(r => ({
+                name:          r['Artist'] || '',
+                genre:         r['Genre'] || '',
+                image:         r['P'] || r['Image'] || r['Photo'] || '',
+                currentStatus: r['Status'] || r['Current Status'] || '',
+                ranking:       parseInt(r['Ranking'] || r['O'] || 0) || 0,
+                salesStatus:   r['AG'] || r['Sales Status'] || 'TBC',
+                curatorial:  parseInt(r['AH'] || r['Curatorial Fit'] || 0) || 0,
+                warm:        parseInt(r['AI'] || r['Warm Relationship'] || 0) || 0,
+                commercial:  parseInt(r['AJ'] || r['Commercial Readiness'] || 0) || 0,
+                wall:        parseInt(r['AK'] || r['Wall-worthy'] || 0) || 0,
+                readiness:   parseInt(r['AL'] || r['Readiness'] || 0) || 0,
+            }));
+
+        renderSummary();
+        renderList();
+    } catch (e) {
+        document.getElementById('approachList').innerHTML = '<div style="color:var(--terracotta);padding:2rem 0;">Failed to load data.</div>';
+    }
+}
+
+function renderSummary() {
+    document.getElementById('sumTotal').textContent = allArtists.length;
+    document.getElementById('sumConfirmed').textContent = allArtists.filter(a => a.salesStatus === 'Confirmed').length;
+    document.getElementById('sumShortlisted').textContent = allArtists.filter(a => a.salesStatus === 'Shortlisted').length;
+    document.getElementById('sumApproached').textContent = allArtists.filter(a => a.salesStatus === 'Approached').length;
+}
+
+function getSorted(artists) {
+    const sort = document.getElementById('approachSort').value;
+    const copy = [...artists];
+    const statusOrder = { Shortlisted: 0, Approached: 1, TBC: 2, Rejected: 3, Confirmed: 4 };
+    if (sort === 'readiness') {
+        // Artists with scores bubble to top (lowest score = best), unscored sink to bottom
+        return copy.sort((a, b) => {
+            const ra = a.readiness || 999, rb = b.readiness || 999;
+            return ra - rb;
+        });
+    } else if (sort === 'ranking') {
+        // Ranking 1 = best, unranked sink to bottom
+        return copy.sort((a, b) => {
+            const ra = a.ranking || 999, rb = b.ranking || 999;
+            return ra - rb;
+        });
+    } else if (sort === 'name') {
+        return copy.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+        return copy.sort((a, b) => (statusOrder[a.salesStatus] ?? 3) - (statusOrder[b.salesStatus] ?? 3));
+    }
+}
+
+function renderList() {
+    let artists = allArtists;
+    if (activePipelineFilter !== 'all') {
+        artists = artists.filter(a => a.currentStatus.toLowerCase() === activePipelineFilter.toLowerCase());
+    }
+    if (activeFilter !== 'all') {
+        artists = artists.filter(a => a.salesStatus === activeFilter);
+    }
+    artists = getSorted(artists);
+
+    const list = document.getElementById('approachList');
+    if (!artists.length) {
+        list.innerHTML = '<div style="color:var(--warm-gray);font-size:0.85rem;padding:2rem 0;">No artists match this filter.</div>';
+        return;
+    }
+
+    list.innerHTML = artists.map(artist => buildCard(artist)).join('');
+
+    // Attach dot click handlers
+    list.querySelectorAll('.score-dot').forEach(dot => {
+        dot.addEventListener('click', () => handleDotClick(dot));
+    });
+
+    // Attach status badge click handlers
+    list.querySelectorAll('.sales-status-badge').forEach(badge => {
+        badge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            const card = badge.closest('.approach-card');
+            const dd = card.querySelector('.sales-status-dropdown');
+            dd.classList.toggle('open');
+        });
+    });
+
+    // Attach status option handlers
+    list.querySelectorAll('.sales-status-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const card = opt.closest('.approach-card');
+            const artistName = card.dataset.artist;
+            const newStatus = opt.dataset.value;
+            updateSalesStatus(artistName, newStatus, card);
+        });
+    });
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', closeAllDropdowns, { once: false });
+}
+
+function buildCard(artist) {
+    const statusClass = STATUS_CLASS[artist.salesStatus] || 'ss-tbc';
+    const cardClass = artist.salesStatus === 'Confirmed' ? 'status-confirmed' : artist.salesStatus === 'Rejected' ? 'status-rejected' : '';
+    const readinessDisplay = artist.readiness > 0 ? `${artist.readiness}/20` : '—';
+
+    const avatarHtml = artist.image
+        ? `<img class="approach-avatar" src="${artist.image}" alt="${artist.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
+        + `<div class="approach-avatar-placeholder" style="display:none"></div>`
+        : `<div class="approach-avatar-placeholder"></div>`;
+
+    const scoresHtml = SCORE_KEYS.map((key, i) => {
+        const val = artist[key] || 0;
+        const dots = [1,2,3,4,5].map(n =>
+            `<button class="score-dot ${n === val ? 'filled' : ''}"
+                data-artist="${escHtml(artist.name)}"
+                data-key="${key}"
+                data-col="${colForKey(key)}"
+                data-value="${n}"
+                title="${SCORE_LABELS[i]}: ${n}"></button>`
+        ).join('');
+        return `<div class="score-block">
+            <span class="score-label">${SCORE_LABELS[i]}</span>
+            <div class="score-dots">${dots}</div>
+        </div>`;
+    }).join('');
+
+    const statusOptionsHtml = SALES_STATUSES.map(s =>
+        `<div class="sales-status-option" data-value="${s}">${s}</div>`
+    ).join('');
+
+    return `
+    <div class="approach-card ${cardClass}" data-artist="${escHtml(artist.name)}">
+        ${avatarHtml}
+        <div class="approach-body">
+            <div class="approach-name-row">
+                <span class="approach-name">${escHtml(artist.name)}</span>
+                <span class="approach-genre-badge">${escHtml(artist.genre)}</span>
+                <span class="approach-readiness">${readinessDisplay}</span>
+            </div>
+            <div class="approach-scores">${scoresHtml}</div>
+        </div>
+        <div class="approach-status-wrap">
+            <span class="sales-status-badge ${statusClass}">${artist.salesStatus}</span>
+            <span class="saving-indicator" id="saving-${slugify(artist.name)}">Saving…</span>
+        </div>
+        <div class="sales-status-dropdown">
+            ${statusOptionsHtml}
+        </div>
+    </div>`;
+}
+
+function colForKey(key) {
+    return { curatorial: 34, warm: 35, commercial: 36, wall: 37 }[key];
+}
+
+function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function slugify(str) {
+    return (str || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.sales-status-dropdown.open').forEach(d => d.classList.remove('open'));
+}
+
+// ---- Write-back: dot score ----
+async function handleDotClick(dot) {
+    const artistName = dot.dataset.artist;
+    const key = dot.dataset.key;
+    const col = parseInt(dot.dataset.col);
+    const value = parseInt(dot.dataset.value);
+
+    // Update local data
+    const artist = allArtists.find(a => a.name === artistName);
+    if (!artist) return;
+
+    const wasSame = artist[key] === value;
+    artist[key] = wasSame ? 0 : value;
+    artist.readiness = (artist.curatorial || 0) + (artist.warm || 0) + (artist.commercial || 0) + (artist.wall || 0);
+
+    // Update dots visually
+    const card = dot.closest('.approach-card');
+    card.querySelectorAll(`.score-dot[data-key="${key}"]`).forEach(d => {
+        d.classList.toggle('filled', parseInt(d.dataset.value) === artist[key]);
+    });
+
+    // Update readiness display
+    const readinessEl = card.querySelector('.approach-readiness');
+    if (readinessEl) readinessEl.textContent = artist.readiness > 0 ? `${artist.readiness}/20` : '—';
+
+    // Save to sheet
+    showSaving(artistName, true);
+    try {
+        const newVal = wasSame ? '' : value;
+        const url = `${APPS_SCRIPT_URL}?action=updateApproach&artistName=${encodeURIComponent(artistName)}&col=${col}&value=${encodeURIComponent(newVal)}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        showSaving(artistName, false, json.success);
+    } catch (e) {
+        showSaving(artistName, false, false);
+    }
+    renderSummary();
+}
+
+// ---- Write-back: sales status ----
+async function updateSalesStatus(artistName, newStatus, card) {
+    closeAllDropdowns();
+
+    const artist = allArtists.find(a => a.name === artistName);
+    if (!artist) return;
+    artist.salesStatus = newStatus;
+
+    // Update badge
+    const badge = card.querySelector('.sales-status-badge');
+    badge.textContent = newStatus;
+    badge.className = `sales-status-badge ${STATUS_CLASS[newStatus] || 'ss-tbc'}`;
+
+    // Update card class
+    card.classList.remove('status-confirmed', 'status-rejected');
+    if (newStatus === 'Confirmed') card.classList.add('status-confirmed');
+    if (newStatus === 'Rejected') card.classList.add('status-rejected');
+
+    showSaving(artistName, true);
+    try {
+        const url = `${APPS_SCRIPT_URL}?action=updateApproach&artistName=${encodeURIComponent(artistName)}&col=33&value=${encodeURIComponent(newStatus)}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        showSaving(artistName, false, json.success);
+    } catch(e) {
+        showSaving(artistName, false, false);
+    }
+    renderSummary();
+}
+
+function showSaving(artistName, saving, success) {
+    const el = document.getElementById(`saving-${slugify(artistName)}`);
+    if (!el) return;
+    if (saving) {
+        el.textContent = 'Saving…';
+        el.classList.add('visible');
+    } else {
+        el.textContent = success ? 'Saved' : 'Error';
+        el.classList.add('visible');
+        setTimeout(() => el.classList.remove('visible'), 1800);
+    }
+}
+
+// ---- Filter & sort controls ----
+document.querySelectorAll('.pipeline-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.pipeline-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activePipelineFilter = btn.dataset.pipeline;
+        renderList();
+    });
+});
+
+document.querySelectorAll('.approach-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.approach-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.status;
+        renderList();
+    });
+});
+
+document.getElementById('approachSort').addEventListener('change', renderList);
+
+// ---- Dark mode ----
+function initDarkMode() {
+    const toggle = document.getElementById('darkModeToggle');
+    const stored = localStorage.getItem('darkMode');
+    if (stored === 'true') document.body.classList.add('dark-mode');
+    toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    });
+}
+initDarkMode();
+
+loadApproach();
+</script>
+</body>
+</html>
