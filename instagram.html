@@ -282,6 +282,7 @@
             <div class="nav-title"><a href="index.html">Artist Prospecting</a></div>
             <div class="nav-title"><a href="analytics.html">Pipeline</a></div>
             <div class="nav-title active"><a href="instagram.html">Instagram</a></div>
+            <div class="nav-title"><a href="approach.html">First Sign-Ups</a></div>
             <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
         </div>
     </div>
@@ -477,7 +478,7 @@
 
         function renderPosts(posts) {
             const grid = document.getElementById('instagram-grid');
-            document.getElementById('ig-shown').textContent = posts.length;
+            document.getElementById('ig-media-count').textContent = posts.length;
 
             if (posts.length === 0) {
                 grid.innerHTML = '<div class="ig-loading">No posts match this filter.</div>';
