@@ -373,6 +373,23 @@
     body.dark-mode .approach-sort-select { background: var(--card-dark); color: var(--cream); }
     body.dark-mode .approach-summary { background: var(--card-dark); }
     body.dark-mode .approach-summary-num { color: var(--cream); }
+
+    body.dark-mode .pipeline-filter-btn {
+        border-color: var(--cream);
+        color: var(--cream);
+    }
+
+    body.dark-mode .pipeline-filter-btn.active,
+    body.dark-mode .pipeline-filter-btn:hover {
+        background: var(--cream);
+        color: var(--charcoal);
+    }
+
+    body.dark-mode .approach-filter-btn {
+        color: var(--cream);
+    }
+
+    body.dark-mode .approach-sort-label { color: var(--cream); }
 </style>
 </head>
 <body class="page-approach">
@@ -406,7 +423,7 @@
         <span class="approach-summary-num" id="sumApproached">—</span>
         <span class="approach-summary-label">Approached</span>
     </div>
-    <span class="readiness-note">Readiness score: lower = stronger &nbsp;·&nbsp; 1 = best, 5 = weakest per category</span>
+    <span class="readiness-note">Readiness score: higher = stronger &nbsp;·&nbsp; 1 = weakest, 5 = best per category</span>
 </div>
 
 <!-- Pipeline status filter -->
@@ -430,7 +447,7 @@
     <button class="approach-filter-btn" data-status="Confirmed">Confirmed</button>
     <span class="approach-sort-label">Sort by</span>
     <select class="approach-sort-select" id="approachSort">
-        <option value="readiness">Readiness score (lowest = best)</option>
+        <option value="readiness">Readiness score (highest = best)</option>
         <option value="ranking">Ranking (high to low)</option>
         <option value="name">Name A–Z</option>
         <option value="status">Sales Status</option>
@@ -522,11 +539,12 @@ async function loadApproach() {
     }
 }
 
-function renderSummary() {
-    document.getElementById('sumTotal').textContent = allArtists.length;
-    document.getElementById('sumConfirmed').textContent = allArtists.filter(a => a.salesStatus === 'Confirmed').length;
-    document.getElementById('sumShortlisted').textContent = allArtists.filter(a => a.salesStatus === 'Shortlisted').length;
-    document.getElementById('sumApproached').textContent = allArtists.filter(a => a.salesStatus === 'Approached').length;
+function renderSummary(filtered) {
+    const src = filtered || allArtists;
+    document.getElementById('sumTotal').textContent = src.length;
+    document.getElementById('sumConfirmed').textContent = src.filter(a => a.salesStatus === 'Confirmed').length;
+    document.getElementById('sumShortlisted').textContent = src.filter(a => a.salesStatus === 'Shortlisted').length;
+    document.getElementById('sumApproached').textContent = src.filter(a => a.salesStatus === 'Approached').length;
 }
 
 function getSorted(artists) {
@@ -534,10 +552,12 @@ function getSorted(artists) {
     const copy = [...artists];
     const statusOrder = { Shortlisted: 0, Approached: 1, TBC: 2, Rejected: 3, Confirmed: 4 };
     if (sort === 'readiness') {
-        // Artists with scores bubble to top (lowest score = best), unscored sink to bottom
+        // Highest score = best, unscored sink to bottom
         return copy.sort((a, b) => {
-            const ra = a.readiness || 999, rb = b.readiness || 999;
-            return ra - rb;
+            if (!a.readiness && !b.readiness) return 0;
+            if (!a.readiness) return 1;
+            if (!b.readiness) return -1;
+            return b.readiness - a.readiness;
         });
     } else if (sort === 'ranking') {
         // Ranking 1 = best, unranked sink to bottom
@@ -560,6 +580,7 @@ function renderList() {
     if (activeFilter !== 'all') {
         artists = artists.filter(a => a.salesStatus === activeFilter);
     }
+    renderSummary(artists);
     artists = getSorted(artists);
 
     const list = document.getElementById('approachList');
