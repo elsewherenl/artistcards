@@ -22,6 +22,7 @@
 <div class="nav-title active"><a href="index.html">Artist Prospecting</a></div>
 <div class="nav-title"><a href="analytics.html">Pipeline</a></div>
 <div class="nav-title"><a href="instagram.html">Instagram</a></div>
+<div class="nav-title"><a href="approach.html">First Sign-Ups</a></div>
     <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">🌙</button>
     </div>
 </div>
@@ -95,15 +96,14 @@
 </select>
 </div>
 <div class="summary-item">
-<label for="rankingFilter" class="summary-label">Ranking</label>
-<span class="ranking-label-hint" id="rankingHint"></span>
-<select id="rankingFilter" class="filter-select ranking-multi-select" multiple>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5">5</option>
-</select>
+<label class="summary-label">Ranking</label><br>
+<div class="ranking-btn-group" id="rankingFilter">
+    <button class="ranking-btn" data-value="1">1</button>
+    <button class="ranking-btn" data-value="2">2</button>
+    <button class="ranking-btn" data-value="3">3</button>
+    <button class="ranking-btn" data-value="4">4</button>
+    <button class="ranking-btn" data-value="5">5</button>
+</div>
 </div>
 <div class="summary-item">
 <label for="sortByFilter" class="summary-label">Sort By</label><br>
