@@ -196,34 +196,43 @@
         transform: translateY(-1px);
     }
 
-    .ranking-multi-select {
-        height: auto;
-        padding: 0.15rem 0.25rem;
+    .ranking-btn-group {
+        display: flex;
+        gap: 4px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .ranking-btn {
+        flex: 1;
+        height: 2.1rem;
+        border: 1px solid var(--biscuit-gold);
         border-radius: 6px;
-        overflow: hidden;
-    }
-
-    .ranking-multi-select option {
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        margin: 1px 0;
+        background: transparent;
+        color: #0D0D0D;
+        font-family: 'Suisse Intl', sans-serif;
         font-size: 0.75rem;
+        font-weight: 400;
         cursor: pointer;
+        transition: background 0.15s, color 0.15s, border-color 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
     }
 
-    .ranking-multi-select option:checked {
-        background: var(--biscuit-gold) linear-gradient(0deg, var(--biscuit-gold) 0%, var(--biscuit-gold) 100%);
-        color: white;
-        font-weight: 500;
+    .ranking-btn:hover {
+        background: rgba(214, 179, 112, 0.15);
+    }
+
+    .ranking-btn.active {
+        background: var(--biscuit-gold);
+        border-color: var(--biscuit-gold);
+        color: #fff;
     }
 
     .ranking-label-hint {
-        font-size: 0.6rem;
-        color: var(--warm-gray);
-        letter-spacing: 0.01em;
-        opacity: 0.7;
-        display: block;
-        margin-bottom: 0.2rem;
+        display: none;
     }
 
 
@@ -1546,6 +1555,22 @@
         background: var(--card-dark);
         color: var(--cream);
         border-color: var(--biscuit-gold);
+    }
+
+    body.dark-mode .ranking-btn {
+        border-color: var(--warm-gray);
+        color: var(--cream);
+    }
+
+    body.dark-mode .ranking-btn:hover {
+        border-color: var(--biscuit-gold);
+        color: var(--biscuit-gold);
+    }
+
+    body.dark-mode .ranking-btn.active {
+        background: var(--biscuit-gold);
+        border-color: var(--biscuit-gold);
+        color: #0D0D0D;
     }
 
     body.dark-mode .ranking-multi-select option:checked {
