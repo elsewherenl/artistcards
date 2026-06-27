@@ -27,12 +27,6 @@
             searchInput.style.paddingRight = '4rem';
         }
 
-        // Ranking multi-select hint
-        const rankingHint = document.getElementById('rankingHint');
-        if (rankingHint) {
-            rankingHint.textContent = isMac ? '⌘ multi-select' : 'Ctrl multi-select';
-        }
-
         // Dark mode initialization
         initDarkMode();
     });
@@ -723,9 +717,14 @@
             themeSelect.appendChild(option);
         });
 
-        // Ranking multi-select filter
-        const rankingSelect = document.getElementById("rankingFilter");
-        rankingSelect.addEventListener("change", refreshUI);
+        // Ranking toggle buttons
+        const rankingBtns = document.querySelectorAll('.ranking-btn');
+        rankingBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                refreshUI();
+            });
+        });
 
         // Store all data for re-filtering
         let fullData = data;
@@ -839,8 +838,8 @@
                 else if (followersRange === "5kto10k") followersMatch = followers >= 5000 && followers <= 10000;
                 else if (followersRange === "10kplus") followersMatch = followers > 10000;
 
-                // Ranking filter (multi-select)
-                const selectedRankings = Array.from(rankingSelect.selectedOptions).map(o => o.value);
+                // Ranking filter (toggle buttons)
+                const selectedRankings = Array.from(document.querySelectorAll('.ranking-btn.active')).map(b => b.dataset.value);
                 let rankingMatch = true;
                 if (selectedRankings.length > 0) {
                     const rowRanking = (row["Ranking"] || "").toString().trim();
