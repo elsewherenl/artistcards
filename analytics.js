@@ -181,7 +181,7 @@ function renderPipelineTimeline(data) {
 
 let postPerformanceRawData = [];
 let postPerformanceChart = null;
-let currentFilterMode = 'with-artist'; // 'with-artist' or 'without-artist'
+let currentFilterMode = 'all'; // 'all', 'with-artist' or 'without-artist'
 let currentChartMode = 'absolute';
 
 function showPostDetail(post) {
@@ -300,19 +300,15 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
     if (currentFilterMode === 'with-artist') {
         processedData = processedData.filter(post => {
             const shared = String(post.artistShared).toLowerCase().trim();
-            // With Artist Shares = anything that is NOT "no artist share"
             return shared !== 'no artist share' && shared !== '';
         });
-        console.log('After with-artist filter:', processedData.length, 'posts');
     } else if (currentFilterMode === 'without-artist') {
         processedData = processedData.filter(post => {
             const shared = String(post.artistShared).toLowerCase().trim();
-            // Without Artist Shares = "no artist share" or empty
             return shared === 'no artist share' || shared === '';
         });
-        console.log('After without-artist filter:', processedData.length, 'posts');
     }
-    // If 'total', no filtering is applied
+    // 'all' — no filtering applied
 
     // Sort based on selected option
     let sortedData;
@@ -2352,14 +2348,10 @@ if (isInstagramPage) {
             renderResponseAnalytics(artistData);
             renderRankingEffectiveness(artistData);
             renderSourcePerformance(artistData);
-            return loadIGAndFollowerData();
+            return loadIGAndFollowerData().catch(err => console.error("IG/follower data error:", err));
         })
         .catch(err => {
-            console.error("Error:", err);
-            ['whereFoundChart','pipelineFunnel','recentActivity'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = '<div style="color:red;">Error loading data</div>';
-            });
+            console.error("Pipeline artist data error:", err);
         });
 }
 
