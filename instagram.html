@@ -309,10 +309,6 @@
             <span class="summary-number" id="ig-avg-eng">—</span>
             <span class="summary-label">Avg Eng. Rate</span>
         </div>
-        <div class="summary-item">
-            <span class="summary-number" id="ig-shown">—</span>
-            <span class="summary-label">Showing</span>
-        </div>
     </div>
 
     <!-- Section Navigation -->
@@ -574,7 +570,7 @@
             document.getElementById('ig-avg-reach').textContent = avgReach.toLocaleString();
             document.getElementById('ig-avg-views').textContent = avgViews.toLocaleString();
             document.getElementById('ig-avg-eng').textContent = avgEng;
-            document.getElementById('ig-shown').textContent = src.length;
+            document.getElementById('ig-media-count').textContent = src.length;
         }
 
         document.querySelectorAll('.ig-filter-btn[data-type]').forEach(btn => {
