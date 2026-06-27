@@ -333,7 +333,7 @@
         <input type="text" id="igSearch" placeholder="Search by artist or caption…" class="ig-search-input">
         <button class="ig-filter-btn active" data-type="ALL">All</button>
         <button class="ig-filter-btn" data-type="IMAGE">Image</button>
-        <button class="ig-filter-btn" data-type="VIDEO">Videos</button>
+
         <button class="ig-filter-btn" data-type="CAROUSEL_ALBUM">Carousels</button>
         <select id="sortSelect" class="ig-sort-select">
             <option value="date_desc">Newest First</option>
@@ -561,10 +561,12 @@
             }
             posts = sortPosts(posts);
             renderPosts(posts);
+            updateAvgStats(posts);
         }
 
-        function updateAvgStats() {
-            const withInsights = allPosts.filter(p => p.reach != null);
+        function updateAvgStats(posts) {
+            const src = posts || allPosts;
+            const withInsights = src.filter(p => p.reach != null && p.reach > 0);
             if (withInsights.length === 0) return;
             const avgReach = Math.round(withInsights.reduce((s, p) => s + p.reach, 0) / withInsights.length);
             const avgViews = Math.round(withInsights.filter(p => p.views != null).reduce((s, p) => s + (p.views || 0), 0) / withInsights.length);
@@ -572,11 +574,12 @@
             document.getElementById('ig-avg-reach').textContent = avgReach.toLocaleString();
             document.getElementById('ig-avg-views').textContent = avgViews.toLocaleString();
             document.getElementById('ig-avg-eng').textContent = avgEng;
+            document.getElementById('ig-shown').textContent = src.length;
         }
 
-        document.querySelectorAll('.ig-filter-btn').forEach(btn => {
+        document.querySelectorAll('.ig-filter-btn[data-type]').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.ig-filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.ig-filter-btn[data-type]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 activeFilter = btn.dataset.type;
                 applyFilterAndSort();
@@ -620,7 +623,6 @@
                 });
 
                 applyFilterAndSort();
-                updateAvgStats();
             } catch (err) {
                 grid.innerHTML = `<div class="ig-error">Failed to load posts: ${err.message}</div>`;
                 console.error(err);
