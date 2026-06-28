@@ -272,6 +272,15 @@
         .ig-search-input {
             width: 100%;
         }
+        .post-stats {
+            gap: 6px;
+        }
+        .post-stat-value {
+            font-size: 12px;
+        }
+        .post-stat-label {
+            font-size: 9px;
+        }
     }
 </style>
 </head>
@@ -510,10 +519,6 @@
                                 <span class="post-stat-label">Likes</span>
                             </div>
                             <div class="post-stat">
-                                <span class="post-stat-value">${post.comments_count !== null ? post.comments_count : '—'}</span>
-                                <span class="post-stat-label">Comments</span>
-                            </div>
-                            <div class="post-stat">
                                 <span class="post-stat-value">${reach !== null ? reach.toLocaleString() : '—'}</span>
                                 <span class="post-stat-label">Reach</span>
                             </div>
@@ -522,8 +527,8 @@
                                 <span class="post-stat-label">Views</span>
                             </div>
                             <div class="post-stat">
-                                <span class="post-stat-value">${engRate}</span>
-                                <span class="post-stat-label">Eng. Rate</span>
+                                <span class="post-stat-value">${post.comments_count !== null ? post.comments_count : '—'}</span>
+                                <span class="post-stat-label">Comments</span>
                             </div>
                         </div>
                     </div>
