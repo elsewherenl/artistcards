@@ -270,6 +270,7 @@
     .ss-approached   { background: rgba(149,57,46,0.1);   color: var(--terracotta); border-color: rgba(149,57,46,0.3); }
     .ss-confirmed    { background: var(--biscuit-gold);   color: #fff; border-color: var(--biscuit-gold); }
     .ss-rejected     { background: rgba(44,44,44,0.08);   color: var(--charcoal); border-color: rgba(44,44,44,0.2); }
+    .ss-not-relevant { background: rgba(138,133,128,0.08); color: var(--warm-gray); border-color: rgba(138,133,128,0.2); text-decoration: line-through; }
 
     /* Status dropdown */
     .sales-status-dropdown {
@@ -445,6 +446,7 @@
     <button class="approach-filter-btn" data-status="TBC">TBC</button>
     <button class="approach-filter-btn" data-status="Rejected">Rejected</button>
     <button class="approach-filter-btn" data-status="Confirmed">Confirmed</button>
+    <button class="approach-filter-btn" data-status="Not Relevant">Not Relevant</button>
     <span class="approach-sort-label">Sort by</span>
     <select class="approach-sort-select" id="approachSort">
         <option value="readiness">Readiness score (highest = best)</option>
@@ -467,8 +469,8 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&sheet=Live%20Longlist';
 
-const SALES_STATUSES = ['TBC', 'Shortlisted', 'Approached', 'Confirmed', 'Rejected'];
-const STATUS_CLASS = { 'TBC': 'ss-tbc', 'Shortlisted': 'ss-shortlisted', 'Approached': 'ss-approached', 'Confirmed': 'ss-confirmed', 'Rejected': 'ss-rejected' };
+const SALES_STATUSES = ['TBC', 'Shortlisted', 'Approached', 'Confirmed', 'Rejected', 'Not Relevant'];
+const STATUS_CLASS = { 'TBC': 'ss-tbc', 'Shortlisted': 'ss-shortlisted', 'Approached': 'ss-approached', 'Confirmed': 'ss-confirmed', 'Rejected': 'ss-rejected', 'Not Relevant': 'ss-not-relevant' };
 const SCORE_LABELS = ['Curatorial fit', 'Warm relationship', 'Commercial readiness', 'Wall-worthy'];
 const SCORE_KEYS = ['curatorial', 'warm', 'commercial', 'wall'];
 
@@ -551,7 +553,7 @@ function renderSummary(filtered) {
 function getSorted(artists) {
     const sort = document.getElementById('approachSort').value;
     const copy = [...artists];
-    const statusOrder = { Shortlisted: 0, Approached: 1, TBC: 2, Rejected: 3, Confirmed: 4 };
+    const statusOrder = { Shortlisted: 0, Approached: 1, TBC: 2, Rejected: 3, Confirmed: 4, 'Not Relevant': 5 };
     if (sort === 'readiness') {
         // Highest score = best, unscored sink to bottom
         return copy.sort((a, b) => {
