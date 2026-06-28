@@ -1381,8 +1381,20 @@
                     e.preventDefault();
                     const tag = this.getAttribute('data-tag');
 
-                    // Set the tag filter and sync the dropdown
+                    // Clear all other filters so the full theme results are shown
+                    currentSearchTerm = '';
+                    document.getElementById('searchInput').value = '';
+                    currentStatusFilter = ['all'];
+                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('.status-btn[data-status="all"]').classList.add('active');
+                    genreSelect.value = 'All';
+                    whereFoundSelect.value = 'All';
+                    followersSelect.value = 'All';
+                    Array.from(rankingSelect.options).forEach(o => o.selected = false);
                     currentTagFilter = null;
+                    updateFeaturedSortOptions();
+
+                    // Set the theme filter
                     themeSelect.value = tag;
 
                     // Scroll to cards section to see filtered results
@@ -1394,7 +1406,6 @@
                         });
                     }
 
-                    // Refresh UI to apply tag filter
                     refreshUI();
                 });
             });
