@@ -523,7 +523,7 @@ async function loadApproach() {
             .map(r => ({
                 name:          r['Artist'] || '',
                 genre:         r['Genre'] || '',
-                image:         r['P'] || r['Image'] || r['Photo'] || '',
+                image:         r['Image'] || r['Image 2'] || r['Image 3'] || r['Photo'] || '',
                 currentStatus: r['Status'] || r['Current Status'] || '',
                 ranking:       parseInt(r['Ranking'] || r['O'] || 0) || 0,
                 galleryRep:    r['Gallery Representation'] || r['K'] || '',
