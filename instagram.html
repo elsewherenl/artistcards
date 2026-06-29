@@ -274,6 +274,10 @@
         }
         .post-stats {
             gap: 6px;
+            flex-wrap: wrap;
+        }
+        .post-stat {
+            min-width: calc(20% - 6px);
         }
         .post-stat-value {
             font-size: 12px;
@@ -529,6 +533,10 @@
                             <div class="post-stat">
                                 <span class="post-stat-value">${post.comments_count !== null ? post.comments_count : '—'}</span>
                                 <span class="post-stat-label">Comments</span>
+                            </div>
+                            <div class="post-stat">
+                                <span class="post-stat-value">${engRate}</span>
+                                <span class="post-stat-label">Eng. Rate</span>
                             </div>
                         </div>
                     </div>
