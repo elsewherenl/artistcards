@@ -237,24 +237,6 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
     // Check if this is raw CSV data or already processed
     const isRawData = data.length > 0 && data[0].hasOwnProperty("Post Date");
 
-    // Debug: Log the first row to see column names
-    if (isRawData && data.length > 0) {
-        console.log('CSV Column names:', Object.keys(data[0]));
-        console.log('Looking for artist share column...');
-        const artistShareKeys = Object.keys(data[0]).filter(key =>
-            key.toLowerCase().includes('artist') && key.toLowerCase().includes('share')
-        );
-        console.log('Possible artist share columns:', artistShareKeys);
-        console.log('First row artist share values:', artistShareKeys.map(key => ({ [key]: data[0][key] })));
-        console.log('First 5 rows sample:', data.slice(0, 5).map(row => {
-            const artistShareCol = artistShareKeys[0];
-            return {
-                title: row["Post Title"],
-                artistShared: row[artistShareCol] || 'NOT FOUND'
-            };
-        }));
-    }
-
     let processedData;
     if (isRawData) {
         // Process raw CSV data
@@ -294,9 +276,6 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
 
     // Apply filter based on current filter mode
     // Column I logic: "No artist share" = Without Artist Shares, anything else = With Artist Shares
-    console.log('Current filter mode:', currentFilterMode);
-    console.log('Sample artist shared values:', processedData.slice(0, 5).map(p => ({ title: p.title, artistShared: p.artistShared })));
-
     if (currentFilterMode === 'with-artist') {
         processedData = processedData.filter(post => {
             const shared = String(post.artistShared).toLowerCase().trim();
@@ -326,10 +305,8 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
             if (!dateA && !dateB) return 0;
             if (!dateA) return 1;
             if (!dateB) return -1;
-            console.log('Sorting featured-recent:', a.title, dateA, 'vs', b.title, dateB, 'result:', dateB - dateA);
             return dateB - dateA;
         });
-        console.log('Featured-recent sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
     } else if (sortBy === 'featured-oldest') {
         // Least recent feature date (oldest first)
         sortedData = [...processedData].sort((a, b) => {
@@ -338,10 +315,8 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
             if (!dateA && !dateB) return 0;
             if (!dateA) return 1;
             if (!dateB) return -1;
-            console.log('Sorting featured-oldest:', a.title, dateA, 'vs', b.title, dateB, 'result:', dateA - dateB);
             return dateA - dateB;
         });
-        console.log('Featured-oldest sorted data:', sortedData.map(d => ({ title: d.title, spotlighted: d.spotlighted })));
     } else {
         // No sort selected — preserve original order
         sortedData = [...processedData];
@@ -1748,44 +1723,23 @@ function renderResponseAnalytics(data) {
         : 0;
 
     // Calculate time from response to feature for featured artists
-    console.log('=== RESPONSE TO FEATURE DEBUG ===');
-    console.log('Featured artists count:', featured.length);
-
     const responseToFeatureTimes = featured
         .filter(row => row["Date Responded"] && row["Date Responded"].trim() && row["Spotlighted"])
         .map(row => {
-            const respondedStr = row["Date Responded"];
-            const featuredStr = row["Spotlighted"];
-            const responded = parseDate(respondedStr);
-            const featuredDate = parseDate(featuredStr);
-
-            console.log(`Artist: ${row["Artist"]}`);
-            console.log(`  Responded date string: "${respondedStr}"`);
-            console.log(`  Featured date string: "${featuredStr}"`);
-            console.log(`  Responded parsed:`, responded);
-            console.log(`  Featured parsed:`, featuredDate);
-            console.log(`  Responded valid:`, responded && !isNaN(responded.getTime()));
-            console.log(`  Featured valid:`, featuredDate && !isNaN(featuredDate.getTime()));
-
+            const responded = parseDate(row["Date Responded"]);
+            const featuredDate = parseDate(row["Spotlighted"]);
             // Use getTime() for Safari compatibility
             if (responded && featuredDate &&
                 !isNaN(responded.getTime()) && !isNaN(featuredDate.getTime())) {
-                const days = Math.floor((featuredDate.getTime() - responded.getTime()) / (1000 * 60 * 60 * 24));
-                console.log('Calculated days:', days);
-                return days;
+                return Math.floor((featuredDate.getTime() - responded.getTime()) / (1000 * 60 * 60 * 24));
             }
             return null;
         })
         .filter(days => days !== null && days >= 0);
 
-    console.log('Valid response→feature times:', responseToFeatureTimes);
-    console.log('Count:', responseToFeatureTimes.length);
-
     const avgResponseToFeature = responseToFeatureTimes.length > 0
         ? Math.round(responseToFeatureTimes.reduce((sum, days) => sum + days, 0) / responseToFeatureTimes.length)
         : 0;
-
-    console.log('Average response→feature time:', avgResponseToFeature);
 
     // Response rate by source WITH response times
     const sourceStats = {};
