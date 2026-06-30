@@ -1,6 +1,6 @@
     // *** IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE ***
     // After deploying the Google Apps Script, paste the URL below
-    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
 
     // Available status options
     const STATUS_OPTIONS = [
