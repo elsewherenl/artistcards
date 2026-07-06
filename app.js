@@ -1651,6 +1651,7 @@
         Array.from(rankingSelect.options).forEach(o => o.selected = false);
         sortBySelect.value = "rankingHighLow";
         searchInput.value = "";
+        searchInput.dispatchEvent(new Event('input'));
         currentSearchTerm = "";
         currentStatusFilter = ['all'];
         currentTagFilter = null;
