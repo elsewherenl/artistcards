@@ -1158,6 +1158,13 @@
                 }
             });
 
+            if (row["When Added"]) {
+                const dateAdded = document.createElement("div");
+                dateAdded.className = "field-item";
+                dateAdded.innerHTML = `<span class="label">Date Added:</span> ${row["When Added"]}`;
+                card.appendChild(dateAdded);
+            }
+
             // Show "When Featured" date for Featured or Spotlighted status
             const cardStatus = (row["Current Status"] || "").toLowerCase().trim();
             if ((cardStatus === "featured" || cardStatus === "spotlighted") && row["Spotlighted"]) {
