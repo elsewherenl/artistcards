@@ -23,13 +23,13 @@
     }
 
     .post-card {
-        background: var(--card-bg, #fff);
-        border: 1px solid var(--border-color, #e5e5e5);
+        background: #fff;
+        border: 1px solid #e5e5e5;
         border-radius: 8px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        transition: box-shadow 0.2s;
+        transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
         height: 100%;
     }
 
@@ -40,7 +40,7 @@
     .post-image-wrap {
         position: relative;
         aspect-ratio: 1 / 1;
-        background: var(--border-color, #e5e5e5);
+        background: #e5e5e5;
         overflow: hidden;
     }
 
@@ -76,14 +76,14 @@
 
     .post-date {
         font-size: 11px;
-        color: var(--text-muted, #999);
+        color: #999;
         font-family: 'Suisse Intl', sans-serif;
         letter-spacing: 0.04em;
     }
 
     .post-caption {
         font-size: 13px;
-        color: var(--text-color, #222);
+        color: #222;
         font-family: 'Suisse Intl', sans-serif;
         line-height: 1.5;
         display: -webkit-box;
@@ -103,7 +103,7 @@
 
     .post-caption-toggle {
         font-size: 11px;
-        color: var(--text-muted, #999);
+        color: #999;
         font-family: 'Suisse Intl', sans-serif;
         cursor: pointer;
         background: none;
@@ -113,7 +113,7 @@
     }
 
     .post-caption-toggle:hover {
-        color: var(--text-color, #222);
+        color: #222;
     }
 
     .post-stats {
@@ -121,7 +121,7 @@
         gap: 14px;
         margin-top: auto;
         padding-top: 8px;
-        border-top: 1px solid var(--border-color, #e5e5e5);
+        border-top: 1px solid #e5e5e5;
     }
 
     .post-stat {
@@ -135,12 +135,12 @@
         font-size: 14px;
         font-family: 'Suisse Intl', sans-serif;
         font-weight: 500;
-        color: var(--text-color, #222);
+        color: #222;
     }
 
     .post-stat-label {
         font-size: 10px;
-        color: var(--text-muted, #999);
+        color: #999;
         font-family: 'Suisse Intl', sans-serif;
         letter-spacing: 0.05em;
         text-transform: uppercase;
@@ -150,7 +150,7 @@
         display: block;
         text-align: center;
         font-size: 11px;
-        color: var(--text-muted, #999);
+        color: #999;
         font-family: 'Suisse Intl', sans-serif;
         text-decoration: none;
         padding: 6px 0 10px;
@@ -158,7 +158,7 @@
     }
 
     .post-link:hover {
-        color: var(--text-color, #222);
+        color: #222;
     }
 
     .ig-filters {
@@ -176,19 +176,19 @@
         letter-spacing: 0.06em;
         text-transform: uppercase;
         padding: 6px 14px;
-        border: 1px solid var(--border-color, #e5e5e5);
+        border: 1px solid #e5e5e5;
         border-radius: 20px;
         background: transparent;
-        color: var(--text-muted, #999);
+        color: #999;
         cursor: pointer;
         transition: all 0.15s;
     }
 
     .ig-filter-btn.active,
     .ig-filter-btn:hover {
-        background: var(--text-color, #222);
+        background: #222;
         color: #fff;
-        border-color: var(--text-color, #222);
+        border-color: #222;
     }
 
     .ig-sort-select {
@@ -196,10 +196,10 @@
         font-size: 12px;
         letter-spacing: 0.06em;
         padding: 6px 14px;
-        border: 1px solid var(--border-color, #e5e5e5);
+        border: 1px solid #e5e5e5;
         border-radius: 20px;
         background: transparent;
-        color: var(--text-muted, #999);
+        color: #999;
         cursor: pointer;
         appearance: none;
         -webkit-appearance: none;
@@ -211,15 +211,15 @@
 
     .ig-sort-select:focus {
         outline: none;
-        border-color: var(--text-color, #222);
-        color: var(--text-color, #222);
+        border-color: #222;
+        color: #222;
     }
 
     .ig-loading, .ig-error {
         text-align: center;
         padding: 60px 32px;
         font-family: 'Suisse Intl', sans-serif;
-        color: var(--text-muted, #999);
+        color: #999;
         font-size: 14px;
     }
 
@@ -238,21 +238,21 @@
         font-family: 'Suisse Intl', sans-serif;
         font-size: 12px;
         padding: 6px 14px;
-        border: 1px solid var(--border-color, #e5e5e5);
+        border: 1px solid #e5e5e5;
         border-radius: 20px;
         background: transparent;
-        color: var(--text-color, #222);
+        color: #222;
         outline: none;
         width: 220px;
         transition: border-color 0.15s;
     }
 
     .ig-search-input:focus {
-        border-color: var(--text-color, #222);
+        border-color: #222;
     }
 
     .ig-search-input::placeholder {
-        color: var(--text-muted, #999);
+        color: #999;
     }
 
     @media (max-width: 900px) {
@@ -289,6 +289,65 @@
 
     .post-image-wrap {
         cursor: zoom-in;
+    }
+
+    /* Dark mode */
+    body.dark-mode .post-card {
+        background: var(--card-dark);
+        border-color: rgba(243, 239, 233, 0.15);
+    }
+
+    body.dark-mode .post-image-wrap {
+        background: rgba(243, 239, 233, 0.08);
+    }
+
+    body.dark-mode .post-date,
+    body.dark-mode .post-caption-toggle,
+    body.dark-mode .post-stat-label,
+    body.dark-mode .post-link,
+    body.dark-mode .ig-loading,
+    body.dark-mode .ig-filter-btn,
+    body.dark-mode .ig-sort-select,
+    body.dark-mode .ig-search-input::placeholder {
+        color: var(--warm-gray);
+    }
+
+    body.dark-mode .post-caption,
+    body.dark-mode .post-stat-value,
+    body.dark-mode .ig-search-input {
+        color: var(--cream);
+    }
+
+    body.dark-mode .post-caption-toggle:hover,
+    body.dark-mode .post-link:hover {
+        color: var(--cream);
+    }
+
+    body.dark-mode .post-stats {
+        border-top-color: rgba(243, 239, 233, 0.15);
+    }
+
+    body.dark-mode .ig-filter-btn,
+    body.dark-mode .ig-sort-select,
+    body.dark-mode .ig-search-input {
+        border-color: rgba(243, 239, 233, 0.25);
+    }
+
+    body.dark-mode .ig-filter-btn.active,
+    body.dark-mode .ig-filter-btn:hover {
+        background: var(--biscuit-gold);
+        color: var(--charcoal);
+        border-color: var(--biscuit-gold);
+    }
+
+    body.dark-mode .ig-sort-select:focus,
+    body.dark-mode .ig-search-input:focus {
+        border-color: var(--biscuit-gold);
+        color: var(--cream);
+    }
+
+    body.dark-mode .ig-sort-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8580'/%3E%3C/svg%3E");
     }
 </style>
 </head>
@@ -358,7 +417,7 @@
             <option value="engagement">Highest Engagement Rate</option>
         </select>
         <button class="ig-filter-btn" id="syncBtn" onclick="syncToSheet()" style="margin-left:auto;">Sync to Sheet</button>
-        <span id="syncStatus" style="font-family:'Suisse Intl',sans-serif;font-size:12px;color:var(--text-muted,#999);"></span>
+        <span id="syncStatus" style="font-family:'Suisse Intl',sans-serif;font-size:12px;color:#999;"></span>
     </div>
 
     <!-- Posts Grid -->
