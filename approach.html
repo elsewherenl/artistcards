@@ -371,6 +371,7 @@
     body.dark-mode .sales-status-option { color: var(--cream); }
     body.dark-mode .sales-status-option:hover { background: rgba(214,179,112,0.15); }
     body.dark-mode .ss-tbc { color: var(--warm-gray); }
+    body.dark-mode .ss-rejected { background: rgba(243,239,233,0.1); color: var(--cream); border-color: rgba(243,239,233,0.25); }
     body.dark-mode .approach-sort-select { background: var(--card-dark); color: var(--cream); }
     body.dark-mode .approach-summary { background: var(--card-dark); }
     body.dark-mode .approach-summary-num { color: var(--cream); }
@@ -466,7 +467,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1gGSXIb3_cwnnbbVk73lYDeOiZwQjYk3OGgJ3V8MYRtc/export?format=csv&sheet=Live%20Longlist';
 
 const SALES_STATUSES = ['TBC', 'Shortlisted', 'Approached', 'Confirmed', 'Rejected', 'Not Relevant'];
