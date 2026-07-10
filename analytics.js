@@ -1482,8 +1482,10 @@ function updateSummary(data, followerData = null, postData = null) {
             }
 
             const growthText = growth > 0 ? `+${growth.toLocaleString()}` : growth.toLocaleString();
-            document.getElementById('summaryFollowerGrowth').textContent = growthText;
-            document.getElementById('summaryFollowerGrowthLabel').textContent = `Follower Growth (in ${timePeriod})`;
+            const growthEl = document.getElementById('summaryFollowerGrowth');
+            const growthLabelEl = document.getElementById('summaryFollowerGrowthLabel');
+            if (growthEl) growthEl.textContent = growthText;
+            if (growthLabelEl) growthLabelEl.textContent = `Follower Growth (in ${timePeriod})`;
         }
     }
 
