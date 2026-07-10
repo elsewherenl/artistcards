@@ -4,7 +4,7 @@
 // so the access token never appears in this file.
 // ==============================================
 
-const PROXY_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
 
 async function proxyRequest(params) {
     const qs = new URLSearchParams(params).toString();
@@ -37,12 +37,16 @@ async function getMediaInsights(mediaId) {
     return await proxyRequest({ action: 'igInsights', mediaId });
 }
 
+async function getFollowerDemographics() {
+    return await proxyRequest({ action: 'igDemographics' });
+}
+
 
 // ------------------------------------------------
 // Page initialisation
 // ------------------------------------------------
 
-const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/elsewherecollective.nl/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
 
 let allPosts = [];
 let activeFilter = 'ALL';
@@ -275,27 +279,121 @@ async function loadInstagram() {
         grid.innerHTML = `<div class="ig-error">Failed to load posts: ${err.message}</div>`;
         console.error(err);
     }
+
+    loadFollowerDemographics();
+}
+
+const AGE_ORDER = ['13-17', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
+
+async function loadFollowerDemographics() {
+    const ageGenderCanvas = document.getElementById('followerAgeGenderChart');
+    const locationContainer = document.getElementById('followerLocationChart');
+    if (!ageGenderCanvas && !locationContainer) return;
+
+    try {
+        const res = await getFollowerDemographics();
+        if (!res.success) throw new Error(res.message || 'Unknown error');
+        renderFollowerAgeGender(res.data.age || [], res.data.gender || []);
+        renderFollowerLocations(res.data.country || [], res.data.city || []);
+    } catch (err) {
+        if (locationContainer) {
+            locationContainer.innerHTML = `<div class="ig-error">Failed to load demographics: ${err.message}</div>`;
+        }
+        console.error(err);
+    }
+}
+
+function renderFollowerAgeGender(ageData, genderData) {
+    const canvas = document.getElementById('followerAgeGenderChart');
+    if (!canvas) return;
+
+    if (ageData.length === 0) {
+        canvas.parentElement.innerHTML = '<div style="text-align:center;color:#666;">No age/gender data available yet</div>';
+        return;
+    }
+
+    // Sum age buckets across genders in case the API breaks age down per-gender combo
+    const ageTotals = {};
+    ageData.forEach(d => {
+        ageTotals[d.dimension] = (ageTotals[d.dimension] || 0) + Number(d.value);
+    });
+
+    const labels = AGE_ORDER.filter(a => ageTotals[a] !== undefined);
+    const values = labels.map(a => ageTotals[a]);
+
+    const isDark = document.body.classList.contains('dark-mode');
+    const barColor = isDark ? '#C4D4BE' : '#A8B5A0';
+    const textColor = isDark ? 'rgba(243,239,233,0.6)' : '#666';
+
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) existingChart.destroy();
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Followers',
+                data: values,
+                backgroundColor: barColor,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { display: false } },
+                y: { ticks: { color: textColor }, grid: { color: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' } }
+            }
+        }
+    });
+
+    // Gender breakdown as a simple summary line under the chart
+    const totalByGender = {};
+    genderData.forEach(d => { totalByGender[d.dimension] = Number(d.value); });
+    const totalGender = Object.values(totalByGender).reduce((s, v) => s + v, 0);
+    const subtitle = canvas.closest('.chart-container')?.querySelector('.chart-subtitle');
+    if (subtitle && totalGender > 0) {
+        const parts = Object.entries(totalByGender)
+            .sort((a, b) => b[1] - a[1])
+            .map(([g, v]) => `${g} ${Math.round((v / totalGender) * 100)}%`);
+        subtitle.textContent = `Current snapshot — ${parts.join(' · ')}`;
+    }
+}
+
+function renderFollowerLocations(countryData, cityData) {
+    const container = document.getElementById('followerLocationChart');
+    if (!container) return;
+
+    const top = [...cityData].sort((a, b) => b.value - a.value).slice(0, 6);
+
+    if (top.length === 0) {
+        container.innerHTML = '<div style="text-align:center;color:#666;">No location data available yet</div>';
+        return;
+    }
+
+    const maxCount = Math.max(...top.map(d => d.value));
+    container.innerHTML = '';
+
+    top.forEach(({ dimension, value }) => {
+        const widthPercent = Math.round((value / maxCount) * 100);
+        const barItem = document.createElement('div');
+        barItem.className = 'bar-item';
+        barItem.innerHTML = `
+            <div class="bar-label">${escapeHtml(dimension)}</div>
+            <div class="bar genre-bar" style="width: ${widthPercent}%;"></div>
+            <div class="bar-value">${Number(value).toLocaleString()}</div>
+        `;
+        container.appendChild(barItem);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Dark mode
-    const toggle = document.getElementById('darkModeToggle');
-    if (toggle) {
-        const savedDarkMode = localStorage.getItem('darkMode');
-        if (savedDarkMode === 'enabled' || (savedDarkMode === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.body.classList.add('dark-mode');
-            toggle.textContent = '☀️';
-            if (savedDarkMode === null) localStorage.setItem('darkMode', 'enabled');
-        } else {
-            toggle.textContent = '🌙';
-        }
-        toggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            toggle.textContent = isDark ? '☀️' : '🌙';
-            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-        });
-    }
+    // Dark mode is initialized once by analytics.js (initDarkMode()), which is
+    // also loaded on this page — a second listener here would double-fire on
+    // click and cancel itself out.
 
     // Filter buttons
     document.querySelectorAll('.ig-filter-btn[data-type]').forEach(btn => {
