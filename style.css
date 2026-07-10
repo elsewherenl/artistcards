@@ -2217,6 +2217,16 @@ canvas {
     height: 420px;
 }
 
+.follower-demo-chart {
+    width: 100%;
+    height: 260px;
+    position: relative;
+}
+
+#followerAgeGenderChart {
+    height: 100% !important;
+}
+
 #followerGrowthContainer {
     height: 100%;
     width: 100%;
