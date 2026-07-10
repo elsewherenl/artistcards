@@ -2372,6 +2372,18 @@ function initDarkMode() {
 // Initialize dark mode on page load
 initDarkMode();
 
+// Back to Top button visibility
+const backToTopBtn = document.getElementById('backToTop');
+if (backToTopBtn) {
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+}
+
 // ============================================
 // SPOTLIGHT ACTIVITY CALENDAR
 // ============================================
