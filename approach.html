@@ -392,6 +392,66 @@
     }
 
     body.dark-mode .approach-sort-label { color: var(--cream); }
+
+    /* ---- Mobile ---- */
+    @media (max-width: 600px) {
+        .approach-summary {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .readiness-note {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .approach-filters {
+            gap: 6px;
+        }
+
+        .approach-sort-label {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .approach-card {
+            grid-template-columns: 40px 1fr;
+            gap: 10px;
+            padding: 12px 14px;
+        }
+
+        .approach-avatar,
+        .approach-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+        }
+
+        .approach-name-row {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .approach-name {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            width: 100%;
+        }
+
+        .approach-scores {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .score-dots {
+            flex-wrap: wrap;
+        }
+
+        .score-dot {
+            width: 20px;
+            height: 20px;
+        }
+    }
 </style>
 </head>
 <body class="page-approach">
