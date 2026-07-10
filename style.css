@@ -3103,6 +3103,9 @@ a.activity-item:hover {
     .bar-label {
         width: 100px;
         min-width: 60px;
+        max-width: 150px;
+        white-space: normal;
+        text-overflow: clip;
         font-size: 0.75rem;
     }
 
@@ -4112,6 +4115,26 @@ body.dark-mode .calendar-nav-btn:disabled:hover {
 
     .calendar-day {
         font-size: 0.8rem;
+    }
+
+    .calendar-carousel-wrapper {
+        gap: 0.5rem;
+    }
+
+    .calendar-nav-btn {
+        width: 1.8rem;
+        height: 1.8rem;
+        font-size: 0.9rem;
+    }
+
+    .calendar-weekdays,
+    .calendar-grid {
+        gap: 0.25rem;
+    }
+
+    .calendar-weekday {
+        padding: 0.25rem;
+        font-size: 0.65rem;
     }
 }
 
