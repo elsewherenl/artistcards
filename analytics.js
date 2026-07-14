@@ -1605,7 +1605,24 @@ function renderFollowerGrowth(data) {
     const startDateStr = `${startDate.toLocaleString('default', { month: 'short' })} ${startDate.getFullYear()}`;
     const subtitle = document.getElementById('followerGrowthSubtitle');
     if (subtitle) {
-        subtitle.textContent = `+${totalGrowth.toLocaleString()} followers (+${growthPercentage}% since ${startDateStr}) — Avg weekly growth: ${avgWeeklyGrowth.toLocaleString()} followers/week`;
+        let lastMonthText = '';
+        if (monthly.length >= 2) {
+            const last = monthly[monthly.length - 1];
+            const prev = monthly[monthly.length - 2];
+            const lastMonthGrowth = last.followers - prev.followers;
+            const lastMonthDays = Math.floor((last.date - prev.date) / (1000 * 60 * 60 * 24));
+            const lastMonthWeeklyRate = lastMonthDays > 0 ? Math.round(lastMonthGrowth / (lastMonthDays / 7)) : 0;
+            const lastMonthName = last.date.toLocaleString('default', { month: 'short' });
+
+            if (avgWeeklyGrowth > 0) {
+                const vsAvgPct = Math.round(((lastMonthWeeklyRate - avgWeeklyGrowth) / avgWeeklyGrowth) * 100);
+                const comparison = vsAvgPct > 0 ? `${vsAvgPct}% faster than` : vsAvgPct < 0 ? `${Math.abs(vsAvgPct)}% slower than` : 'in line with';
+                lastMonthText = ` — ${lastMonthName}: +${lastMonthGrowth.toLocaleString()} (${lastMonthWeeklyRate.toLocaleString()}/week, ${comparison} average)`;
+            } else {
+                lastMonthText = ` — ${lastMonthName}: +${lastMonthGrowth.toLocaleString()} (${lastMonthWeeklyRate.toLocaleString()}/week)`;
+            }
+        }
+        subtitle.textContent = `+${totalGrowth.toLocaleString()} followers (+${growthPercentage}% since ${startDateStr}) — Avg weekly growth: ${avgWeeklyGrowth.toLocaleString()} followers/week${lastMonthText}`;
     }
 
     const labels = monthly.map(d =>
