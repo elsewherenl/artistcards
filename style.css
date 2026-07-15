@@ -6,9 +6,10 @@
     --cream:            #F3EFE9;
     --charcoal:         #2C2C2C;
     --warm-gray:        #8A8580;
-    --biscuit-gold:     #D6B370;
+    --biscuit-gold-original: #D6B370;
     --gold-muted:       #C4A563;
     --gold-light:       #E8C882;
+    --biscuit-gold:     var(--gold-light);
     --terracotta:       #95392E;
     --terracotta-dark:  #B8503F;
     --terracotta-deep:  #7a2e25;
@@ -26,6 +27,53 @@
     --warm-off-white:   #FDFCF8;
     --terracotta-red:   #95392E;
     --sage-green:       #A8B5A0;
+
+    /* Status palette — one accent family per pipeline stage */
+    --status-gold-rgb:        214, 179, 112;   /* Prospect */
+    --status-gold-text:       #9A7840;
+    --status-gold-text-dark:  #E8C882;
+
+    --status-blue-rgb:        91, 127, 166;    /* Planned Outreach / Outreach */
+    --status-blue-text:       #3A5E80;
+    --status-blue-text-dark:  #8BAEC8;
+
+    --status-amber-rgb:       200, 146, 74;    /* Awaiting Response */
+    --status-amber-text:      #8A5E20;
+    --status-amber-text-dark: #D4A86A;
+
+    --status-gray-rgb:        74, 74, 82;      /* No Response (light) */
+    --status-gray-rgb-dark:   90, 95, 107;     /* No Response (dark) */
+    --status-gray-text:       #2E2E36;
+    --status-gray-text-dark:  #9A9AA8;
+
+    --status-sage-rgb:        168, 181, 160;   /* Responded */
+    --status-sage-text:       #3D5C38;
+    --status-sage-text-dark:  #B8C8B0;
+
+    --status-terracotta-rgb:       184, 80, 63;   /* Spotlighted */
+    --status-terracotta-text:      #7A2E20;
+    --status-terracotta-text-dark: #D4806A;
+
+    --status-teal-rgb:        61, 122, 110;    /* Negotiating */
+    --status-teal-text:       #1E5C52;
+    --status-teal-text-dark:  #6AADA0;
+
+    --status-forest-rgb:      58, 92, 66;      /* Featured */
+    --status-forest-text:     #243D2A;
+    --status-forest-text-dark:#7AAA88;
+
+    --status-mauve-rgb:       139, 94, 107;    /* Networking */
+    --status-mauve-text:      #5E2E3D;
+    --status-mauve-text-dark: #C09AAA;
+
+    --status-rust-rgb:        149, 57, 46;     /* Rejected */
+    --status-rust-text:       #6B2E24;
+    --status-rust-text-dark:  #C07868;
+
+    /* Ranking accent — dusty blue */
+    --ranking-blue-rgb:        107, 159, 255;
+    --ranking-blue:            #6B9FFF;
+    --ranking-blue-text-light: #1d4ed8;
 }
 
 /* ================================================
@@ -430,9 +478,9 @@
         cursor: pointer;
         transition: all 0.3s ease;
         user-select: none;
-        background: linear-gradient(135deg, rgba(107, 159, 255, 0.25) 0%, rgba(107, 159, 255, 0.15) 100%);
-        color: #1d4ed8;
-        border: 1px solid rgba(107, 159, 255, 0.4);
+        background: linear-gradient(135deg, rgba(var(--ranking-blue-rgb), 0.25) 0%, rgba(var(--ranking-blue-rgb), 0.15) 100%);
+        color: var(--ranking-blue-text-light);
+        border: 1px solid rgba(var(--ranking-blue-rgb), 0.4);
         backdrop-filter: blur(4px);
         position: relative;
         overflow: hidden;
@@ -455,8 +503,8 @@
 
     .ranking-badge:hover {
         transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 4px 12px rgba(107, 159, 255, 0.3);
-        border-color: rgba(107, 159, 255, 0.6);
+        box-shadow: 0 4px 12px rgba(var(--ranking-blue-rgb), 0.3);
+        border-color: rgba(var(--ranking-blue-rgb), 0.6);
     }
 
     .ranking-badge:active {
@@ -474,9 +522,9 @@
         top: 3rem;
         right: 1rem;
         background: white;
-        border: 1px solid #6B9FFF;
+        border: 1px solid var(--ranking-blue);
         border-radius: 8px;
-        box-shadow: 0 8px 24px rgba(107, 159, 255, 0.25), 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 24px rgba(var(--ranking-blue-rgb), 0.25), 0 4px 8px rgba(0, 0, 0, 0.1);
         z-index: 100;
         min-width: 100px;
         display: none;
@@ -507,7 +555,7 @@
         font-weight: 500;
         text-align: center;
         transition: all 0.2s ease;
-        border-bottom: 1px solid rgba(107, 159, 255, 0.15);
+        border-bottom: 1px solid rgba(var(--ranking-blue-rgb), 0.15);
         position: relative;
     }
 
@@ -523,98 +571,98 @@
     }
 
     .ranking-option:hover {
-        background: linear-gradient(135deg, rgba(107, 159, 255, 0.15) 0%, rgba(107, 159, 255, 0.08) 100%);
-        color: #1d4ed8;
+        background: linear-gradient(135deg, rgba(var(--ranking-blue-rgb), 0.15) 0%, rgba(var(--ranking-blue-rgb), 0.08) 100%);
+        color: var(--ranking-blue-text-light);
         transform: translateX(3px);
         padding-left: 1.3rem;
     }
 
     .ranking-option:active {
-        background: rgba(107, 159, 255, 0.25);
+        background: rgba(var(--ranking-blue-rgb), 0.25);
         transform: scale(0.98);
     }
 
     /* Prospect — biscuit gold */
     .status-prospect {
-        background: rgba(214, 179, 112, 0.2);
-        color: #9A7840;
-        border: 1px solid rgba(214, 179, 112, 0.35);
+        background: rgba(var(--status-gold-rgb), 0.2);
+        color: var(--status-gold-text);
+        border: 1px solid rgba(var(--status-gold-rgb), 0.35);
     }
 
     /* Planned Outreach — steel blue */
     .status-planned-outreach {
-        background: rgba(91, 127, 166, 0.15);
-        color: #3A5E80;
-        border: 1px solid rgba(91, 127, 166, 0.3);
+        background: rgba(var(--status-blue-rgb), 0.15);
+        color: var(--status-blue-text);
+        border: 1px solid rgba(var(--status-blue-rgb), 0.3);
     }
 
     /* Outreach (legacy alias) — steel blue */
     .status-outreach {
-        background: rgba(91, 127, 166, 0.15);
-        color: #3A5E80;
-        border: 1px solid rgba(91, 127, 166, 0.3);
+        background: rgba(var(--status-blue-rgb), 0.15);
+        color: var(--status-blue-text);
+        border: 1px solid rgba(var(--status-blue-rgb), 0.3);
     }
 
     /* Awaiting Response — warm amber */
     .status-awaitingresponse {
-        background: rgba(200, 146, 74, 0.15);
-        color: #8A5E20;
-        border: 1px solid rgba(200, 146, 74, 0.3);
+        background: rgba(var(--status-amber-rgb), 0.15);
+        color: var(--status-amber-text);
+        border: 1px solid rgba(var(--status-amber-rgb), 0.3);
     }
 
     /* No Response — neutral gray */
     .status-noresponse {
-        background: rgba(74, 74, 82, 0.15);
-        color: #2E2E36;
-        border: 1px solid rgba(74, 74, 82, 0.3);
+        background: rgba(var(--status-gray-rgb), 0.15);
+        color: var(--status-gray-text);
+        border: 1px solid rgba(var(--status-gray-rgb), 0.3);
     }
 
     /* Responded — sage green */
     .status-responded {
-        background: rgba(168, 181, 160, 0.2);
-        color: #3D5C38;
-        border: 1px solid rgba(168, 181, 160, 0.4);
+        background: rgba(var(--status-sage-rgb), 0.2);
+        color: var(--status-sage-text);
+        border: 1px solid rgba(var(--status-sage-rgb), 0.4);
     }
 
     /* Spotlighted — terracotta */
     .status-spotlighted {
-        background: rgba(184, 80, 63, 0.15);
-        color: #7A2E20;
-        border: 1px solid rgba(184, 80, 63, 0.3);
+        background: rgba(var(--status-terracotta-rgb), 0.15);
+        color: var(--status-terracotta-text);
+        border: 1px solid rgba(var(--status-terracotta-rgb), 0.3);
     }
 
     /* Negotiating — teal */
     .status-negotiating {
-        background: rgba(61, 122, 110, 0.15);
-        color: #1E5C52;
-        border: 1px solid rgba(61, 122, 110, 0.3);
+        background: rgba(var(--status-teal-rgb), 0.15);
+        color: var(--status-teal-text);
+        border: 1px solid rgba(var(--status-teal-rgb), 0.3);
     }
 
     /* Featured — deep forest green */
     .status-featured {
-        background: rgba(58, 92, 66, 0.15);
-        color: #243D2A;
-        border: 1px solid rgba(58, 92, 66, 0.3);
+        background: rgba(var(--status-forest-rgb), 0.15);
+        color: var(--status-forest-text);
+        border: 1px solid rgba(var(--status-forest-rgb), 0.3);
     }
 
     /* Networking — warm mauve */
     .status-networking {
-        background: rgba(139, 94, 107, 0.15);
-        color: #5E2E3D;
-        border: 1px solid rgba(139, 94, 107, 0.3);
+        background: rgba(var(--status-mauve-rgb), 0.15);
+        color: var(--status-mauve-text);
+        border: 1px solid rgba(var(--status-mauve-rgb), 0.3);
     }
 
     /* Rejected — muted terracotta */
     .status-rejected {
-        background: rgba(149, 57, 46, 0.12);
-        color: #6B2E24;
-        border: 1px solid rgba(149, 57, 46, 0.25);
+        background: rgba(var(--status-rust-rgb), 0.12);
+        color: var(--status-rust-text);
+        border: 1px solid rgba(var(--status-rust-rgb), 0.25);
     }
 
     .status-feature.planned {
-        background: rgba(200, 146, 74, 0.15);
-        color: #8A5E20;
-        border: 1px solid rgba(200, 146, 74, 0.3);
+        background: rgba(var(--status-amber-rgb), 0.15);
+        color: var(--status-amber-text);
+        border: 1px solid rgba(var(--status-amber-rgb), 0.3);
     }
 
 /* ================================================
@@ -1460,55 +1508,55 @@
 
     /* Status badge dark mode overrides — light text on dark cards */
     body.dark-mode .status-prospect {
-        background: rgba(214, 179, 112, 0.25);
-        color: #E8C882;
-        border-color: rgba(214, 179, 112, 0.4);
+        background: rgba(var(--status-gold-rgb), 0.25);
+        color: var(--status-gold-text-dark);
+        border-color: rgba(var(--status-gold-rgb), 0.4);
     }
     body.dark-mode .status-planned-outreach,
     body.dark-mode .status-outreach {
-        background: rgba(91, 127, 166, 0.25);
-        color: #8BAEC8;
-        border-color: rgba(91, 127, 166, 0.4);
+        background: rgba(var(--status-blue-rgb), 0.25);
+        color: var(--status-blue-text-dark);
+        border-color: rgba(var(--status-blue-rgb), 0.4);
     }
     body.dark-mode .status-awaitingresponse {
-        background: rgba(200, 146, 74, 0.25);
-        color: #D4A86A;
-        border-color: rgba(200, 146, 74, 0.4);
+        background: rgba(var(--status-amber-rgb), 0.25);
+        color: var(--status-amber-text-dark);
+        border-color: rgba(var(--status-amber-rgb), 0.4);
     }
     body.dark-mode .status-noresponse {
-        background: rgba(90, 95, 107, 0.25);
-        color: #9A9AA8;
-        border-color: rgba(90, 95, 107, 0.4);
+        background: rgba(var(--status-gray-rgb-dark), 0.25);
+        color: var(--status-gray-text-dark);
+        border-color: rgba(var(--status-gray-rgb-dark), 0.4);
     }
     body.dark-mode .status-responded {
-        background: rgba(168, 181, 160, 0.25);
-        color: #B8C8B0;
-        border-color: rgba(168, 181, 160, 0.4);
+        background: rgba(var(--status-sage-rgb), 0.25);
+        color: var(--status-sage-text-dark);
+        border-color: rgba(var(--status-sage-rgb), 0.4);
     }
     body.dark-mode .status-spotlighted {
-        background: rgba(184, 80, 63, 0.25);
-        color: #D4806A;
-        border-color: rgba(184, 80, 63, 0.4);
+        background: rgba(var(--status-terracotta-rgb), 0.25);
+        color: var(--status-terracotta-text-dark);
+        border-color: rgba(var(--status-terracotta-rgb), 0.4);
     }
     body.dark-mode .status-negotiating {
-        background: rgba(61, 122, 110, 0.25);
-        color: #6AADA0;
-        border-color: rgba(61, 122, 110, 0.4);
+        background: rgba(var(--status-teal-rgb), 0.25);
+        color: var(--status-teal-text-dark);
+        border-color: rgba(var(--status-teal-rgb), 0.4);
     }
     body.dark-mode .status-featured {
-        background: rgba(58, 92, 66, 0.25);
-        color: #7AAA88;
-        border-color: rgba(58, 92, 66, 0.4);
+        background: rgba(var(--status-forest-rgb), 0.25);
+        color: var(--status-forest-text-dark);
+        border-color: rgba(var(--status-forest-rgb), 0.4);
     }
     body.dark-mode .status-networking {
-        background: rgba(139, 94, 107, 0.25);
-        color: #C09AAA;
-        border-color: rgba(139, 94, 107, 0.4);
+        background: rgba(var(--status-mauve-rgb), 0.25);
+        color: var(--status-mauve-text-dark);
+        border-color: rgba(var(--status-mauve-rgb), 0.4);
     }
     body.dark-mode .status-rejected {
-        background: rgba(149, 57, 46, 0.25);
-        color: #C07868;
-        border-color: rgba(149, 57, 46, 0.4);
+        background: rgba(var(--status-rust-rgb), 0.25);
+        color: var(--status-rust-text-dark);
+        border-color: rgba(var(--status-rust-rgb), 0.4);
     }
 
     body.dark-mode .artist-name {
@@ -1589,41 +1637,41 @@
     }
 
     body.dark-mode .status-option:hover {
-        background: rgba(107, 159, 255, 0.2);
+        background: rgba(var(--ranking-blue-rgb), 0.2);
     }
 
     body.dark-mode .ranking-badge {
-        background: linear-gradient(135deg, rgba(107, 159, 255, 0.3) 0%, rgba(107, 159, 255, 0.2) 100%);
-        color: #6B9FFF;
-        border: 1px solid rgba(107, 159, 255, 0.5);
+        background: linear-gradient(135deg, rgba(var(--ranking-blue-rgb), 0.3) 0%, rgba(var(--ranking-blue-rgb), 0.2) 100%);
+        color: var(--ranking-blue);
+        border: 1px solid rgba(var(--ranking-blue-rgb), 0.5);
     }
 
     body.dark-mode .ranking-badge::before {
-        background: linear-gradient(90deg, transparent, rgba(107, 159, 255, 0.2), transparent);
+        background: linear-gradient(90deg, transparent, rgba(var(--ranking-blue-rgb), 0.2), transparent);
     }
 
     body.dark-mode .ranking-badge:hover {
-        box-shadow: 0 4px 12px rgba(107, 159, 255, 0.4);
-        border-color: rgba(107, 159, 255, 0.7);
+        box-shadow: 0 4px 12px rgba(var(--ranking-blue-rgb), 0.4);
+        border-color: rgba(var(--ranking-blue-rgb), 0.7);
     }
 
     body.dark-mode .ranking-selector {
-        background: #2A2A2A;
-        border: 1px solid #6B9FFF;
+        background: var(--card-dark);
+        border: 1px solid var(--ranking-blue);
     }
 
     body.dark-mode .ranking-option {
         color: var(--cream);
-        border-bottom: 1px solid rgba(107, 159, 255, 0.2);
+        border-bottom: 1px solid rgba(var(--ranking-blue-rgb), 0.2);
     }
 
     body.dark-mode .ranking-option:hover {
-        background: linear-gradient(135deg, rgba(107, 159, 255, 0.25) 0%, rgba(107, 159, 255, 0.15) 100%);
-        color: #6B9FFF;
+        background: linear-gradient(135deg, rgba(var(--ranking-blue-rgb), 0.25) 0%, rgba(var(--ranking-blue-rgb), 0.15) 100%);
+        color: var(--ranking-blue);
     }
 
     body.dark-mode .ranking-option:active {
-        background: rgba(107, 159, 255, 0.35);
+        background: rgba(var(--ranking-blue-rgb), 0.35);
     }
 
     body.dark-mode .lightbox-info {
