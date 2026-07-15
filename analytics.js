@@ -98,7 +98,7 @@ function renderPipelineTimeline(data) {
                     label: "Total Pipeline",
                     data: cumulativeTotals,
                     type: "line",
-                    borderColor: "#D6B370",
+                    borderColor: "#E8C882",
                     borderWidth: isMobile ? 1.5 : 2,
                     fill: false,
                     yAxisID: 'y1'
@@ -454,15 +454,15 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
                 label: 'Engagement Index',
                 data: displayData.map(p => avgEngAll > 0 ? Math.round((p.engagementRate / avgEngAll) * 100) : 0),
                 type: 'line',
-                borderColor: isDarkMode ? '#E8C882' : '#D6B370',
-                backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                borderColor: '#E8C882',
+                backgroundColor: '#E8C882',
                 borderWidth: isMobile ? 2 : 2.5,
                 fill: false,
                 tension: 0.1,
                 yAxisID: 'y',
                 pointRadius: isMobile ? 4 : 5,
                 pointHoverRadius: isMobile ? 6 : 7,
-                pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                pointBackgroundColor: '#E8C882',
                 pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
                 pointBorderWidth: 2,
                 pointHoverBorderWidth: 2.5
@@ -488,15 +488,15 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
                 label: 'Engagement %',
                 data: displayData.map(post => post.engagementRate),
                 type: 'line',
-                borderColor: isDarkMode ? '#E8C882' : '#D6B370',
-                backgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                borderColor: '#E8C882',
+                backgroundColor: '#E8C882',
                 borderWidth: isMobile ? 2 : 2.5,
                 fill: false,
                 tension: 0.1,
                 yAxisID: 'y1',
                 pointRadius: isMobile ? 4 : 5,
                 pointHoverRadius: isMobile ? 6 : 7,
-                pointBackgroundColor: isDarkMode ? '#E8C882' : '#D6B370',
+                pointBackgroundColor: '#E8C882',
                 pointBorderColor: isDarkMode ? '#2C2C2C' : '#F3EFE9',
                 pointBorderWidth: 2,
                 pointHoverBorderWidth: 2.5
@@ -513,7 +513,7 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
                 display: true,
                 text: 'Index (100 = average)',
                 font: { size: isMobile ? 10 : 13, weight: '500', family: "'Suisse Intl', sans-serif" },
-                color: '#D6B370',
+                color: '#E8C882',
                 padding: { top: 0, bottom: isMobile ? 5 : 8 }
             },
             ticks: {
@@ -555,7 +555,7 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
                 display: true,
                 text: 'Reach / Views',
                 font: { size: isMobile ? 10 : 13, weight: '500', family: "'Suisse Intl', sans-serif" },
-                color: '#D6B370',
+                color: '#E8C882',
                 padding: { top: 0, bottom: isMobile ? 5 : 8 }
             },
             ticks: {
@@ -582,7 +582,7 @@ function renderPostPerformance(data, sortBy = 'none', filterMode = null) {
                 display: true,
                 text: 'Engagement %',
                 font: { size: isMobile ? 10 : 13, weight: '500', family: "'Suisse Intl', sans-serif" },
-                color: '#D6B370',
+                color: '#E8C882',
                 padding: { top: 0, bottom: isMobile ? 5 : 8 }
             },
             ticks: {
@@ -989,7 +989,7 @@ function renderArtistRanking(data) {
     // Color palette for rankings (warm sunset to earthy tones)
     const rankingColors = {
         '1': '#E8C48A', // Light warm gold - highest potential
-        '2': '#D6B370', // Primary gold
+        '2': '#E8C882', // Primary gold
         '3': '#B88B5D', // Warm brown
         '4': '#A3674A', // Rich terracotta brown
         '5': '#95392E'  // Deep terracotta - lowest ranking
@@ -1082,7 +1082,7 @@ function renderArtistRankingLast4Weeks(data) {
     // Color palette for rankings (warm sunset to earthy tones)
     const rankingColors = {
         '1': '#E8C48A', // Light warm gold - highest potential
-        '2': '#D6B370', // Primary gold
+        '2': '#E8C882', // Primary gold
         '3': '#B88B5D', // Warm brown
         '4': '#A3674A', // Rich terracotta brown
         '5': '#95392E'  // Deep terracotta - lowest ranking
@@ -2122,25 +2122,25 @@ function renderSourcePerformance(data) {
                     <td style="padding: 0.75rem 0.5rem; font-weight: 500; color: ${headerColor};">${m.method}</td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center; color: ${headerColor};">${m.contacted}</td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#A8B5A0' : m.responseRate >= 30 ? '#D6B370' : '#8A8580'};">
+                        <span style="font-weight: 600; color: ${m.responseRate >= 50 ? '#A8B5A0' : m.responseRate >= 30 ? '#E8C882' : '#8A8580'};">
                             ${m.responseRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.responded}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.noResponseRate >= 60 ? '#B8503F' : m.noResponseRate >= 40 ? '#D6B370' : '#8A8580'};">
+                        <span style="font-weight: 600; color: ${m.noResponseRate >= 60 ? '#B8503F' : m.noResponseRate >= 40 ? '#E8C882' : '#8A8580'};">
                             ${m.noResponseRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.noResponse}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#A8B5A0' : m.positiveRate >= 20 ? '#D6B370' : '#8A8580'};">
+                        <span style="font-weight: 600; color: ${m.positiveRate >= 40 ? '#A8B5A0' : m.positiveRate >= 20 ? '#E8C882' : '#8A8580'};">
                             ${m.positiveRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.positiveResponse}/${m.contacted})</span>
                     </td>
                     <td style="padding: 0.75rem 0.5rem; text-align: center;">
-                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#A8B5A0' : m.spotlightedRate >= 15 ? '#D6B370' : '#8A8580'};">
+                        <span style="font-weight: 600; color: ${m.spotlightedRate >= 30 ? '#A8B5A0' : m.spotlightedRate >= 15 ? '#E8C882' : '#8A8580'};">
                             ${m.spotlightedRate}%
                         </span>
                         <span style="font-size: 0.8rem; color: ${secondaryColor}; display: block;">(${m.spotlighted}/${m.contacted})</span>
@@ -2192,13 +2192,13 @@ function renderRankingEffectiveness(data) {
     }
 
     // Brand colours: header bg → text colour follows the brand rule
-    // Rank 1 = gold (#D6B370) → black text
+    // Rank 1 = gold (#E8C882) → black text
     // Rank 2 = peach-gold → black text
     // Rank 3 = mid-brown → off-white text
     // Rank 4 = dark brown → off-white text
     // Rank 5 = terracotta (#95392E) → off-white text
     const rankingStyle = {
-        '1': { bg: '#D6B370', text: '#1A1A1A', bodyTint: 'rgba(214,179,112,0.06)' },
+        '1': { bg: '#E8C882', text: '#1A1A1A', bodyTint: 'rgba(232,200,130,0.06)' },
         '2': { bg: '#C4956A', text: '#1A1A1A', bodyTint: 'rgba(196,149,106,0.06)' },
         '3': { bg: '#9B7040', text: '#F3EFE9', bodyTint: 'rgba(155,112,64,0.06)'  },
         '4': { bg: '#6B4F35', text: '#F3EFE9', bodyTint: 'rgba(107,79,53,0.06)'   },
@@ -2210,7 +2210,7 @@ function renderRankingEffectiveness(data) {
     function yesRateBadge(rate) {
         if (rate === null) return { bg: 'rgba(0,0,0,0.03)', bar: '#ccc' };
         if (rate >= 70) return { bg: 'rgba(168,181,160,0.2)', bar: '#A8B5A0' }; // sage green
-        if (rate >= 40) return { bg: 'rgba(214,179,112,0.2)', bar: '#D6B370' }; // gold
+        if (rate >= 40) return { bg: 'rgba(232,200,130,0.2)', bar: '#E8C882' }; // gold
         return { bg: 'rgba(149,57,46,0.15)', bar: '#95392E' };                  // terracotta
     }
 
