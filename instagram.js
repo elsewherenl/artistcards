@@ -46,8 +46,6 @@ async function getFollowerDemographics() {
 // Page initialisation
 // ------------------------------------------------
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7hnoQatrVPElr51rj8XOcFxwdEAidIMVdR0tyXv0TEGrXFp8LXyXToCmaWAu6UCq6/exec';
-
 let allPosts = [];
 let activeFilter = 'ALL';
 let activeSort = 'date_desc';
@@ -59,7 +57,7 @@ async function syncToSheet() {
     btn.textContent = 'Syncing…';
     status.textContent = '';
     try {
-        const res = await fetch(`${APPS_SCRIPT_URL}?action=syncInstagram`);
+        const res = await fetch(`${PROXY_URL}?action=syncInstagram`);
         const data = await res.json();
         if (data.success) {
             status.textContent = `✓ ${data.message}`;
@@ -111,6 +109,8 @@ function _showIgLightboxAt(idx) {
     const reach = post.reach ?? null;
     const views = post.views ?? null;
     const likes = post.like_count ?? null;
+    const shares = post.shares ?? null;
+    const saves = post.saved ?? null;
     const engRate = (reach && likes) ? ((likes / reach) * 100).toFixed(1) + '%' : '—';
 
     document.getElementById('igLightboxImage').src = imageUrl;
@@ -118,6 +118,8 @@ function _showIgLightboxAt(idx) {
     document.getElementById('igLightboxCaption').textContent = post.caption || '(no caption)';
     document.getElementById('igLightboxReach').textContent = reach !== null ? reach.toLocaleString() : '—';
     document.getElementById('igLightboxViews').textContent = views !== null ? views.toLocaleString() : '—';
+    document.getElementById('igLightboxShares').textContent = shares !== null ? shares.toLocaleString() : '—';
+    document.getElementById('igLightboxSaves').textContent = saves !== null ? saves.toLocaleString() : '—';
     document.getElementById('igLightboxLikes').textContent = likes !== null ? likes.toLocaleString() : '—';
     document.getElementById('igLightboxEng').textContent = engRate;
     document.getElementById('igLightboxLink').href = post.permalink;
@@ -156,7 +158,7 @@ function renderPosts(posts) {
         return;
     }
 
-    grid.innerHTML = posts.map((post, i) => {
+    grid.innerHTML = posts.map((post) => {
         const postIndex = allPosts.indexOf(post);
         const imageUrl = post.media_type === 'VIDEO' ? (post.thumbnail_url || '') : (post.media_url || '');
         const badge = post.media_type === 'VIDEO' ? 'Video' : post.media_type === 'CAROUSEL_ALBUM' ? 'Carousel' : 'Photo';
@@ -304,7 +306,7 @@ async function loadFollowerDemographics() {
         const res = await getFollowerDemographics();
         if (!res.success) throw new Error(res.message || 'Unknown error');
         renderFollowerAgeGender(res.data.age || [], res.data.gender || []);
-        renderFollowerLocations(res.data.country || [], res.data.city || []);
+        renderFollowerLocations(res.data.city || []);
     } catch (err) {
         if (locationContainer) {
             locationContainer.innerHTML = `<div class="ig-error">Failed to load demographics: ${err.message}</div>`;
@@ -373,7 +375,7 @@ function renderFollowerAgeGender(ageData, genderData) {
     }
 }
 
-function renderFollowerLocations(countryData, cityData) {
+function renderFollowerLocations(cityData) {
     const container = document.getElementById('followerLocationChart');
     if (!container) return;
 
