@@ -164,6 +164,8 @@ function renderPosts(posts) {
         const reach = post.reach ?? null;
         const views = post.views ?? null;
         const likes = post.like_count ?? null;
+        const shares = post.shares ?? null;
+        const saves = post.saved ?? null;
         const engRate = (reach && likes) ? ((likes / reach) * 100).toFixed(1) + '%' : '—';
         const permalink = escapeHtml(post.permalink);
 
@@ -189,6 +191,14 @@ function renderPosts(posts) {
                     <div class="post-stat">
                         <span class="post-stat-value">${views !== null ? views.toLocaleString() : '—'}</span>
                         <span class="post-stat-label">Views</span>
+                    </div>
+                    <div class="post-stat">
+                        <span class="post-stat-value">${shares !== null ? shares.toLocaleString() : '—'}</span>
+                        <span class="post-stat-label">Shares</span>
+                    </div>
+                    <div class="post-stat">
+                        <span class="post-stat-value">${saves !== null ? saves.toLocaleString() : '—'}</span>
+                        <span class="post-stat-label">Saves</span>
                     </div>
                     <div class="post-stat">
                         <span class="post-stat-value">${post.comments_count !== null ? post.comments_count : '—'}</span>
