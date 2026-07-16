@@ -910,7 +910,7 @@
         .lightbox-info-item span:not(.lightbox-info-label) {
         font-size: 0.85rem;
         font-weight: 300;
-        color: var(--biscuit-gold);
+        color: var(--charcoal);
         line-height: 1.4;
         }
 
@@ -1683,7 +1683,7 @@
     }
 
     body.dark-mode .lightbox-info-item span:not(.lightbox-info-label) {
-        color: var(--biscuit-gold);
+        color: var(--cream);
     }
 
     body.dark-mode .lightbox-info-item a {
