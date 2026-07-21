@@ -22,6 +22,91 @@
         max-width: 100%;
     }
 
+    .instagram-grid.compact-view {
+        grid-template-columns: repeat(8, 1fr);
+        gap: 6px;
+        padding: 20px 0;
+    }
+
+    .instagram-grid.compact-view .post-card {
+        border: none;
+        border-radius: 4px;
+    }
+
+    .instagram-grid.compact-view .post-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    .instagram-grid.compact-view .post-meta,
+    .instagram-grid.compact-view .post-link {
+        display: none;
+    }
+
+    .instagram-grid.compact-view .post-type-badge {
+        font-size: 8px;
+        padding: 2px 5px;
+        top: 4px;
+        right: 4px;
+    }
+
+    @media (max-width: 900px) {
+        .instagram-grid.compact-view {
+            grid-template-columns: repeat(5, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .instagram-grid.compact-view {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+    }
+
+    .ig-view-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid #e5e5e5;
+        border-radius: 20px;
+        background: transparent;
+        color: #999;
+        cursor: pointer;
+        transition: all 0.15s;
+        padding: 0;
+    }
+
+    .ig-view-toggle:hover {
+        background: #222;
+        color: #fff;
+        border-color: #222;
+    }
+
+    .ig-view-toggle.active {
+        background: #222;
+        color: #fff;
+        border-color: #222;
+    }
+
+    .ig-view-toggle svg {
+        width: 15px;
+        height: 15px;
+        display: block;
+    }
+
+    body.dark-mode .ig-view-toggle {
+        border-color: rgba(243, 239, 233, 0.25);
+        color: var(--warm-gray);
+    }
+
+    body.dark-mode .ig-view-toggle.active,
+    body.dark-mode .ig-view-toggle:hover {
+        background: var(--biscuit-gold);
+        color: var(--charcoal);
+        border-color: var(--biscuit-gold);
+    }
+
     .post-card {
         background: #fff;
         border: 1px solid #e5e5e5;
@@ -418,6 +503,12 @@
             <option value="likes">Highest Likes</option>
             <option value="engagement">Highest Engagement Rate</option>
         </select>
+        <button class="ig-view-toggle active" id="viewToggleGrid" title="Card view" onclick="setIgViewMode('grid')">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+        </button>
+        <button class="ig-view-toggle" id="viewToggleCompact" title="Thumbnail view" onclick="setIgViewMode('compact')">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="6.25" y="0.5" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="12" y="0.5" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="0.5" y="6.25" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="6.25" y="6.25" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="12" y="6.25" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="0.5" y="12" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="6.25" y="12" width="3.5" height="3.5" rx="0.7" fill="currentColor"/><rect x="12" y="12" width="3.5" height="3.5" rx="0.7" fill="currentColor"/></svg>
+        </button>
         <button class="ig-filter-btn" id="syncBtn" onclick="syncToSheet()" style="margin-left:auto;">Sync to Sheet</button>
         <span id="syncStatus" style="font-family:'Suisse Intl',sans-serif;font-size:12px;color:#999;"></span>
     </div>
