@@ -49,6 +49,15 @@ async function getFollowerDemographics() {
 let allPosts = [];
 let activeFilter = 'ALL';
 let activeSort = 'date_desc';
+let igViewMode = localStorage.getItem('igViewMode') || 'grid';
+
+function setIgViewMode(mode) {
+    igViewMode = mode;
+    localStorage.setItem('igViewMode', mode);
+    document.getElementById('instagram-grid').classList.toggle('compact-view', mode === 'compact');
+    document.getElementById('viewToggleGrid').classList.toggle('active', mode === 'grid');
+    document.getElementById('viewToggleCompact').classList.toggle('active', mode === 'compact');
+}
 
 async function syncToSheet() {
     const btn = document.getElementById('syncBtn');
@@ -151,6 +160,7 @@ function formatDate(iso) {
 
 function renderPosts(posts) {
     const grid = document.getElementById('instagram-grid');
+    grid.classList.toggle('compact-view', igViewMode === 'compact');
     document.getElementById('ig-media-count').textContent = posts.length;
 
     if (posts.length === 0) {
@@ -406,6 +416,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dark mode is initialized once by analytics.js (initDarkMode()), which is
     // also loaded on this page — a second listener here would double-fire on
     // click and cancel itself out.
+
+    setIgViewMode(igViewMode);
 
     // Filter buttons
     document.querySelectorAll('.ig-filter-btn[data-type]').forEach(btn => {
