@@ -93,6 +93,7 @@
         cursor: pointer;
     }
 
+
     /* ---- Artist rows ---- */
     .approach-list {
         display: flex;
@@ -488,6 +489,12 @@
     <span class="readiness-note">Readiness score: higher = stronger &nbsp;·&nbsp; 1 = weakest, 5 = best per category</span>
 </div>
 
+<!-- Search Bar -->
+<div class="search-container">
+    <input type="text" id="approachSearch" class="search-input" placeholder="Search artists by name or genre..." />
+    <button id="approachClearFilters" class="clear-btn">Clear Filters</button>
+</div>
+
 <!-- Pipeline status filter -->
 <div class="approach-filters" style="margin-bottom: 0.75rem;">
     <span class="approach-sort-label" style="margin-left:0; margin-right: 8px;">Pipeline status</span>
@@ -538,6 +545,7 @@ const SCORE_KEYS = ['curatorial', 'warm', 'commercial', 'wall'];
 let allArtists = [];
 let activeFilter = 'all';
 let activePipelineFilter = 'all';
+let searchQuery = '';
 
 // ---- CSV parse ----
 function parseCSV(text) {
@@ -643,6 +651,12 @@ function renderList() {
     }
     if (activeFilter !== 'all') {
         artists = artists.filter(a => a.salesStatus === activeFilter);
+    }
+    if (searchQuery) {
+        artists = artists.filter(a =>
+            a.name.toLowerCase().includes(searchQuery) ||
+            a.genre.toLowerCase().includes(searchQuery)
+        );
     }
     renderSummary(artists);
     artists = getSorted(artists);
@@ -863,6 +877,28 @@ document.querySelectorAll('.approach-filter-btn').forEach(btn => {
 });
 
 document.getElementById('approachSort').addEventListener('change', renderList);
+
+document.getElementById('approachSearch').addEventListener('input', (e) => {
+    searchQuery = e.target.value.trim().toLowerCase();
+    renderList();
+});
+
+document.getElementById('approachClearFilters').addEventListener('click', () => {
+    document.getElementById('approachSearch').value = '';
+    searchQuery = '';
+
+    document.querySelectorAll('.pipeline-filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.pipeline-filter-btn[data-pipeline="all"]').classList.add('active');
+    activePipelineFilter = 'all';
+
+    document.querySelectorAll('.approach-filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.approach-filter-btn[data-status="all"]').classList.add('active');
+    activeFilter = 'all';
+
+    document.getElementById('approachSort').value = 'readiness';
+
+    renderList();
+});
 
 // ---- Dark mode ----
 function initDarkMode() {
