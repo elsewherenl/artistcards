@@ -1642,6 +1642,40 @@ function renderFollowerGrowth(data) {
     const followerLineColor = isDarkModeFollower ? '#C4D4BE' : '#A8B5A0';
     const followerFillColor = isDarkModeFollower ? 'rgba(168, 181, 160, 0.15)' : 'rgba(168, 181, 160, 0.12)';
     const textColor = isDarkModeFollower ? 'rgba(243,239,233,0.6)' : '#666';
+    const momLabelColor = isDarkModeFollower ? 'rgba(243,239,233,0.75)' : '#555';
+
+    // Month-on-month % change, aligned to each point (first point has none)
+    const momChange = monthly.map((d, i) => {
+        if (i === 0) return null;
+        const prev = monthly[i - 1].followers;
+        if (!prev) return null;
+        return ((d.followers - prev) / prev) * 100;
+    });
+
+    const momLabelPlugin = {
+        id: 'momLabelPlugin',
+        afterDatasetsDraw(chart) {
+            if (window.innerWidth <= 768) return; // desktop only
+
+            const meta = chart.getDatasetMeta(0);
+            const { ctx } = chart;
+            ctx.save();
+            ctx.font = '11px sans-serif';
+            ctx.fillStyle = momLabelColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+
+            meta.data.forEach((point, i) => {
+                const pct = momChange[i];
+                if (pct === null) return;
+                const sign = pct > 0 ? '+' : '';
+                const text = `${sign}${pct.toFixed(1)}%`;
+                ctx.fillText(text, point.x, point.y - 10);
+            });
+
+            ctx.restore();
+        }
+    };
 
     new Chart(ctx, {
         type: 'line',
@@ -1665,6 +1699,9 @@ function renderFollowerGrowth(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: { top: 24 }
+            },
             scales: {
                 y: {
                     beginAtZero: false,
@@ -1691,11 +1728,16 @@ function renderFollowerGrowth(data) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: context => `Followers: ${context.parsed.y.toLocaleString()}`
+                        label: context => {
+                            const pct = momChange[context.dataIndex];
+                            const pctText = pct === null ? '' : ` (${pct > 0 ? '+' : ''}${pct.toFixed(1)}% MoM)`;
+                            return `Followers: ${context.parsed.y.toLocaleString()}${pctText}`;
+                        }
                     }
                 }
             }
-        }
+        },
+        plugins: [momLabelPlugin]
     });
 }
 
